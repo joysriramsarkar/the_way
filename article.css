@@ -325,7 +325,7 @@
 
 /* ── Related Articles ─────────────────────────────────────── */
 .article-related {
-  background: #f4f8fc;
+  background: #fff;
   border-top: 2px solid var(--brand-navy);
   padding: 48px 0 64px;
 }
@@ -445,3 +445,6 @@
 .related-card-title-link:hover { color: var(--brand-navy); }
 .related-card-section { display: inline-block; font-family: var(--font-sans); font-size: 10.5px; font-weight: 700; letter-spacing: 0.09em; text-transform: uppercase; color: var(--brand-navy); margin-bottom: 8px; text-decoration: none; transition: opacity 0.15s; }
 .related-card-section:hover { opacity: 0.75; }
+/* ── Ensure footer is always full-width on article page ────────── */
+.site-footer { width: 100%; display: block; }
+.footer-main { width: 100%; max-width: 100%; }
