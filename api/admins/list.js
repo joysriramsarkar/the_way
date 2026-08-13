@@ -1,4 +1,4 @@
-﻿const { requireAdmin } = require('../_lib/auth');
+const { requireAdmin } = require('../_lib/auth');
 const { createClient } = require('@supabase/supabase-js');
 module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', req.headers.origin || '*');

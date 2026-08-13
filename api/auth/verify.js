@@ -1,4 +1,4 @@
-﻿const { OAuth2Client } = require('google-auth-library');
+const { OAuth2Client } = require('google-auth-library');
 const { createClient }  = require('@supabase/supabase-js');
 const jwt               = require('jsonwebtoken');
 

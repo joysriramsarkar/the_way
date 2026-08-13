@@ -1,4 +1,4 @@
-﻿/* ═══════════════════════════════════════════════════════════
+/* ═══════════════════════════════════════════════════════════
    THE PRIVATIAN FAMILY — Admin Auth Frontend Guard
    Include this script at the TOP of every admin page.
    Redirects to login if session is invalid.

@@ -1,4 +1,4 @@
-﻿const { verifySession } = require('../_lib/auth');
+const { verifySession } = require('../_lib/auth');
 module.exports = function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', req.headers.origin || '*');
   res.setHeader('Access-Control-Allow-Headers', 'Authorization');
