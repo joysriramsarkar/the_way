@@ -313,19 +313,14 @@ body { overflow-x: hidden; min-width: 320px; }
   .hero-headline { font-size: clamp(19px, 5.5vw, 26px); line-height: 1.25; margin-bottom: 8px; }
   .hero-subtitle { font-size: 13.5px; line-height: 1.5; }
 
-  /* Hero sidebar: compact horizontal cards */
-  .hero-sidebar { grid-template-columns: 1fr; border-top: 2px solid var(--brand-navy); padding: 0 16px; }
-  .hero-sidebar-article {
-    grid-template-columns: 88px 1fr;
-    border-right: none;
-    border-bottom: var(--border-light);
-    gap: 0;
-  }
-  .hero-sidebar-article:last-child { border-bottom: none; }
-  .hero-sidebar-img { height: 88px; object-fit: cover; }
-  .hero-sidebar-body { padding: 10px 12px; }
-  .hero-sidebar-title { font-size: 13px; line-height: 1.35; margin-bottom: 4px; }
-  .hero-sidebar-desc { font-size: 11.5px; line-height: 1.5; }
+  /* Hero sidebar: full-width stacked cards on mobile */
+  .hero-sidebar { display: flex !important; flex-direction: column !important; width: 100% !important; padding: 16px !important; gap: 0 !important; border-top: 2px solid var(--brand-navy); }
+  .hero-sidebar-article { display: grid !important; grid-template-columns: 90px 1fr !important; width: 100% !important; flex: none !important; border-right: none !important; border-bottom: var(--border-light) !important; border-radius: 0 !important; border-left: none !important; border-top: none !important; }
+  .hero-sidebar-article:last-child { border-bottom: none !important; }
+  .hero-sidebar-img { height: 90px !important; width: 90px !important; object-fit: cover !important; }
+  .hero-sidebar-body { padding: 10px 14px !important; }
+  .hero-sidebar-title { font-size: 14px !important; line-height: 1.35; margin-bottom: 5px; }
+  .hero-sidebar-desc { font-size: 12px !important; line-height: 1.5; }
 
   /* Small articles: 2-col grid on mobile too */
   .small-articles-section { padding: 20px 0; }
