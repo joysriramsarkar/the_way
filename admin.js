@@ -1,11 +1,11 @@
-/* ═══════════════════════════════════════════════════════════
-   THE PRIVATIAN FAMILY — ADMIN JS
-   Sections CRUD · localStorage sync · Toast · Modal
-═══════════════════════════════════════════════════════════ */
+﻿/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+   THE PRIVATIAN FAMILY â€” ADMIN JS
+   Sections CRUD Â· localStorage sync Â· Toast Â· Modal
+â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 
 const STORAGE_KEY = 'privatian_sections';
 
-// ── Default seed sections (mirrors main website nav) ───────
+// â”€â”€ Default seed sections (mirrors main website nav) â”€â”€â”€â”€â”€â”€â”€
 const DEFAULT_SECTIONS = [
   { id: 'all',                name: 'All',                 slug: '',                   locked: true,  deleted: false, createdAt: '2024-01-01T00:00:00Z' },
   { id: 'findings',           name: 'Findings',            slug: 'findings',            locked: false, deleted: false, createdAt: '2024-01-01T00:00:00Z' },
@@ -17,7 +17,7 @@ const DEFAULT_SECTIONS = [
   { id: 'work-economy',       name: 'Work & Economy',      slug: 'work-economy',        locked: false, deleted: false, createdAt: '2024-01-01T00:00:00Z' },
 ];
 
-// ── SVG icons ──────────────────────────────────────────────
+// â”€â”€ SVG icons â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 const ICONS = {
   pencil: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="15" height="15"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>`,
   trash:  `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="15" height="15"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>`,
@@ -32,7 +32,7 @@ const ICONS = {
   upload: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="15" height="15"><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/></svg>`,
 };
 
-// ── Data layer ─────────────────────────────────────────────
+// â”€â”€ Data layer â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function loadSections() {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
@@ -45,7 +45,7 @@ function saveSections(sections) {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(sections));
 }
 
-// ── Apply Changes — push active sections to main website ───
+// â”€â”€ Apply Changes â€” push active sections to main website â”€â”€â”€
 const APPLIED_KEY = 'privatian_applied_sections';
 
 function applyChanges() {
@@ -72,7 +72,7 @@ function applyChanges() {
     }, 2200);
   }
 
-  showToast('success', `Changes applied — reload the main site to see updated sections.`);
+  showToast('success', `Changes applied â€” reload the main site to see updated sections.`);
 }
 
 function initData() {
@@ -86,11 +86,11 @@ function initData() {
     sections.forEach(s => {
       const defaultMatch = DEFAULT_SECTIONS.find(d => d.id === s.id);
       if (s.slug === undefined) {
-        // Slug missing — add it
+        // Slug missing â€” add it
         s.slug = s.locked ? '' : (defaultMatch ? defaultMatch.slug : genSlug(s.name));
         changed = true;
       } else if (defaultMatch && !s.locked && defaultMatch.slug && s.slug !== defaultMatch.slug) {
-        // Built-in section has wrong slug (e.g. from old auto-generation) — correct it
+        // Built-in section has wrong slug (e.g. from old auto-generation) â€” correct it
         s.slug = defaultMatch.slug;
         changed = true;
       }
@@ -119,19 +119,19 @@ function validateSlug(slug) {
 }
 
 function formatDate(iso) {
-  if (!iso) return '—';
+  if (!iso) return 'â€”';
   const d = new Date(iso);
   return d.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
 }
 
-// ── State ──────────────────────────────────────────────────
+// â”€â”€ State â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 let sections = [];
 let currentTab = 'active';
 let editingId  = null;   // for modal edit mode
 let pendingDeleteId = null;  // for confirm modal
 let undoTimer  = null;
 
-// ── DOM refs ───────────────────────────────────────────────
+// â”€â”€ DOM refs â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 const sectionsTable  = document.getElementById('sections-tbody');
 const trashTable     = document.getElementById('trash-tbody');
 const countActive    = document.getElementById('count-active');
@@ -145,7 +145,7 @@ const trashEmpty     = document.getElementById('trash-empty');
 const topbarActions  = document.getElementById('topbar-actions');
 const toastContainer = document.getElementById('toast-container');
 
-// Modal — add/edit
+// Modal â€” add/edit
 const modalOverlay   = document.getElementById('modal-overlay');
 const modalTitle     = document.getElementById('modal-title');
 const modalSaveBtn   = document.getElementById('modal-save-btn');
@@ -154,14 +154,14 @@ const modalCloseBtn  = document.getElementById('modal-close-btn');
 const nameInput      = document.getElementById('section-name-input');
 const modalError     = document.getElementById('modal-error');
 
-// Modal — confirm delete
+// Modal â€” confirm delete
 const confirmOverlay    = document.getElementById('confirm-overlay');
 const confirmTitle      = document.getElementById('confirm-title');
 const confirmSectionName= document.getElementById('confirm-section-name');
 const confirmDeleteBtn  = document.getElementById('confirm-delete-btn');
 const confirmCancelBtn  = document.getElementById('confirm-cancel-btn');
 
-// ── Render ─────────────────────────────────────────────────
+// â”€â”€ Render â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function render() {
   const active = sections.filter(s => !s.deleted);
   const trash  = sections.filter(s =>  s.deleted);
@@ -201,14 +201,14 @@ function renderActive(active) {
       </td>
       <td class="col-slug">
         ${s.locked
-          ? '<span class="section-slug-cell--empty">—</span>'
+          ? '<span class="section-slug-cell--empty">â€”</span>'
           : (s.slug
               ? `<span class="section-slug-cell" title="/section/${escapeHtml(s.slug)}">${escapeHtml(s.slug)}</span>`
               : '<span class="section-slug-cell--empty">not set</span>'
             )
         }
       </td>
-      <td class="articles-count articles-count--dash col-articles">—</td>
+      <td class="articles-count articles-count--dash col-articles">â€”</td>
       <td class="created-date">${formatDate(s.createdAt)}</td>
       <td>
         ${s.locked
@@ -253,7 +253,7 @@ function renderTrash(trash) {
           ${escapeHtml(s.name)}
         </div>
       </td>
-      <td class="articles-count articles-count--dash col-articles">—</td>
+      <td class="articles-count articles-count--dash col-articles">â€”</td>
       <td class="created-date">${formatDate(s.deletedAt)}</td>
       <td>
         <div class="action-group">
@@ -273,7 +273,7 @@ function renderTrash(trash) {
   });
 }
 
-// ── Actions ────────────────────────────────────────────────
+// â”€â”€ Actions â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function addSection(name, slug) {
   const trimmed = name.trim();
   const slugVal = slug.trim();
@@ -351,7 +351,7 @@ function permanentlyDelete(id) {
   showToast('error', `"${name}" permanently deleted.`);
 }
 
-// ── Modal — Add / Edit ──────────────────────────────────
+// â”€â”€ Modal â€” Add / Edit â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 const slugInput   = document.getElementById('section-slug-input');
 const slugPreview = document.getElementById('slug-preview');
 let slugManuallyEdited = false;
@@ -454,7 +454,7 @@ modalCancelBtn.addEventListener('click', closeModal);
 modalCloseBtn.addEventListener('click', closeModal);
 modalOverlay.addEventListener('click', e => { if (e.target === modalOverlay) closeModal(); });
 
-// ── Confirm Delete Modal ───────────────────────────────────
+// â”€â”€ Confirm Delete Modal â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function openConfirmDelete(id) {
   const s = sections.find(s => s.id === id);
   if (!s) return;
@@ -475,7 +475,7 @@ confirmDeleteBtn.addEventListener('click', () => {
 confirmCancelBtn.addEventListener('click', closeConfirmModal);
 confirmOverlay.addEventListener('click', e => { if (e.target === confirmOverlay) closeConfirmModal(); });
 
-// ── Keyboard shortcuts ─────────────────────────────────────
+// â”€â”€ Keyboard shortcuts â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape') {
     if (!modalOverlay.hidden) closeModal();
@@ -483,7 +483,7 @@ document.addEventListener('keydown', e => {
   }
 });
 
-// ── Tab switching ──────────────────────────────────────────
+// â”€â”€ Tab switching â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function switchTab(tab) {
   currentTab = tab;
   tabActiveBtn.classList.toggle('active', tab === 'active');
@@ -495,7 +495,7 @@ function switchTab(tab) {
 tabActiveBtn.addEventListener('click', () => switchTab('active'));
 tabTrashBtn.addEventListener('click',  () => switchTab('trash'));
 
-// ── Page navigation ────────────────────────────────────────
+// â”€â”€ Page navigation â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 const PAGE_CONFIG = {
   sections:  { title: 'Sections',  breadcrumb: 'Sections' },
   dashboard: { title: 'Dashboard', breadcrumb: 'Dashboard' },
@@ -548,7 +548,7 @@ document.querySelectorAll('.sidebar-nav-item').forEach(el => {
   });
 });
 
-// ── Toast ──────────────────────────────────────────────────
+// â”€â”€ Toast â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function showToast(type, message, actionLabel, actionFn) {
   const iconMap = { success: ICONS.check, warning: ICONS.warn, error: ICONS.error };
 
@@ -578,7 +578,7 @@ function showToast(type, message, actionLabel, actionFn) {
   setTimeout(dismiss, 4500);
 }
 
-// ── Helpers ────────────────────────────────────────────────
+// â”€â”€ Helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function escapeHtml(str) {
   return String(str)
     .replace(/&/g,'&amp;')
@@ -587,7 +587,8 @@ function escapeHtml(str) {
     .replace(/"/g,'&quot;');
 }
 
-// ── INIT ───────────────────────────────────────────────────
+// â”€â”€ INIT â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 sections = initData();
 navigateTo('sections');
 render();
+

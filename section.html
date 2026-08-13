@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -8,9 +8,9 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Source+Sans+3:wght@300;400;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="style.css" />`r`n  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>`r`n  <script src="supabase-config.js"></script>
   <style>
-    /* ── CRITICAL OVERRIDES for section page ── */
+    /* â”€â”€ CRITICAL OVERRIDES for section page â”€â”€ */
     /* style.css sets img{width:100%} which breaks positioned images */
     .hero-art img,
     .hero-art .hero-img {
@@ -21,7 +21,7 @@
       display: block !important;
     }
 
-    /* ── SECTION PAGE VARIABLES ── */
+    /* â”€â”€ SECTION PAGE VARIABLES â”€â”€ */
     :root {
       --sec-navy: #0d3a63;
       --sec-gold: #c9a96e;
@@ -33,7 +33,7 @@
 
     body { background: #f7f9fc; }
 
-    /* ── IDENTITY BAR ── */
+    /* â”€â”€ IDENTITY BAR â”€â”€ */
     .id-bar { background: var(--sec-navy); border-bottom: 3px solid var(--sec-gold); }
     .id-inner {
       max-width: var(--max-width);
@@ -82,10 +82,10 @@
     }
     .id-back:hover { color: var(--sec-gold); }
 
-    /* ── PAGE WRAPPER ── */
+    /* â”€â”€ PAGE WRAPPER â”€â”€ */
     .pw { max-width: var(--max-width); margin: 0 auto; padding: 0 24px 80px; }
 
-    /* ── HERO AREA ── */
+    /* â”€â”€ HERO AREA â”€â”€ */
     .hero-wrap { padding-top: 0; }
     .hero-area {
       display: grid;
@@ -168,10 +168,10 @@
     .hsit { font-family: var(--font-serif); font-size: 14px; font-weight: 600; color: var(--tp); line-height: 1.35; }
     .hsid { font-family: var(--font-sans); font-size: 11px; color: var(--tm); margin-top: 5px; }
 
-    /* ── CONTENT LAYOUT ── */
+    /* â”€â”€ CONTENT LAYOUT â”€â”€ */
     .cl { display: grid; grid-template-columns: 1fr 280px; gap: 40px; align-items: start; }
 
-    /* ── GRID HEADER ── */
+    /* â”€â”€ GRID HEADER â”€â”€ */
     .gh {
       display: flex;
       align-items: center;
@@ -183,7 +183,7 @@
     .ghl { font-family: var(--font-sans); font-size: 11px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--sec-navy); }
     .ghc { font-family: var(--font-sans); font-size: 11px; color: var(--tm); }
 
-    /* ── ARTICLE GRID ── */
+    /* â”€â”€ ARTICLE GRID â”€â”€ */
     .ag { display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px 20px; }
     .ac {
       display: flex;
@@ -216,7 +216,7 @@
     .ac-title { font-family: var(--font-serif); font-size: 15px; font-weight: 600; line-height: 1.4; color: var(--tp); margin: 0; flex: 1; }
     .ac-meta { font-family: var(--font-sans); font-size: 11px; color: var(--tm); margin-top: auto; padding-top: 10px; border-top: 1px solid var(--sec-div); }
 
-    /* ── EMPTY STATE ── */
+    /* â”€â”€ EMPTY STATE â”€â”€ */
     .ag-empty {
       grid-column: 1 / -1;
       padding: 56px 24px;
@@ -229,7 +229,7 @@
     .ag-empty h3 { font-family: var(--font-serif); font-size: 19px; font-weight: 400; color: var(--ts); margin: 0 0 8px; }
     .ag-empty p { font-family: var(--font-sans); font-size: 13.5px; color: var(--tm); max-width: 320px; margin: 0 auto; line-height: 1.6; }
 
-    /* ── SIDEBAR ── */
+    /* â”€â”€ SIDEBAR â”€â”€ */
     .sb { display: flex; flex-direction: column; gap: 28px; }
     .sw { background: #fff; border: 1px solid var(--sec-div); }
     .sw-hd { font-family: var(--font-sans); font-size: 10px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--tm); padding: 13px 18px; border-bottom: 1px solid var(--sec-div); margin: 0; }
@@ -245,13 +245,13 @@
     .sa-btn { display: inline-flex; align-items: center; gap: 6px; font-family: var(--font-sans); font-size: 12.5px; font-weight: 600; color: var(--sec-navy); text-decoration: none; border: 1.5px solid var(--sec-navy); padding: 7px 14px; border-radius: 2px; transition: background .15s, color .15s; }
     .sa-btn:hover { background: var(--sec-navy); color: #fff; }
 
-    /* ── PAGINATION ── */
+    /* â”€â”€ PAGINATION â”€â”€ */
     .pag { display: flex; align-items: center; justify-content: center; gap: 6px; padding: 40px 0 0; margin-top: 40px; border-top: 1px solid var(--sec-div); }
     .pag-btn { display: inline-flex; align-items: center; justify-content: center; width: 34px; height: 34px; border: 1px solid var(--sec-div); background: #fff; color: var(--ts); font-family: var(--font-sans); font-size: 13px; text-decoration: none; transition: background .15s, color .15s, border-color .15s; border-radius: 2px; }
     .pag-btn:hover, .pag-btn.on { background: var(--sec-navy); border-color: var(--sec-navy); color: #fff; }
     .pag-el { color: var(--tm); font-size: 13px; padding: 0 4px; }
 
-    /* ── RESPONSIVE ── */
+    /* â”€â”€ RESPONSIVE â”€â”€ */
     @media (max-width: 1024px) {
       .hero-area { grid-template-columns: 1fr 280px; }
       .ag { grid-template-columns: repeat(2, 1fr); }
@@ -273,10 +273,10 @@
 </head>
 <body>
 
-<!-- ── SITE HEADER (identical to index.html) ── -->
+<!-- â”€â”€ SITE HEADER (identical to index.html) â”€â”€ -->
 <div id="site-header-mount"></div>
 
-<!-- ── SECTION IDENTITY BAR ── -->
+<!-- â”€â”€ SECTION IDENTITY BAR â”€â”€ -->
 <div class="id-bar">
   <div class="id-inner">
     <div>
@@ -297,7 +297,7 @@
   </div>
 </div>
 
-<!-- ── HERO AREA ── -->
+<!-- â”€â”€ HERO AREA â”€â”€ -->
 <div class="pw hero-wrap">
   <div class="hero-area">
     <div class="hero-art">
@@ -333,7 +333,7 @@
   </div>
 </div>
 
-<!-- ── MAIN CONTENT + SIDEBAR ── -->
+<!-- â”€â”€ MAIN CONTENT + SIDEBAR â”€â”€ -->
 <div class="pw">
   <div class="cl">
     <main>
