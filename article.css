@@ -44,7 +44,7 @@
 .breadcrumb-sep { color: #b0bec9; font-size: 14px; }
 
 /* Section pill */
-.article-section-pill {
+.article-section-pill { display: inline-block; text-decoration: none; cursor: pointer;
   display: inline-block;
   font-family: var(--font-sans);
   font-size: 11px;
@@ -437,3 +437,11 @@
   .article-layout { grid-template-columns: 1fr; }
   .article-content p { font-size: 12pt; }
 }
+/* Related card restructured — separate image link + title link */
+.related-card-img-link { display: block; text-decoration: none; }
+.related-card-img-link:hover .related-card-img { transform: scale(1.04); }
+.related-card-title { font-family: var(--font-serif); font-size: 17px; font-weight: 700; line-height: 1.35; color: #0d1f35; margin: 0 0 10px; }
+.related-card-title-link { text-decoration: none; color: inherit; transition: color 0.15s; }
+.related-card-title-link:hover { color: var(--brand-navy); }
+.related-card-section { display: inline-block; font-family: var(--font-sans); font-size: 10.5px; font-weight: 700; letter-spacing: 0.09em; text-transform: uppercase; color: var(--brand-navy); margin-bottom: 8px; text-decoration: none; transition: opacity 0.15s; }
+.related-card-section:hover { opacity: 0.75; }
