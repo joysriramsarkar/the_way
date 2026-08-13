@@ -1,6 +1,5 @@
 /* ═══════════════════════════════════════════════════════════
    THE PRIVATIAN FAMILY — Admin Auth Frontend Guard
-   Include this script at the TOP of every admin page.
    Redirects to login if session is invalid.
 ═══════════════════════════════════════════════════════════ */
 (function () {
@@ -34,42 +33,52 @@
     window.location.replace(LOGIN_URL);
   }
 
-  function injectUserBar(user) {
-    if (document.getElementById('admin-user-bar')) return;
-    const bar = document.createElement('div');
-    bar.id = 'admin-user-bar';
-    bar.style.cssText = [
-      'position:fixed','top:0','left:0','right:0','z-index:9999',
-      'background:linear-gradient(135deg,#0a528e,#0d6eaa)',
-      'color:#fff','font-family:"Source Sans 3",sans-serif',
-      'font-size:13px','height:40px','display:flex','align-items:center',
-      'padding:0 16px','box-shadow:0 2px 8px rgba(0,0,0,.25)',
-      'gap:12px'
-    ].join(';');
-    bar.innerHTML =
-      '<div style="display:flex;align-items:center;gap:8px;flex:1;">' +
-        (user.picture ? '<img src="' + esc(user.picture) + '" alt="" referrerpolicy="no-referrer" style="width:26px;height:26px;border-radius:50%;border:2px solid rgba(255,255,255,.4);">' : '') +
-        '<span style="opacity:.8">Signed in as</span>' +
-        '<strong>' + esc(user.email) + '</strong>' +
-        '<span style="background:rgba(255,255,255,.2);border-radius:10px;padding:1px 8px;font-size:11px;font-weight:600;">' + esc(user.role) + '</span>' +
-      '</div>' +
-      '<button id="admin-signout-btn" style="background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);color:#fff;border-radius:6px;padding:4px 12px;cursor:pointer;font-size:12px;font-weight:600;">Sign out</button>';
+  function injectSidebarUser(user) {
+    function inject() {
+      // Find the sidebar footer and inject user profile before "View Main Site"
+      const sidebarFooter = document.querySelector('.sidebar-footer');
+      if (!sidebarFooter || document.getElementById('sidebar-user-profile')) return;
 
-    document.body.insertBefore(bar, document.body.firstChild);
+      const profile = document.createElement('div');
+      profile.id = 'sidebar-user-profile';
+      profile.style.cssText = 'padding:12px 16px;border-top:1px solid rgba(255,255,255,.1);margin-bottom:0;';
+      profile.innerHTML =
+        '<div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">' +
+          (user.picture
+            ? '<img src="' + esc(user.picture) + '" referrerpolicy="no-referrer" style="width:34px;height:34px;border-radius:50%;border:2px solid rgba(255,255,255,.2);flex-shrink:0;" />'
+            : '<div style="width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#fff;flex-shrink:0;">' + esc((user.name||user.email).charAt(0).toUpperCase()) + '</div>'
+          ) +
+          '<div style="min-width:0;flex:1;">' +
+            '<div style="font-size:13px;font-weight:600;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + esc(user.name || user.email) + '</div>' +
+            '<div style="font-size:11px;color:rgba(255,255,255,.5);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + esc(user.email) + '</div>' +
+          '</div>' +
+          '<span style="background:rgba(255,255,255,.15);border-radius:6px;padding:2px 7px;font-size:10px;font-weight:700;color:rgba(255,255,255,.8);flex-shrink:0;letter-spacing:.04em;">' + esc(user.role) + '</span>' +
+        '</div>' +
+        '<button id="sidebar-signout-btn" style="width:100%;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);color:rgba(255,255,255,.7);border-radius:8px;padding:8px;cursor:pointer;font-size:12px;font-weight:600;font-family:inherit;transition:all .2s;"' +
+          ' onmouseover="this.style.background=\'rgba(255,255,255,.15)\'" onmouseout="this.style.background=\'rgba(255,255,255,.08)\'">' +
+          'Sign Out' +
+        '</button>';
 
-    // Push body content down
-    document.body.style.paddingTop = '40px';
+      // Insert before the sidebar footer content
+      sidebarFooter.insertBefore(profile, sidebarFooter.firstChild);
 
-    document.getElementById('admin-signout-btn').addEventListener('click', async function () {
-      localStorage.removeItem(TOKEN_KEY);
-      await fetch('/api/auth/logout', { method: 'POST' }).catch(function(){});
-      window.location.replace(LOGIN_URL);
-    });
+      document.getElementById('sidebar-signout-btn').addEventListener('click', async function () {
+        localStorage.removeItem(TOKEN_KEY);
+        await fetch('/api/auth/logout', { method: 'POST' }).catch(function(){});
+        window.location.replace(LOGIN_URL);
+      });
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', inject);
+    } else {
+      inject();
+    }
   }
 
   // ── Main guard ────────────────────────────────────────────
   document.documentElement.style.opacity = '0';
-  document.documentElement.style.transition = 'opacity .15s';
+  document.documentElement.style.transition = 'opacity .2s';
 
   checkSession().then(function (user) {
     if (!user) {
@@ -78,15 +87,12 @@
     }
     window.PRIVATIAN_USER  = user;
     window.PRIVATIAN_TOKEN = getToken();
+
     window.dispatchEvent(new CustomEvent('privatian:ready', { detail: user }));
 
     document.documentElement.style.opacity = '1';
 
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', function() { injectUserBar(user); });
-    } else {
-      injectUserBar(user);
-    }
+    injectSidebarUser(user);
   });
 
 })();

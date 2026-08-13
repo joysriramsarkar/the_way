@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -280,6 +280,36 @@
   </div>
 
   <!-- â•â• TOAST CONTAINER â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+  <!-- == PAGE: MANAGE ACCESS == -->
+  <section class="page" id="page-access">
+    <div style="padding:0 0 20px;">
+      <p style="color:#6b7280;font-size:14px;">Manage who can access the Admin Panel. Only admins can see this page.</p>
+    </div>
+    <div class="card" style="margin-bottom:24px;border-radius:12px;border:1px solid #e5e7eb;overflow:hidden;">
+      <div style="padding:16px 20px;background:#f9fafb;border-bottom:1px solid #e5e7eb;font-weight:600;font-size:14px;">Add Whitelisted Email</div>
+      <div style="padding:20px;display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap;">
+        <div style="flex:1;min-width:200px;">
+          <label style="display:block;font-size:11px;font-weight:700;margin-bottom:6px;color:#6b7280;text-transform:uppercase;letter-spacing:.06em;">Gmail Address</label>
+          <input type="email" id="access-email-input" placeholder="someone@gmail.com"
+            style="width:100%;padding:9px 13px;border:1px solid #d1d5db;border-radius:8px;font-size:14px;outline:none;font-family:inherit;" />
+        </div>
+        <div style="min-width:150px;">
+          <label style="display:block;font-size:11px;font-weight:700;margin-bottom:6px;color:#6b7280;text-transform:uppercase;letter-spacing:.06em;">Role</label>
+          <select id="access-role-select"
+            style="width:100%;padding:9px 13px;border:1px solid #d1d5db;border-radius:8px;font-size:14px;outline:none;background:#fff;font-family:inherit;">
+            <option value="Moderator">Moderator</option>
+            <option value="Admin">Admin</option>
+          </select>
+        </div>
+        <button class="btn btn--primary" id="access-add-btn" style="height:40px;padding:0 20px;white-space:nowrap;">Add to Whitelist</button>
+      </div>
+    </div>
+    <div class="card" style="border-radius:12px;border:1px solid #e5e7eb;overflow:hidden;">
+      <div style="padding:16px 20px;background:#f9fafb;border-bottom:1px solid #e5e7eb;font-weight:600;font-size:14px;">Current Whitelist</div>
+      <div id="access-list"><div style="text-align:center;padding:40px;color:#9ca3af;">Loading...</div></div>
+    </div>
+  </section>
+
   <div class="toast-container" id="toast-container" aria-live="polite"></div>
 
   <script src="admin.js"></script>
