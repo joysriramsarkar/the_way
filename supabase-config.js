@@ -38,30 +38,23 @@ async function db_saveSections(allSections) {
   const sb = window._sb;
   if (!sb) return false;
   try {
-    // Upsert all sections by admin_id (active + deleted)
-    for (let i = 0; i < allSections.length; i++) {
-      const s = allSections[i];
-      if (!s.id || s.id === 'all' || s.locked) continue;
-
-      const row = {
-        name:          s.name,
-        slug:          s.slug || s.id,
-        display_order: i + 1,
-        is_active:     !s.deleted,
-        locked:        false,
-        is_deleted:    s.deleted  || false,
-        deleted_at:    s.deleted ? (s.deletedAt || new Date().toISOString()) : null,
-        admin_id:      s.id
-      };
-
-      // Try UPDATE first, then INSERT
-      const { data: existing } = await sb.from('sections').select('id').eq('admin_id', s.id).single();
-      if (existing) {
-        await sb.from('sections').update(row).eq('admin_id', s.id);
-      } else {
-        await sb.from('sections').insert(row);
-      }
-    }
+    const rows = allSections
+      .filter(function(s) { return s.id && s.id !== 'all' && !s.locked; })
+      .map(function(s, i) {
+        return {
+          name:          s.name,
+          slug:          s.slug || s.id,
+          display_order: i + 1,
+          is_active:     !s.deleted,
+          locked:        false,
+          is_deleted:    s.deleted  || false,
+          deleted_at:    s.deleted ? (s.deletedAt || new Date().toISOString()) : null,
+          admin_id:      s.id
+        };
+      });
+    if (rows.length === 0) return true;
+    const { error } = await sb.from('sections').upsert(rows, { onConflict: 'admin_id' });
+    if (error) throw error;
     return true;
   } catch(e) {
     console.warn('[Supabase] saveSections failed:', e.message);
@@ -179,16 +172,20 @@ async function db_getAllAdminSections() {
 
 async function db_syncSection(s, order) {
   const sb = window._sb;
-  if (!sb) return false;
+  if (!sb || !s.id || s.id === 'all' || s.locked) return false;
   try {
-    const row = _sectionToRow(s, order);
-    const { data: existing } = await sb
-      .from('sections').select('id').eq('admin_id', s.id).single();
-    if (existing) {
-      await sb.from('sections').update(row).eq('admin_id', s.id);
-    } else {
-      await sb.from('sections').insert(row);
-    }
+    const row = {
+      name:          s.name,
+      slug:          s.slug || s.id,
+      display_order: order || 0,
+      is_active:     !s.deleted,
+      locked:        false,
+      is_deleted:    s.deleted  || false,
+      deleted_at:    s.deleted ? (s.deletedAt || new Date().toISOString()) : null,
+      admin_id:      s.id
+    };
+    const { error } = await sb.from('sections').upsert(row, { onConflict: 'admin_id' });
+    if (error) throw error;
     return true;
   } catch(e) {
     console.warn('[Supabase] syncSection failed:', e.message);
