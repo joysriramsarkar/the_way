@@ -187,14 +187,14 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
 .site-footer { background: var(--bg-footer); }
 .footer-main { background: var(--bg-footer); color: #e0eefc; padding: 48px 0 40px; }
 .footer-inner { display: grid; grid-template-columns: 1fr 1fr 2fr 1.5fr; max-width: var(--max-width); margin: 0 auto; padding: 0 24px; gap: 0; }
-.footer-col a { display: block; color: #c8dff4; font-size: 14px; line-height: 1.6; margin-bottom: 10px; text-decoration: none; }
+.footer-col a { display: block; color: #c8dff4; font-size: 14px; line-height: 1.6; margin-bottom: 0; text-decoration: none; }
 .footer-col a:hover { color: #ffffff; }
 .footer-col { padding: 0 40px; border-right: var(--border-light); }
 .footer-col:first-child { padding-left: 0; }
 .footer-col:last-child { border-right: none; }
 .footer-col-title { font-family: var(--font-sans); font-size: 12px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: #ffffff; margin-bottom: 16px; }
 .footer-series-icon { margin-right: 6px; }
-.footer-col-list { display: flex; flex-direction: column; gap: 14px; }
+.footer-col-list { display: flex; flex-direction: column; gap: 4px; }
 .footer-col-list li a { font-family: var(--font-sans); font-size: 16px; font-weight: 600; color: var(--text-primary); transition: color 0.15s; }
 .footer-col-list li a:hover { color: var(--brand-navy); }
 .footer-series-item { margin-bottom: 20px; }
@@ -202,7 +202,7 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
 .footer-series-name a:hover { color: var(--brand-navy); }
 .footer-series-desc { font-size: 13px; color: #b8d6ef; line-height: 1.5; }
 .footer-social-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px 12px; }
-.footer-social-link { display: flex; align-items: center; gap: 8px; font-family: var(--font-sans); font-size: 14.5px; font-weight: 600; color: #c8dff4; transition: color 0.15s; }
+.footer-social-link { display: flex !important; align-items: center !important; gap: 8px; font-family: var(--font-sans); font-size: 14.5px; font-weight: 600; color: #c8dff4; transition: color 0.15s; }
 .footer-social-link:hover { color: #ffffff; }
 .footer-social-link svg { flex-shrink: 0; opacity: 0.85; }
 .footer-bottom { border-top: var(--border-light); background: var(--bg-footer-bottom); padding: 10px 0; }
