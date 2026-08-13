@@ -274,7 +274,7 @@ body { overflow-x: hidden; min-width: 320px; }
   .small-article:first-child { padding-left: 0; }
   .small-article:nth-child(2) { padding-right: 0; }
   /* If last article is the only one in its row, span both columns */
-  .small-article:last-child:nth-child(odd) { grid-column: 1 / -1; border-right: none; max-width: 50%; padding-left: 0; }
+  .small-article:last-child:nth-child(odd) { grid-column: 1 / -1; border-right: none; border-top: var(--border-light); padding: 20px 0 20px 0; }
   .events-featured-inner { grid-template-columns: 1fr; }
   .events-panel { padding-right: 0; border-right: none; border-bottom: var(--border-light); padding-bottom: 28px; margin-bottom: 28px; }
   .events-featured-article { padding-left: 0; }
