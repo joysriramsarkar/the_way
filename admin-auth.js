@@ -78,6 +78,7 @@
     }
     window.PRIVATIAN_USER  = user;
     window.PRIVATIAN_TOKEN = getToken();
+    window.dispatchEvent(new CustomEvent('privatian:ready', { detail: user }));
 
     document.documentElement.style.opacity = '1';
 
