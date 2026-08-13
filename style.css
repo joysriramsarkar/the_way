@@ -298,11 +298,11 @@ body { overflow-x: hidden; min-width: 320px; }
   .menu-btn { padding: 8px 10px; font-size: 13px; min-height: 40px; }
   .search-btn { width: 36px; height: 36px; }
 
-  /* Sub-header: horizontal scroll, no scrollbar */
-  .sub-header { overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
-  .sub-header::-webkit-scrollbar { display: none; }
-  .sub-header-inner { justify-content: flex-start; width: max-content; min-width: 100%; }
-  .sub-link { padding: 0 12px; font-size: 10px; white-space: nowrap; min-height: 40px; }
+  /* Sub-header: centered, no scroll, compact */
+  .sub-header { overflow: hidden; }
+  .sub-header-inner { justify-content: center; width: 100%; flex-wrap: nowrap; overflow: hidden; }
+  .sub-link { padding: 0 6px; font-size: 8.5px; letter-spacing: 0.04em; white-space: nowrap; min-height: 36px; }
+  .sub-header-divider { margin: 0 2px; }
 
   /* Hero */
   .hero-section { padding: 0 0 20px; }
