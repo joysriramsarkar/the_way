@@ -386,10 +386,17 @@ body { overflow-x: hidden; min-width: 320px; }
   .footer-bottom-links a { padding: 3px 10px; font-size: 11px; }
   .footer-bottom-links a:first-child { border-left: none; padding-left: 0; }
 
-  /* Search */
-  .search-overlay-inner { padding: 36px 16px 20px; }
-  .search-input { font-size: 18px; }
-  .search-results-grid { grid-template-columns: 1fr; gap: 10px; }
+  /* Search — compact mobile layout */
+  .search-overlay { overflow: hidden; }
+  .search-overlay-inner { padding: 50px 14px 16px; max-width: 100%; box-sizing: border-box; }
+  .search-input-wrap { gap: 8px; padding-bottom: 10px; margin-bottom: 14px; }
+  .search-input { font-size: 15px; }
+  .search-icon-inline svg { width: 18px; height: 18px; }
+  .search-hint { font-size: 11px; padding: 10px 0; }
+  .search-close-btn { top: 12px; right: 12px; padding: 5px 10px; font-size: 12px; }
+  .search-results-grid { grid-template-columns: 1fr; gap: 8px; }
+  .search-result-item { padding: 12px; }
+  .search-result-title { font-size: 14px; }
 }
 
 /* ── 400px: very small phones ───────────────────────────── */
