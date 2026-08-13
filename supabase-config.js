@@ -38,6 +38,11 @@ async function db_saveSections(allSections) {
   const sb = window._sb;
   if (!sb) return false;
   try {
+    // Step 1: Delete all non-locked sections
+    const { error: delErr } = await sb.from('sections').delete().eq('locked', false);
+    if (delErr) throw delErr;
+
+    // Step 2: Re-insert all sections with current state
     const rows = allSections
       .filter(function(s) { return s.id && s.id !== 'all' && !s.locked; })
       .map(function(s, i) {
@@ -52,9 +57,11 @@ async function db_saveSections(allSections) {
           admin_id:      s.id
         };
       });
-    if (rows.length === 0) return true;
-    const { error } = await sb.from('sections').upsert(rows, { onConflict: 'admin_id' });
-    if (error) throw error;
+
+    if (rows.length > 0) {
+      const { error: insErr } = await sb.from('sections').insert(rows);
+      if (insErr) throw insErr;
+    }
     return true;
   } catch(e) {
     console.warn('[Supabase] saveSections failed:', e.message);
@@ -171,26 +178,8 @@ async function db_getAllAdminSections() {
 }
 
 async function db_syncSection(s, order) {
-  const sb = window._sb;
-  if (!sb || !s.id || s.id === 'all' || s.locked) return false;
-  try {
-    const row = {
-      name:          s.name,
-      slug:          s.slug || s.id,
-      display_order: order || 0,
-      is_active:     !s.deleted,
-      locked:        false,
-      is_deleted:    s.deleted  || false,
-      deleted_at:    s.deleted ? (s.deletedAt || new Date().toISOString()) : null,
-      admin_id:      s.id
-    };
-    const { error } = await sb.from('sections').upsert(row, { onConflict: 'admin_id' });
-    if (error) throw error;
-    return true;
-  } catch(e) {
-    console.warn('[Supabase] syncSection failed:', e.message);
-    return false;
-  }
+  // Sync handled by Apply Changes; no-op for individual operations
+  return true;
 }
 
 async function db_syncAllAdminSections(sections) {
