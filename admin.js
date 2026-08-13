@@ -623,10 +623,79 @@ render();
     sections = sbSections.concat(localOnly);
     saveSections(sections);
     render();
+    updateSyncBadge();
   } catch(e) {
     console.warn('[Admin] Supabase startup sync failed:', e.message);
   }
 })();
+
+// ── Supabase sync utility ─────────────────────────────────────────
+let _lastSyncedAt = null;
+
+async function syncFromSupabase(silent) {
+  if (!window._sb) return false;
+  try {
+    const sbSections = typeof db_getAllAdminSections === 'function'
+      ? await db_getAllAdminSections() : null;
+    if (!sbSections || sbSections.length === 0) return false;
+    const localOnly = sections.filter(function(s) {
+      return !sbSections.find(function(r) { return r.id === s.id; });
+    });
+    sections = sbSections.concat(localOnly);
+    saveSections(sections);
+    render();
+    _lastSyncedAt = new Date();
+    updateSyncBadge();
+    if (!silent) showToast('success', 'Synced from database.');
+    return true;
+  } catch(e) {
+    console.warn('[Admin] syncFromSupabase failed:', e.message);
+    return false;
+  }
+}
+
+function updateSyncBadge() {
+  const el = document.getElementById('sync-badge');
+  if (!el || !_lastSyncedAt) return;
+  const s = Math.round((Date.now() - _lastSyncedAt.getTime()) / 1000);
+  el.textContent = s < 5 ? 'Synced just now' : ('Synced ' + s + 's ago');
+  el.title = _lastSyncedAt.toLocaleTimeString();
+}
+
+// Update sync badge every 30 seconds
+setInterval(function() { updateSyncBadge(); }, 30000);
+
+// Auto-refresh from Supabase when tab becomes visible (another admin may have made changes)
+document.addEventListener('visibilitychange', function() {
+  if (document.visibilityState === 'visible') {
+    var since = _lastSyncedAt ? Date.now() - _lastSyncedAt.getTime() : Infinity;
+    if (since > 15000) { // Only sync if 15+ seconds have passed
+      syncFromSupabase(true);
+    }
+  }
+});
+
+// Inject sync badge into page header area
+(function() {
+  function injectSyncBadge() {
+    var pageHeader = document.querySelector('.page-header');
+    if (!pageHeader || document.getElementById('sync-badge')) return;
+    var badge = document.createElement('span');
+    badge.id = 'sync-badge';
+    badge.style.cssText = 'font-size:11px;color:#9ca3af;margin-left:8px;cursor:pointer;';
+    badge.title = 'Click to refresh from database';
+    badge.textContent = 'Loading from DB...';
+    badge.onclick = function() { syncFromSupabase(false); };
+    pageHeader.appendChild(badge);
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', injectSyncBadge);
+  } else {
+    setTimeout(injectSyncBadge, 500);
+  }
+})();
+
+
 
 
 
