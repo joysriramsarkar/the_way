@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -8,7 +8,9 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Source+Sans+3:wght@300;400;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="style.css" />`r`n  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>`r`n  <script src="supabase-config.js"></script>
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-config.js"></script>
   <style>
     /* â”€â”€ CRITICAL OVERRIDES for section page â”€â”€ */
     /* style.css sets img{width:100%} which breaks positioned images */
@@ -251,22 +253,34 @@
     .pag-btn:hover, .pag-btn.on { background: var(--sec-navy); border-color: var(--sec-navy); color: #fff; }
     .pag-el { color: var(--tm); font-size: 13px; padding: 0 4px; }
 
-    /* â”€â”€ RESPONSIVE â”€â”€ */
+    
+    /* ── RESPONSIVE ── */
     @media (max-width: 1024px) {
-      .hero-area { grid-template-columns: 1fr 280px; }
+      .hero-area { grid-template-columns: 1fr 260px; }
       .ag { grid-template-columns: repeat(2, 1fr); }
+      .cl { gap: 28px; }
     }
-    @media (max-width: 780px) {
+    @media (max-width: 768px) {
+      .id-inner { padding: 24px 16px 20px; flex-wrap: wrap; }
+      .id-back { margin-top: 8px; }
+      .pw { padding: 0 16px 48px; }
       .hero-area { grid-template-columns: 1fr; }
-      .hero-sb { border-left: none; border-top: 1px solid var(--sec-div); }
-      .cl { grid-template-columns: 1fr; }
-      .ag { grid-template-columns: repeat(2, 1fr); }
-      .pw { padding: 0 16px 60px; }
-      .id-inner { padding: 24px 16px 20px; }
+      .hero-art { min-height: clamp(220px, 55vw, 380px); }
+      .hero-ov { padding: 20px; }
+      .hero-h { font-size: clamp(16px, 4vw, 24px); }
+      .hero-sb { border-left: none; border-top: 2px solid var(--sec-div); flex-direction: row; flex-wrap: wrap; }
+      .hero-sb-hd { width: 100%; }
+      .hero-sb-item { flex: 1; min-width: 50%; border-bottom: none; border-right: 1px solid var(--sec-div); }
+      .hero-sb-item:last-child { border-right: none; }
+      .cl { grid-template-columns: 1fr; gap: 0; }
+      .ag { grid-template-columns: repeat(2, 1fr); gap: 20px 16px; }
     }
     @media (max-width: 480px) {
-      .ag { grid-template-columns: 1fr; }
-      .hero-art { min-height: 260px; }
+      .ag { grid-template-columns: 1fr; gap: 16px; }
+      .hero-art { min-height: 200px; }
+      .hero-sb-item { min-width: 100%; border-right: none; border-bottom: 1px solid var(--sec-div); }
+      .hero-sb-item:last-child { border-bottom: none; }
+      .id-title { font-size: clamp(22px, 7vw, 36px); }
     }
   </style>
   <script src="components.js"></script>
