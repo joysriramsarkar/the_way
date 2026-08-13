@@ -1,5 +1,5 @@
 /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-   THE PRIVATIAN FAMILY â€” ADMIN JS
+   THE PRIVATIAN FAMILY — ADMIN JS
    Sections CRUD Â· localStorage sync Â· Toast Â· Modal
 â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 
@@ -45,7 +45,7 @@ function saveSections(sections) {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(sections));
 }
 
-// â”€â”€ Apply Changes â€” push active sections to main website â”€â”€â”€
+// â”€â”€ Apply Changes — push active sections to main website â”€â”€â”€
 const APPLIED_KEY = 'privatian_applied_sections';
 
 async function applyChanges() {
@@ -92,11 +92,11 @@ function initData() {
     sections.forEach(s => {
       const defaultMatch = DEFAULT_SECTIONS.find(d => d.id === s.id);
       if (s.slug === undefined) {
-        // Slug missing â€” add it
+        // Slug missing — add it
         s.slug = s.locked ? '' : (defaultMatch ? defaultMatch.slug : genSlug(s.name));
         changed = true;
       } else if (defaultMatch && !s.locked && defaultMatch.slug && s.slug !== defaultMatch.slug) {
-        // Built-in section has wrong slug (e.g. from old auto-generation) â€” correct it
+        // Built-in section has wrong slug (e.g. from old auto-generation) — correct it
         s.slug = defaultMatch.slug;
         changed = true;
       }
@@ -125,7 +125,7 @@ function validateSlug(slug) {
 }
 
 function formatDate(iso) {
-  if (!iso) return 'â€”';
+  if (!iso) return '—';
   const d = new Date(iso);
   return d.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
 }
@@ -151,7 +151,7 @@ const trashEmpty     = document.getElementById('trash-empty');
 const topbarActions  = document.getElementById('topbar-actions');
 const toastContainer = document.getElementById('toast-container');
 
-// Modal â€” add/edit
+// Modal — add/edit
 const modalOverlay   = document.getElementById('modal-overlay');
 const modalTitle     = document.getElementById('modal-title');
 const modalSaveBtn   = document.getElementById('modal-save-btn');
@@ -160,7 +160,7 @@ const modalCloseBtn  = document.getElementById('modal-close-btn');
 const nameInput      = document.getElementById('section-name-input');
 const modalError     = document.getElementById('modal-error');
 
-// Modal â€” confirm delete
+// Modal — confirm delete
 const confirmOverlay    = document.getElementById('confirm-overlay');
 const confirmTitle      = document.getElementById('confirm-title');
 const confirmSectionName= document.getElementById('confirm-section-name');
@@ -207,14 +207,14 @@ function renderActive(active) {
       </td>
       <td class="col-slug">
         ${s.locked
-          ? '<span class="section-slug-cell--empty">â€”</span>'
+          ? '<span class="section-slug-cell--empty">—</span>'
           : (s.slug
               ? `<span class="section-slug-cell" title="/section/${escapeHtml(s.slug)}">${escapeHtml(s.slug)}</span>`
               : '<span class="section-slug-cell--empty">not set</span>'
             )
         }
       </td>
-      <td class="articles-count articles-count--dash col-articles">â€”</td>
+      <td class="articles-count articles-count--dash col-articles">—</td>
       <td class="created-date">${formatDate(s.createdAt)}</td>
       <td>
         ${s.locked
@@ -259,7 +259,7 @@ function renderTrash(trash) {
           ${escapeHtml(s.name)}
         </div>
       </td>
-      <td class="articles-count articles-count--dash col-articles">â€”</td>
+      <td class="articles-count articles-count--dash col-articles">—</td>
       <td class="created-date">${formatDate(s.deletedAt)}</td>
       <td>
         <div class="action-group">
@@ -360,7 +360,7 @@ function permanentlyDelete(id) {
   showToast('error', `"${name}" permanently deleted.`);
 }
 
-// â”€â”€ Modal â€” Add / Edit â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// â”€â”€ Modal — Add / Edit â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 const slugInput   = document.getElementById('section-slug-input');
 const slugPreview = document.getElementById('slug-preview');
 let slugManuallyEdited = false;
