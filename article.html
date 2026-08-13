@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Article — The Privatian Family</title>
+  <meta name="description" content="" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Source+Sans+3:wght@300;400;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="article.css" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-config.js"></script>
+  <script src="components.js"></script>
+</head>
+<body class="article-page">
+  <div id="site-header-mount"></div>
+  <div class="article-hero-band" id="article-hero-band">
+    <div class="article-hero-inner">
+      <nav class="article-breadcrumb" id="article-breadcrumb" aria-label="breadcrumb">
+        <a href="index.html" class="breadcrumb-home">Home</a>
+        <span class="breadcrumb-sep">&#x203A;</span>
+        <a href="#" class="breadcrumb-section" id="article-section-link">Findings</a>
+      </nav>
+      <div class="article-section-pill" id="article-section-pill">Findings</div>
+      <h1 class="article-headline" id="article-headline">
+        Don&#x2019;t mince words &#x2014; the quiet power of private tradition
+      </h1>
+      <p class="article-deck" id="article-deck">
+        An exploration of how Privatian families have shaped culture, knowledge, and heritage across generations through deliberate private endeavors.
+      </p>
+      <div class="article-meta" id="article-meta">
+        <span class="article-author" id="article-author">By <strong>Eleanor Whitmore</strong></span>
+        <span class="meta-dot">&#xB7;</span>
+        <span class="article-date" id="article-date">August 13, 2026</span>
+        <span class="meta-dot">&#xB7;</span>
+        <span class="article-readtime" id="article-readtime">8 min read</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="article-layout" id="article-layout">
+
+    <aside class="article-share-sidebar" id="article-share-sidebar" aria-label="Share this article">
+      <div class="share-label">Share</div>
+      <div class="share-buttons">
+        <button class="share-btn" id="share-twitter" title="Share on X" onclick="shareArticle('twitter')"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.742l7.73-8.835L1.254 2.25H8.08l4.253 5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg></button>
+        <button class="share-btn" id="share-facebook" title="Share on Facebook" onclick="shareArticle('facebook')"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg></button>
+        <button class="share-btn" id="share-linkedin" title="Share on LinkedIn" onclick="shareArticle('linkedin')"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg></button>
+        <button class="share-btn" id="share-email" title="Share via Email" onclick="shareArticle('email')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg></button>
+        <button class="share-btn" id="share-copy" title="Copy link" onclick="shareArticle('copy')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button>
+        <button class="share-btn" id="share-print" title="Print" onclick="window.print()"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg></button>
+      </div>
+    </aside>
+
+    <main class="article-body" id="article-body">
+      <figure class="article-hero-figure" id="article-hero-figure">
+        <img src="img1.png" alt="Heritage gathering" class="article-hero-img" id="article-hero-img" loading="eager" />
+        <figcaption class="article-hero-caption" id="article-hero-caption">
+          A gathering of Privatian family members at an annual heritage symposium, 2024.
+          <span class="caption-credit">Photo by The Privatian Archive</span>
+        </figcaption>
+      </figure>
+
+      <div class="article-content" id="article-content">
+        <p class="article-lead" id="article-lead">For generations, the Privatian family has operated at the intersection of intellectual rigor and private tradition &#x2014; cultivating a heritage that rarely announces itself, yet shapes everything it touches.</p>
+        <p>In the spring of 2024, a group of Privatian scholars gathered at a heritage symposium unlike any other. Told to speak plainly &#x2014; to abandon the polished circumlocutions that often insulate academic discourse from meaningful confrontation &#x2014; the participants found themselves navigating disagreements of remarkable depth.</p>
+        <p>The results, according to those who participated, were transformative. &#x201C;There is something deeply clarifying about being asked to say exactly what you mean,&#x201D; said one participant, a third-generation Privatian researcher who asked not to be named. &#x201C;We don&#x2019;t often allow ourselves that honesty.&#x201D;</p>
+        <blockquote class="article-pullquote" id="article-pullquote-1">
+          <p>&#x201C;Private tradition is not secrecy &#x2014; it is the careful stewardship of knowledge across time, ensuring that what matters most is never diluted by passing trend.&#x201D;</p>
+          <cite>&#x2014; A senior Privatian family archivist</cite>
+        </blockquote>
+        <p>The initiative, which brought together historians, social scientists, and members of the extended Privatian network, was designed around a single provocative premise: that private families have been the hidden architects of culture far more than public institutions have acknowledged.</p>
+        <p>Findings from the symposium challenge the conventional academic narrative. Where traditional scholarship tends to center institutions as the primary engines of cultural transmission, the Privatian model suggests something more intimate: that the family unit, when structured around deliberate intellectual inheritance, outperforms institutional frameworks in sustaining knowledge across generations.</p>
+        <h2>A Different Model of Knowledge</h2>
+        <p>The Privatian approach to knowledge preservation begins not with libraries or archives, but with conversation. Family dinners become seminars. Walks in the garden become tutorials. The home itself is the institution.</p>
+        <p>This model, which scholars in the symposium termed &#x201C;intimate epistemology,&#x201D; has deep historical roots. From the Medici circles of Renaissance Florence to the intellectual salons of 18th-century Paris, private networks have always served as incubators for ideas that later transformed public life.</p>
+        <blockquote class="article-pullquote" id="article-pullquote-2">
+          <p>&#x201C;Every library in this family has been curated with purpose. Not to impress visitors, but to form minds.&#x201D;</p>
+          <cite>&#x2014; From the Privatian family correspondence, 1947</cite>
+        </blockquote>
+        <p>&#x201C;The family is the most durable institution human civilization has produced,&#x201D; said one symposium speaker, a historian of private intellectual life. &#x201C;Empires fall. Universities reform themselves out of existence. But families &#x2014; when they take their intellectual life seriously &#x2014; persist.&#x201D;</p>
+        <h2>The Question of Openness</h2>
+        <p>Critics of the Privatian model point to its exclusivity. What of the knowledge that remains private &#x2014; locked in family archives, passed only to blood relatives or trusted initiates? Is this not a form of intellectual hoarding?</p>
+        <p>Symposium participants engaged this challenge directly. The consensus that emerged was nuanced: privacy in intellectual life is not the same as secrecy, and stewardship is not the same as gatekeeping. The Privatian tradition, at its best, preserves knowledge precisely so that it can eventually be shared &#x2014; but shared thoughtfully, contextually, and with care for its proper reception.</p>
+        <p>&#x201C;We are not hiding these ideas,&#x201D; said one archivist. &#x201C;We are aging them. Like wine. Like certain kinds of understanding that require time to be properly received.&#x201D;</p>
+        <p>The symposium ended without resolution &#x2014; as perhaps it should have. The deepest questions about private intellectual life do not yield to weekend conferences. But the participants left with something perhaps more valuable: a shared language for disagreements that had previously gone unspoken, and the experience of having said exactly what they meant.</p>
+      </div>
+
+      <div class="article-author-bio" id="article-author-bio">
+        <div class="author-bio-avatar" id="author-bio-avatar">
+          <svg width="52" height="52" viewBox="0 0 52 52" fill="none"><circle cx="26" cy="26" r="26" fill="#e8f1f9"/><circle cx="26" cy="20" r="9" fill="#0a528e" opacity="0.35"/><ellipse cx="26" cy="42" rx="16" ry="9" fill="#0a528e" opacity="0.2"/></svg>
+        </div>
+        <div class="author-bio-text">
+          <div class="author-bio-name" id="author-bio-name">Eleanor Whitmore</div>
+          <div class="author-bio-role" id="author-bio-role">Staff Writer, The Privatian Family</div>
+          <p class="author-bio-desc" id="author-bio-desc">Eleanor covers heritage, intellectual tradition, and the long arc of private knowledge. She has been a contributing writer since 2021.</p>
+        </div>
+      </div>
+
+      <div class="article-tags" id="article-tags">
+        <span class="tags-label">Topics:</span>
+        <a href="#" class="article-tag" id="tag-1">Heritage</a>
+        <a href="#" class="article-tag" id="tag-2">Private Knowledge</a>
+        <a href="#" class="article-tag" id="tag-3">Tradition</a>
+        <a href="#" class="article-tag" id="tag-4">Culture</a>
+      </div>
+    </main>
+
+    <aside class="article-right-aside" id="article-right-aside" aria-hidden="true"></aside>
+  </div>
+
+  <section class="article-related" id="article-related">
+    <div class="article-related-inner">
+      <h2 class="related-heading">Related Stories</h2>
+      <div class="related-grid" id="related-grid">
+        <article class="related-card" id="related-card-1">
+          <a href="article.html" class="related-card-link">
+            <div class="related-card-img-wrap"><img src="img2.png" alt="" class="related-card-img" loading="lazy" /></div>
+            <div class="related-card-body">
+              <div class="related-card-section">Community &amp; Heritage</div>
+              <h3 class="related-card-title">When Privatians meet: the quiet power of community</h3>
+              <div class="related-card-meta">Aug 10, 2026 &middot; 6 min read</div>
+            </div>
+          </a>
+        </article>
+        <article class="related-card" id="related-card-2">
+          <a href="article.html" class="related-card-link">
+            <div class="related-card-img-wrap"><img src="img3.png" alt="" class="related-card-img" loading="lazy" /></div>
+            <div class="related-card-body">
+              <div class="related-card-section">Culture</div>
+              <h3 class="related-card-title">Why handwritten correspondence is making a private comeback</h3>
+              <div class="related-card-meta">Aug 7, 2026 &middot; 5 min read</div>
+            </div>
+          </a>
+        </article>
+        <article class="related-card" id="related-card-3">
+          <a href="article.html" class="related-card-link">
+            <div class="related-card-img-wrap"><img src="img4.png" alt="" class="related-card-img" loading="lazy" /></div>
+            <div class="related-card-body">
+              <div class="related-card-section">Findings</div>
+              <h3 class="related-card-title">Liberal tradition in the modern age: how the Privatian family stays ahead</h3>
+              <div class="related-card-meta">Aug 3, 2026 &middot; 7 min read</div>
+            </div>
+          </a>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <div id="site-footer-mount"></div>
+
+  <script>
+    function shareArticle(platform) {
+      var url = encodeURIComponent(window.location.href);
+      var title = encodeURIComponent(document.getElementById('article-headline').textContent.trim());
+      var urls = {
+        twitter:  'https://twitter.com/intent/tweet?url=' + url + '&text=' + title,
+        facebook: 'https://www.facebook.com/sharer/sharer.php?u=' + url,
+        linkedin: 'https://www.linkedin.com/sharing/share-offsite/?url=' + url,
+        email:    'mailto:?subject=' + title + '&body=' + url
+      };
+      if (platform === 'copy') {
+        navigator.clipboard.writeText(window.location.href).then(function() {
+          var btn = document.getElementById('share-copy');
+          btn.style.color = 'var(--brand-navy)';
+          setTimeout(function() { btn.style.color = ''; }, 1500);
+        });
+        return;
+      }
+      if (urls[platform]) window.open(urls[platform], '_blank', 'width=600,height=400');
+    }
+    (function() {
+      var sidebar = document.getElementById('article-share-sidebar');
+      var band = document.getElementById('article-hero-band');
+      function onScroll() {
+        if (!band || !sidebar) return;
+        sidebar.classList.toggle('is-visible', band.getBoundingClientRect().bottom < 80);
+      }
+      window.addEventListener('scroll', onScroll, { passive: true });
+      onScroll();
+    })();
+    (function() {
+      var bar = document.createElement('div');
+      bar.id = 'read-progress';
+      bar.style.cssText = 'position:fixed;top:0;left:0;height:3px;background:var(--brand-navy,#0a528e);z-index:9999;width:0%;transition:width 0.1s;pointer-events:none;';
+      document.body.appendChild(bar);
+      window.addEventListener('scroll', function() {
+        var body = document.getElementById('article-body');
+        if (!body) return;
+        var rect = body.getBoundingClientRect();
+        var total = rect.height - window.innerHeight;
+        var scrolled = Math.max(0, -rect.top);
+        bar.style.width = Math.min(100, (scrolled / total) * 100) + '%';
+      }, { passive: true });
+    })();
+  </script>
+</body>
+</html>
