@@ -26,6 +26,9 @@ module.exports = async function handler(req, res) {
     const name    = gp.name    || email;
     const picture = gp.picture || '';
 
+    console.log('[verify] Google email verified:', email);
+    console.log('[verify] SUPABASE_URL:', process.env.SUPABASE_URL);
+
     const sb = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
     const { data: admin, error } = await sb
       .from('allowed_admins')
@@ -34,10 +37,13 @@ module.exports = async function handler(req, res) {
       .eq('status', 'active')
       .single();
 
+    console.log('[verify] Supabase result - data:', JSON.stringify(admin), '| error:', JSON.stringify(error));
+
     if (error || !admin) {
       return res.status(403).json({
         error: 'This Google account is not authorized to access the admin panel.',
-        email
+        email,
+        debug_sb_error: error ? error.message : null
       });
     }
 
@@ -57,7 +63,7 @@ module.exports = async function handler(req, res) {
     });
 
   } catch(e) {
-    console.error('[auth/verify]', e.message);
-    return res.status(500).json({ error: 'Authentication failed. Please try again.' });
+    console.error('[auth/verify] CATCH:', e.message);
+    return res.status(500).json({ error: 'Authentication failed. Please try again.', debug: e.message });
   }
 };
