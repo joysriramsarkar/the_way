@@ -501,6 +501,7 @@ const PAGE_CONFIG = {
   dashboard: { title: 'Dashboard', breadcrumb: 'Dashboard' },
   articles:  { title: 'Articles',  breadcrumb: 'Articles' },
   settings:  { title: 'Settings',  breadcrumb: 'Settings' },
+  access:    { title: 'Manage Access', breadcrumb: 'Manage Access' },
 };
 
 function navigateTo(page) {
@@ -517,6 +518,7 @@ function navigateTo(page) {
 
   // Inject topbar action buttons
   topbarActions.innerHTML = '';
+  if (page === 'access') { loadAccessList(); }
   if (page === 'sections') {
     // Apply Changes button
     const applyBtn = document.createElement('button');
@@ -591,4 +593,67 @@ function escapeHtml(str) {
 sections = initData();
 navigateTo('sections');
 render();
+
+
+
+
+// ── MANAGE ACCESS PAGE ───────────────────────────────────────────────────
+function initAccessPage() {
+  const user = window.PRIVATIAN_USER;
+  if (!user || user.role !== 'Admin') return;
+  const li = document.getElementById('nav-access-li');
+  if (li) li.style.display = '';
+  const addBtn = document.getElementById('access-add-btn');
+  if (addBtn) addBtn.addEventListener('click', addAdminEmail);
+}
+
+async function loadAccessList() {
+  const list = document.getElementById('access-list');
+  if (!list) return;
+  list.innerHTML = '<div style="text-align:center;padding:32px;color:#6b7280;">Loading...</div>';
+  try {
+    const res = await fetch('/api/admins/list', { headers: { 'Authorization': 'Bearer ' + window.PRIVATIAN_TOKEN } });
+    if (!res.ok) throw new Error('Failed');
+    const admins = await res.json();
+    if (!admins.length) { list.innerHTML = '<div style="text-align:center;padding:32px;color:#6b7280;">No whitelisted admins yet.</div>'; return; }
+    list.innerHTML = admins.map(a => `<div style="display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid #e5e7eb;flex-wrap:wrap;"><div style="flex:1;min-width:160px;"><div style="font-weight:600;font-size:14px;">${escapeHtml(a.email)}</div><div style="font-size:12px;color:#6b7280;">Added by ${escapeHtml(a.added_by||'—')} &middot; ${new Date(a.added_at).toLocaleDateString()}</div></div><span style="background:${a.role==='Admin'?'#dbeafe':'#d1fae5'};color:${a.role==='Admin'?'#1e40af':'#065f46'};border-radius:10px;padding:2px 10px;font-size:12px;font-weight:600;">${escapeHtml(a.role)}</span><span style="background:${a.status==='active'?'#dcfce7':'#fee2e2'};color:${a.status==='active'?'#166534':'#991b1b'};border-radius:10px;padding:2px 10px;font-size:12px;font-weight:600;">${escapeHtml(a.status)}</span>${a.email===(window.PRIVATIAN_USER&&window.PRIVATIAN_USER.email)?'<span style="font-size:12px;color:#aaa;">(you)</span>':`<button onclick="toggleAdminStatus('${a.id}','${a.status==='active'?'suspended':'active'}')" style="background:none;border:1px solid #e5e7eb;border-radius:6px;padding:4px 10px;font-size:12px;cursor:pointer;color:#6b7280;">${a.status==='active'?'Suspend':'Restore'}</button><button onclick="removeAdmin('${a.id}','${escapeHtml(a.email)}')" style="background:none;border:1px solid #fca5a5;border-radius:6px;padding:4px 10px;font-size:12px;cursor:pointer;color:#dc2626;">Remove</button>`}</div>`).join('');
+  } catch(e) { list.innerHTML = '<div style="text-align:center;padding:24px;color:#dc2626;">Error loading admins.</div>'; }
+}
+
+async function addAdminEmail() {
+  const emailInput = document.getElementById('access-email-input');
+  const roleSelect = document.getElementById('access-role-select');
+  const email = (emailInput.value||'').trim();
+  const role = roleSelect.value;
+  if (!email || !email.includes('@')) { showToast('error','Please enter a valid email.'); return; }
+  try {
+    const res = await fetch('/api/admins/add', { method:'POST', headers:{'Content-Type':'application/json','Authorization':'Bearer '+window.PRIVATIAN_TOKEN}, body:JSON.stringify({email,role}) });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error||'Failed');
+    emailInput.value='';
+    showToast('success',email+' added as '+role+'.');
+    loadAccessList();
+  } catch(e) { showToast('error',e.message||'Failed to add.'); }
+}
+
+async function toggleAdminStatus(id, newStatus) {
+  try {
+    const res = await fetch('/api/admins/update?id='+id, { method:'PATCH', headers:{'Content-Type':'application/json','Authorization':'Bearer '+window.PRIVATIAN_TOKEN}, body:JSON.stringify({status:newStatus}) });
+    if (!res.ok) throw new Error();
+    showToast('success','Status updated.');
+    loadAccessList();
+  } catch(e) { showToast('error','Failed to update.'); }
+}
+
+async function removeAdmin(id, email) {
+  if (!confirm('Remove '+email+' from the whitelist?')) return;
+  try {
+    const res = await fetch('/api/admins/remove?id='+id, { method:'DELETE', headers:{'Authorization':'Bearer '+window.PRIVATIAN_TOKEN} });
+    if (!res.ok) throw new Error();
+    showToast('success',email+' removed.');
+    loadAccessList();
+  } catch(e) { showToast('error','Failed to remove.'); }
+}
+
+document.addEventListener('DOMContentLoaded', function() { initAccessPage(); });
 
