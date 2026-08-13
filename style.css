@@ -491,7 +491,7 @@ body { overflow-x: hidden; min-width: 320px; }
   flex-shrink: 0;
 }
 .search-input {
-  flex: 1; min-width: 0; min-width: 0; width: 100%;
+  flex: 1; min-width: 0; width: 100%;
   background: transparent;
   border: none;
   outline: none;
