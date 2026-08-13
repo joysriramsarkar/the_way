@@ -128,3 +128,79 @@ document.addEventListener('DOMContentLoaded', function() {
     initSupabaseClient();
   }
 });
+
+// ── ADMIN SECTIONS SYNC (cross-browser real-time) ────────────────
+
+function _sectionToRow(s, order) {
+  return {
+    name:          s.name,
+    slug:          s.slug || s.id,
+    display_order: order || 0,
+    is_active:     !s.deleted && !s.locked,
+    locked:        s.locked  || false,
+    is_deleted:    s.deleted || false,
+    deleted_at:    s.deleted ? (s.deletedAt || new Date().toISOString()) : null,
+    admin_id:      s.id
+  };
+}
+
+function _rowToSection(row) {
+  return {
+    id:        row.admin_id || row.slug,
+    name:      row.name,
+    slug:      row.slug || '',
+    locked:    row.locked     || false,
+    deleted:   row.is_deleted || false,
+    deletedAt: row.deleted_at || null,
+    createdAt: row.created_at || new Date().toISOString()
+  };
+}
+
+async function db_getAllAdminSections() {
+  const sb = window._sb;
+  if (!sb) return null;
+  try {
+    const { data, error } = await sb
+      .from('sections')
+      .select('*')
+      .order('display_order');
+    if (error) throw error;
+    return (data || []).map(_rowToSection);
+  } catch(e) {
+    console.warn('[Supabase] getAllAdminSections failed:', e.message);
+    return null;
+  }
+}
+
+async function db_syncSection(s, order) {
+  const sb = window._sb;
+  if (!sb) return false;
+  try {
+    const row = _sectionToRow(s, order);
+    const { data: existing } = await sb
+      .from('sections').select('id').eq('admin_id', s.id).single();
+    if (existing) {
+      await sb.from('sections').update(row).eq('admin_id', s.id);
+    } else {
+      await sb.from('sections').insert(row);
+    }
+    return true;
+  } catch(e) {
+    console.warn('[Supabase] syncSection failed:', e.message);
+    return false;
+  }
+}
+
+async function db_syncAllAdminSections(sections) {
+  const sb = window._sb;
+  if (!sb) return false;
+  try {
+    for (let i = 0; i < sections.length; i++) {
+      await db_syncSection(sections[i], i);
+    }
+    return true;
+  } catch(e) {
+    console.warn('[Supabase] syncAllAdminSections failed:', e.message);
+    return false;
+  }
+}

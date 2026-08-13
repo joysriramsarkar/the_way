@@ -319,6 +319,7 @@ function deleteSection(id) {
   s.deleted = true;
   s.deletedAt = new Date().toISOString();
   saveSections(sections);
+  if (typeof db_syncSection === 'function') db_syncSection(s, sections.indexOf(s));
   render();
 
   // Show toast with undo
@@ -345,8 +346,10 @@ function permanentlyDelete(id) {
   const idx = sections.findIndex(s => s.id === id);
   if (idx === -1) return;
   const name = sections[idx].name;
+  const deletedId = sections[idx].id;
   sections.splice(idx, 1);
   saveSections(sections);
+  if (window._sb) window._sb.from('sections').delete().eq('admin_id', deletedId).then(function(){}).catch(function(){});
   render();
   showToast('error', `"${name}" permanently deleted.`);
 }
@@ -593,6 +596,31 @@ function escapeHtml(str) {
 sections = initData();
 navigateTo('sections');
 render();
+
+// ── Supabase startup sync (cross-browser truth) ──────────────────
+(async function() {
+  try {
+    // Wait for Supabase client to initialize
+    let waited = 0;
+    while (!window._sb && waited < 3000) {
+      await new Promise(function(r){ setTimeout(r, 200); });
+      waited += 200;
+    }
+    if (!window._sb) return;
+    const sbSections = typeof db_getAllAdminSections === 'function'
+      ? await db_getAllAdminSections() : null;
+    if (!sbSections || sbSections.length === 0) return;
+    // Merge: Supabase is source of truth; keep local-only items (just added, not yet synced)
+    const localOnly = sections.filter(function(s) {
+      return !sbSections.find(function(sb) { return sb.id === s.id; });
+    });
+    sections = sbSections.concat(localOnly);
+    saveSections(sections);
+    render();
+  } catch(e) {
+    console.warn('[Admin] Supabase startup sync failed:', e.message);
+  }
+})();
 
 
 
