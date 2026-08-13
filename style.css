@@ -262,7 +262,8 @@ body { overflow-x: hidden; min-width: 320px; }
     display: grid; grid-template-columns: 1fr 1fr; gap: 0;
   }
   .sidebar-divider { display: none; }
-  .hero-sidebar-article { display: grid; grid-template-columns: 120px 1fr; border-right: var(--border-light); }
+  .hero-sidebar-article { display: block; border-right: var(--border-light); }
+  .hero-sidebar-article .hero-sidebar-link { display: grid !important; grid-template-columns: 120px 1fr; height: auto !important; flex-direction: unset !important; }
   .hero-sidebar-article:last-child { border-right: none; }
   .hero-sidebar-img { height: 120px; }
   .hero-sidebar-body { padding: 14px 16px; }
@@ -315,7 +316,8 @@ body { overflow-x: hidden; min-width: 320px; }
 
   /* Hero sidebar: full-width stacked cards on mobile */
   .hero-sidebar { display: flex !important; flex-direction: column !important; width: 100% !important; padding: 16px !important; gap: 0 !important; border-top: 2px solid var(--brand-navy); }
-  .hero-sidebar-article { display: grid !important; grid-template-columns: 90px 1fr !important; width: 100% !important; flex: none !important; border-right: none !important; border-bottom: var(--border-light) !important; border-radius: 0 !important; border-left: none !important; border-top: none !important; }
+  .hero-sidebar-article { display: block !important; width: 100% !important; flex: none !important; border-right: none !important; border-bottom: var(--border-light) !important; border-radius: 0 !important; border-left: none !important; border-top: none !important; }
+  .hero-sidebar-article .hero-sidebar-link { display: grid !important; grid-template-columns: 90px 1fr !important; width: 100% !important; height: auto !important; flex-direction: unset !important; }
   .hero-sidebar-article:last-child { border-bottom: none !important; }
   .hero-sidebar-img { height: 90px !important; width: 90px !important; object-fit: cover !important; }
   .hero-sidebar-body { padding: 10px 14px !important; }
