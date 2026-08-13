@@ -34,27 +34,33 @@ async function db_getSections() {
   }
 }
 
-async function db_saveSections(activeSections) {
+async function db_saveSections(allSections) {
   const sb = window._sb;
   if (!sb) return false;
   try {
-    // Delete all non-locked sections
-    await sb.from('sections').delete().eq('locked', false);
+    // Upsert all sections by admin_id (active + deleted)
+    for (let i = 0; i < allSections.length; i++) {
+      const s = allSections[i];
+      if (!s.id || s.id === 'all' || s.locked) continue;
 
-    // Re-insert
-    const rows = activeSections
-      .filter(s => !s.locked && !s.deleted && s.id !== 'all')
-      .map((s, i) => ({
-        name: s.name,
-        slug: s.slug || s.id,
+      const row = {
+        name:          s.name,
+        slug:          s.slug || s.id,
         display_order: i + 1,
-        is_active: true,
-        locked: false
-      }));
+        is_active:     !s.deleted,
+        locked:        false,
+        is_deleted:    s.deleted  || false,
+        deleted_at:    s.deleted ? (s.deletedAt || new Date().toISOString()) : null,
+        admin_id:      s.id
+      };
 
-    if (rows.length > 0) {
-      const { error } = await sb.from('sections').insert(rows);
-      if (error) throw error;
+      // Try UPDATE first, then INSERT
+      const { data: existing } = await sb.from('sections').select('id').eq('admin_id', s.id).single();
+      if (existing) {
+        await sb.from('sections').update(row).eq('admin_id', s.id);
+      } else {
+        await sb.from('sections').insert(row);
+      }
     }
     return true;
   } catch(e) {
@@ -62,7 +68,6 @@ async function db_saveSections(activeSections) {
     return false;
   }
 }
-
 // ── ARTICLES ─────────────────────────────────────────────────
 
 async function db_getArticles(sectionSlug, limit) {

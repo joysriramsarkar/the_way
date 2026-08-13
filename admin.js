@@ -48,7 +48,7 @@ function saveSections(sections) {
 // â”€â”€ Apply Changes â€” push active sections to main website â”€â”€â”€
 const APPLIED_KEY = 'privatian_applied_sections';
 
-function applyChanges() {
+async function applyChanges() {
   const active = sections.filter(s => !s.deleted && !s.locked);
   const payload = {
     sections: active.map(s => ({ id: s.id, name: s.name, slug: s.slug || '' })),
@@ -56,25 +56,31 @@ function applyChanges() {
   };
   localStorage.setItem(APPLIED_KEY, JSON.stringify(payload));
 
-  // Update button to show confirmation briefly
   const btn = document.getElementById('apply-changes-btn');
+  const origHTML = btn ? btn.innerHTML : '';
+  if (btn) { btn.disabled = true; btn.innerHTML = ICONS.upload + ' Saving to DB...'; }
+
+  let saved = false;
+  try {
+    if (typeof db_saveSections === 'function') saved = await db_saveSections(sections);
+  } catch(e) { console.warn('[Admin] applyChanges save failed:', e.message); }
+
   if (btn) {
-    const originalHTML = btn.innerHTML;
-    btn.innerHTML = `${ICONS.check} Applied!`;
-    btn.disabled = true;
+    btn.innerHTML = ICONS.check + (saved ? ' Saved to DB!' : ' Applied!');
     btn.style.background = 'var(--success)';
     btn.style.borderColor = 'var(--success)';
-    setTimeout(() => {
-      btn.innerHTML = originalHTML;
+    setTimeout(function() {
+      btn.innerHTML = origHTML;
       btn.disabled = false;
       btn.style.background = '';
       btn.style.borderColor = '';
-    }, 2200);
+    }, 2500);
   }
 
-  showToast('success', `Changes applied â€” reload the main site to see updated sections.`);
+  showToast('success', saved
+    ? 'Saved to database! Main site updates automatically.'
+    : 'Applied locally. Check Supabase connection.');
 }
-
 function initData() {
   let sections = loadSections();
   if (!sections) {
