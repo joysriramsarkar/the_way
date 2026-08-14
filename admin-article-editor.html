@@ -390,7 +390,7 @@
   // ── Load existing article ─────────────────────────────────
   async function loadArticle(id) {
     try {
-      const res  = await fetch('/api/articles/get?id=' + id, {
+      const res  = await fetch('/api/articles?action=get&id=' + id, {
         headers: { 'Authorization': 'Bearer ' + window.PRIVATIAN_TOKEN }
       });
       if (!res.ok) { showToast('Article not found', 'error'); return; }
@@ -454,7 +454,7 @@
 
     const payload = buildPayload();
     try {
-      const res  = await fetch('/api/articles/save', {
+      const res  = await fetch('/api/articles?action=save', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + window.PRIVATIAN_TOKEN },
         body: JSON.stringify(payload)
@@ -490,7 +490,7 @@
     const btn = document.getElementById('editor-publish-btn');
     btn.textContent = '...';
     try {
-      const res  = await fetch('/api/articles/publish?id=' + _articleId, {
+      const res  = await fetch('/api/articles?action=publish&id=' + _articleId, {
         method: 'POST', headers: { 'Authorization': 'Bearer ' + window.PRIVATIAN_TOKEN }
       });
       const data = await res.json();

@@ -1351,7 +1351,7 @@ async function initArticlesPage() {
   document.getElementById('articles-empty').style.display  = 'none';
 
   try {
-    const res  = await fetch('/api/articles/list', {
+    const res  = await fetch('/api/articles?action=list', {
       headers: { 'Authorization': 'Bearer ' + window.PRIVATIAN_TOKEN }
     });
     _allArticles = await res.json();
@@ -1447,7 +1447,7 @@ async function toggleArticleStatus(id, btn) {
   btn.disabled = true;
   btn.textContent = '...';
   try {
-    const res  = await fetch('/api/articles/publish?id=' + id, {
+    const res  = await fetch('/api/articles?action=publish&id=' + id, {
       method: 'POST', headers: { 'Authorization': 'Bearer ' + window.PRIVATIAN_TOKEN }
     });
     const data = await res.json();
@@ -1476,7 +1476,7 @@ function deleteArticleConfirm(id, title) {
 
 async function _doDeleteArticle(id) {
   try {
-    const res  = await fetch('/api/articles/delete?id=' + id, {
+    const res  = await fetch('/api/articles?action=delete&id=' + id, {
       method: 'DELETE', headers: { 'Authorization': 'Bearer ' + window.PRIVATIAN_TOKEN }
     });
     const data = await res.json();
