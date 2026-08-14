@@ -237,7 +237,7 @@
       const token = localStorage.getItem(TOKEN_KEY);
       if (!token) return;
       try {
-        const r = await fetch('/api/auth/me', { headers: { 'Authorization': 'Bearer ' + token } });
+        const r = await fetch('/api/auth?action=me', { headers: { 'Authorization': 'Bearer ' + token } });
         if (r.ok) { window.location.replace('/admin.html'); }
       } catch(e) {}
     })();
@@ -264,7 +264,7 @@
       showMsg('info', 'Verifying your identity...');
 
       try {
-        const res = await fetch('/api/auth/verify', {
+        const res = await fetch('/api/auth?action=verify', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ credential: response.credential })

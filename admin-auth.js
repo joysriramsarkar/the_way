@@ -20,7 +20,7 @@
     const token = getToken();
     if (!token) return null;
     try {
-      const r = await fetch('/api/auth/me', {
+      const r = await fetch('/api/auth?action=me', {
         headers: { 'Authorization': 'Bearer ' + token }
       });
       if (!r.ok) return null;
@@ -31,7 +31,7 @@
   // Live DB check — catches suspended/deleted users even if JWT is still valid
   async function checkDbAccess(token) {
     try {
-      const r = await fetch('/api/admins/check', {
+      const r = await fetch('/api/admins?action=check', {
         headers: { 'Authorization': 'Bearer ' + token }
       });
       const d = await r.json().catch(() => ({}));
@@ -81,7 +81,7 @@
 
       document.getElementById('sidebar-signout-btn').addEventListener('click', async function () {
         localStorage.removeItem(TOKEN_KEY);
-        await fetch('/api/auth/logout', { method: 'POST' }).catch(function(){});
+        await fetch('/api/auth?action=logout', { method: 'POST' }).catch(function(){});
         window.location.replace(LOGIN_URL);
       });
     }

@@ -739,7 +739,7 @@ async function loadAccessList() {
   });
 
   try {
-    const res = await fetch('/api/admins/list?include_deleted=true', {
+    const res = await fetch('/api/admins?action=list?include_deleted=true', {
       headers: { 'Authorization': 'Bearer ' + window.PRIVATIAN_TOKEN }
     });
     if (!res.ok) throw new Error('Failed');
@@ -845,7 +845,7 @@ async function addAdminEmail() {
   if (!email || !email.includes('@')) { showToast('error', 'Please enter a valid email.'); return; }
   if (!email.endsWith('@gmail.com'))  { showToast('error', 'Only @gmail.com addresses are allowed.'); return; }
   try {
-    const res  = await fetch('/api/admins/add', {
+    const res  = await fetch('/api/admins?action=add', {
       method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + window.PRIVATIAN_TOKEN },
       body: JSON.stringify({ email, role })
     });
@@ -866,7 +866,7 @@ function changeAdminRole(id, email, newRole) {
     confirmColor: '#1e3a5f',
     onConfirm: async () => {
       try {
-        const res  = await fetch('/api/admins/update?id=' + id, {
+        const res  = await fetch('/api/admins?action=update&id=' + id, {
           method: 'PATCH', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + window.PRIVATIAN_TOKEN },
           body: JSON.stringify({ role: newRole })
         });
@@ -896,7 +896,7 @@ function toggleAdminStatus(id, newStatus, email) {
     confirmColor: newStatus === 'suspended' ? '#d97706' : '#059669',
     onConfirm: async () => {
       try {
-        const res  = await fetch('/api/admins/update?id=' + id, {
+        const res  = await fetch('/api/admins?action=update&id=' + id, {
           method: 'PATCH', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + window.PRIVATIAN_TOKEN },
           body: JSON.stringify({ status: newStatus })
         });
@@ -924,7 +924,7 @@ function removeAdmin(id, email) {
     confirmColor: '#dc2626',
     onConfirm: async () => {
       try {
-        const res  = await fetch('/api/admins/remove?id=' + id, { method: 'DELETE', headers: { 'Authorization': 'Bearer ' + window.PRIVATIAN_TOKEN } });
+        const res  = await fetch('/api/admins?action=remove&id=' + id, { method: 'DELETE', headers: { 'Authorization': 'Bearer ' + window.PRIVATIAN_TOKEN } });
         const data = await res.json();
         if (!res.ok) {
           if (data.error === 'min_admins') { _minAdminPopup(); return; }
@@ -946,7 +946,7 @@ function restoreAdmin(id, email) {
     confirmColor: '#059669',
     onConfirm: async () => {
       try {
-        const res  = await fetch('/api/admins/update?id=' + id, {
+        const res  = await fetch('/api/admins?action=update&id=' + id, {
           method: 'PATCH', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + window.PRIVATIAN_TOKEN },
           body: JSON.stringify({ status: 'active' })
         });
@@ -969,7 +969,7 @@ function purgeAdmin(id, email) {
     confirmColor: '#dc2626',
     onConfirm: async () => {
       try {
-        const res  = await fetch('/api/admins/purge?id=' + id, { method: 'DELETE', headers: { 'Authorization': 'Bearer ' + window.PRIVATIAN_TOKEN } });
+        const res  = await fetch('/api/admins?action=purge&id=' + id, { method: 'DELETE', headers: { 'Authorization': 'Bearer ' + window.PRIVATIAN_TOKEN } });
         const data = await res.json();
         if (!res.ok) throw new Error(data.error || 'Failed');
         showToast('success', email + ' permanently deleted.');
@@ -987,7 +987,7 @@ async function checkMyAccess() {
   if (_accessRevoked || !window.PRIVATIAN_TOKEN) return;
   _lastAccessCheck = Date.now();
   try {
-    const res  = await fetch('/api/admins/check', { headers: { 'Authorization': 'Bearer ' + window.PRIVATIAN_TOKEN } });
+    const res  = await fetch('/api/admins?action=check', { headers: { 'Authorization': 'Bearer ' + window.PRIVATIAN_TOKEN } });
     if (res.status === 401) { _revokeAccess('session_expired'); return; }
     const data = await res.json();
     if (!data.ok) { _revokeAccess(data.reason || 'revoked'); return; }
