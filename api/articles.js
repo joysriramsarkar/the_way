@@ -31,23 +31,24 @@ function slugify(text) {
 function normalizeArticle(row) {
   if (!row) return null;
   return {
-    id:           row.id,
-    slug:         row.slug || '',
-    title:        row.title || '',
-    deck:         row.deck || row.excerpt || '',
-    section:      row.section || row.section_slug || '',
-    author:       row.author || 'The Privatian Family',
-    author_role:  row.author_role || '',
-    author_bio:   row.author_bio || '',
-    hero_img_url: row.hero_img_url || row.featured_image || '',
-    hero_caption: row.hero_caption || '',
-    hero_credit:  row.hero_credit || '',
-    content_html: row.content_html || row.content || '',
-    status:       row.status || (row.is_featured !== undefined ? 'published' : 'draft'),
-    created_by:   row.created_by || '',
-    created_at:   row.created_at || null,
-    updated_at:   row.updated_at || row.created_at || null,
-    published_at: row.published_at || row.created_at || null,
+    id:               row.id,
+    slug:             row.slug || '',
+    title:            row.title || '',
+    deck:             row.deck || row.excerpt || '',
+    section:          row.section || row.section_slug || '',
+    author:           row.author || 'The Privatian Family',
+    author_role:      row.author_role || '',
+    author_bio:       row.author_bio || '',
+    author_photo_url: row.author_photo_url || '',
+    hero_img_url:     row.hero_img_url || row.featured_image || '',
+    hero_caption:     row.hero_caption || '',
+    hero_credit:      row.hero_credit || '',
+    content_html:     row.content_html || row.content || '',
+    status:           row.status || (row.is_featured !== undefined ? 'published' : 'draft'),
+    created_by:       row.created_by || '',
+    created_at:       row.created_at || null,
+    updated_at:       row.updated_at || row.created_at || null,
+    published_at:     row.published_at || row.created_at || null,
   };
 }
 
@@ -135,8 +136,8 @@ module.exports = async function handler(req, res) {
 
     const {
       id: bodyId, title = '', deck = '', section = '', author = '', author_role = '',
-      author_bio = '', hero_img_url = '', hero_caption = '', hero_credit = '',
-      content_html = '', slug: bodySlug
+      author_bio = '', author_photo_url = '', hero_img_url = '', hero_caption = '',
+      hero_credit = '', content_html = '', slug: bodySlug
     } = req.body || {};
 
     const client = sb();
@@ -144,7 +145,7 @@ module.exports = async function handler(req, res) {
     if (bodyId) {
       // UPDATE
       const updates = {
-        title, deck, section, author, author_role, author_bio,
+        title, deck, section, author, author_role, author_bio, author_photo_url,
         hero_img_url, hero_caption, hero_credit, content_html,
         updated_at: new Date().toISOString(),
       };
@@ -161,7 +162,7 @@ module.exports = async function handler(req, res) {
         slug = slug + '-' + (Math.max(...nums) + 1);
       }
       const { data, error } = await client.from('articles').insert({
-        slug, title, deck, section, author, author_role, author_bio,
+        slug, title, deck, section, author, author_role, author_bio, author_photo_url,
         hero_img_url, hero_caption, hero_credit, content_html,
         status: 'draft', created_by: session.email,
       }).select().single();
@@ -198,7 +199,7 @@ module.exports = async function handler(req, res) {
     return res.status(200).json({ success: true });
   }
 
-  // ── UPLOAD (image upload) ────────────────────────────────────────
+  // ── UPLOAD (image) ───────────────────────────────────────────────
   if (action === 'upload' && req.method === 'POST') {
     const session = requireAuth(req, res);
     if (!session) return;
@@ -214,8 +215,27 @@ module.exports = async function handler(req, res) {
         const base64 = `data:image/jpeg;base64,${req.rawBody.toString('base64')}`;
         return res.status(200).json({ url: base64 });
       }
+
+      // Signed Supabase Storage upload URL pattern
+      const client = sb();
+      const fileName = 'article-imgs/' + Date.now() + '-' + Math.random().toString(36).slice(2) + '.jpg';
+      const { data: signedData, error: signErr } = await client.storage
+        .from('article-images')
+        .createSignedUploadUrl(fileName);
+
+      if (signedData && !signErr) {
+        const publicUrl = client.storage.from('article-images').getPublicUrl(fileName).data.publicUrl;
+        return res.status(200).json({
+          uploadUrl: signedData.signedUrl,
+          token: signedData.token,
+          path: fileName,
+          publicUrl,
+          url: publicUrl,
+        });
+      }
+
       return res.status(200).json({
-        url: req.body?.url || 'img1.png',
+        url: req.body?.url || 'assets/images/img1.png',
         success: true
       });
     } catch (e) {
