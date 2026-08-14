@@ -674,10 +674,10 @@ function _confirmModal({ title, body, confirmText = 'Confirm', confirmColor = '#
       </div>
     </div>`;
 
-  document.getElementById('confirm-modal-cancel').onclick = () => overlay.remove();
-  document.getElementById('confirm-modal-ok').onclick = () => { overlay.remove(); onConfirm(); };
-  overlay.addEventListener('click', e => { if (e.target === overlay) overlay.remove(); });
   document.body.appendChild(overlay);
+  overlay.querySelector('#confirm-modal-cancel').onclick = () => overlay.remove();
+  overlay.querySelector('#confirm-modal-ok').onclick = () => { overlay.remove(); onConfirm(); };
+  overlay.addEventListener('click', e => { if (e.target === overlay) overlay.remove(); });
 }
 
 // ── Min-admins info popup ────────────────────────────────────────
