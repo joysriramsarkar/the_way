@@ -20,7 +20,7 @@ module.exports = async function handler(req, res) {
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'PATCH') return res.status(405).end();
 
-  const session = requireAdmin(req, res);
+  const session = await requireAdmin(req, res);
   if (!session) return;
 
   const { id } = req.query;
