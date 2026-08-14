@@ -534,6 +534,8 @@ document.querySelectorAll('.sidebar-nav-item').forEach(el => {
   el.addEventListener('click', e => {
     e.preventDefault();
     navigateTo(el.dataset.page);
+    // Silent access check on every navigation action
+    if (Date.now() - _lastAccessCheck > 60000) checkMyAccess();
   });
 });
 
@@ -630,7 +632,11 @@ document.addEventListener('visibilitychange', function() {
 
 
 
-// ── MANAGE ACCESS PAGE ───────────────────────────────────────────────────
+
+// =================================================================
+// MANAGE ACCESS PAGE
+// =================================================================
+
 function initAccessPage() {
   const user = window.PRIVATIAN_USER;
   if (!user || user.role !== 'Admin') return;
@@ -645,53 +651,319 @@ async function loadAccessList() {
   if (!list) return;
   list.innerHTML = '<div style="text-align:center;padding:32px;color:#6b7280;">Loading...</div>';
   try {
-    const res = await fetch('/api/admins/list', { headers: { 'Authorization': 'Bearer ' + window.PRIVATIAN_TOKEN } });
+    const res = await fetch('/api/admins/list?include_deleted=true', {
+      headers: { 'Authorization': 'Bearer ' + window.PRIVATIAN_TOKEN }
+    });
     if (!res.ok) throw new Error('Failed');
-    const admins = await res.json();
-    if (!admins.length) { list.innerHTML = '<div style="text-align:center;padding:32px;color:#6b7280;">No whitelisted admins yet.</div>'; return; }
-    list.innerHTML = admins.map(a => `<div style="display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid #e5e7eb;flex-wrap:wrap;"><div style="flex:1;min-width:160px;"><div style="font-weight:600;font-size:14px;">${escapeHtml(a.email)}</div><div style="font-size:12px;color:#6b7280;">Added by ${escapeHtml(a.added_by||'—')} &middot; ${new Date(a.added_at).toLocaleDateString()}</div></div><span style="background:${a.role==='Admin'?'#dbeafe':'#d1fae5'};color:${a.role==='Admin'?'#1e40af':'#065f46'};border-radius:10px;padding:2px 10px;font-size:12px;font-weight:600;">${escapeHtml(a.role)}</span><span style="background:${a.status==='active'?'#dcfce7':'#fee2e2'};color:${a.status==='active'?'#166534':'#991b1b'};border-radius:10px;padding:2px 10px;font-size:12px;font-weight:600;">${escapeHtml(a.status)}</span>${a.email===(window.PRIVATIAN_USER&&window.PRIVATIAN_USER.email)?'<span style="font-size:12px;color:#aaa;">(you)</span>':`<button onclick="toggleAdminStatus('${a.id}','${a.status==='active'?'suspended':'active'}')" style="background:none;border:1px solid #e5e7eb;border-radius:6px;padding:4px 10px;font-size:12px;cursor:pointer;color:#6b7280;">${a.status==='active'?'Suspend':'Restore'}</button><button onclick="removeAdmin('${a.id}','${escapeHtml(a.email)}')" style="background:none;border:1px solid #fca5a5;border-radius:6px;padding:4px 10px;font-size:12px;cursor:pointer;color:#dc2626;">Remove</button>`}</div>`).join('');
-  } catch(e) { list.innerHTML = '<div style="text-align:center;padding:24px;color:#dc2626;">Error loading admins.</div>'; }
+    const all = await res.json();
+
+    const me = (window.PRIVATIAN_USER && window.PRIVATIAN_USER.email || '').toLowerCase();
+    const active    = all.filter(a => a.status === 'active');
+    const suspended = all.filter(a => a.status === 'suspended');
+    const deleted   = all.filter(a => a.status === 'deleted');
+
+    function adminRow(a) {
+      const isSelf = a.email.toLowerCase() === me;
+      const statusColor = { active: '#dcfce7', suspended: '#fef3c7', deleted: '#fee2e2' };
+      const statusText  = { active: '#166534', suspended: '#92400e', deleted: '#991b1b' };
+      const roleColor   = a.role === 'Admin' ? '#dbeafe' : '#d1fae5';
+      const roleText    = a.role === 'Admin' ? '#1e40af' : '#065f46';
+      const actions = isSelf
+        ? '<span style="font-size:12px;color:#9ca3af;padding:4px 8px;">(you)</span>'
+        : (a.status === 'deleted'
+          ? `<button onclick="restoreAdmin('${a.id}','${escapeHtml(a.email)}')" style="background:none;border:1px solid #6ee7b7;border-radius:6px;padding:4px 10px;font-size:12px;cursor:pointer;color:#059669;">Restore</button>`
+          : `
+            <button onclick="toggleAdminStatus('${a.id}','${a.status==='active'?'suspended':'active'}','${escapeHtml(a.email)}')" style="background:none;border:1px solid #e5e7eb;border-radius:6px;padding:4px 10px;font-size:12px;cursor:pointer;color:#6b7280;">${a.status==='active'?'Suspend':'Unsuspend'}</button>
+            <button onclick="removeAdmin('${a.id}','${escapeHtml(a.email)}')" style="background:none;border:1px solid #fca5a5;border-radius:6px;padding:4px 10px;font-size:12px;cursor:pointer;color:#dc2626;">Remove</button>
+          `);
+      return `<div style="display:flex;align-items:center;gap:10px;padding:12px 16px;border-bottom:1px solid #e5e7eb;flex-wrap:wrap;">
+        <div style="flex:1;min-width:160px;">
+          <div style="font-weight:600;font-size:14px;">${escapeHtml(a.email)}</div>
+          <div style="font-size:12px;color:#6b7280;">Added by ${escapeHtml(a.added_by||'—')} &middot; ${new Date(a.added_at).toLocaleDateString()}</div>
+        </div>
+        <span style="background:${roleColor};color:${roleText};border-radius:10px;padding:2px 10px;font-size:12px;font-weight:600;">${escapeHtml(a.role)}</span>
+        <span style="background:${statusColor[a.status]||'#f3f4f6'};color:${statusText[a.status]||'#374151'};border-radius:10px;padding:2px 10px;font-size:12px;font-weight:600;">${escapeHtml(a.status)}</span>
+        <div style="display:flex;gap:6px;">${actions}</div>
+      </div>`;
+    }
+
+    function section(title, rows, emptyMsg) {
+      if (!rows.length && !emptyMsg) return '';
+      return `<div style="margin-bottom:24px;">
+        <div style="font-size:11px;font-weight:700;color:#6b7280;letter-spacing:.08em;text-transform:uppercase;padding:8px 16px;background:#f9fafb;border-bottom:1px solid #e5e7eb;">${escapeHtml(title)} (${rows.length})</div>
+        ${rows.length ? rows.map(adminRow).join('') : '<div style="padding:16px 16px;color:#9ca3af;font-size:13px;">' + emptyMsg + '</div>'}
+      </div>`;
+    }
+
+    list.innerHTML =
+      section('Active', active, 'No active admins.') +
+      section('Suspended', suspended, '') +
+      (deleted.length ? section('Recycle — Removed Accounts', deleted, '') : '');
+
+    if (!all.length) list.innerHTML = '<div style="text-align:center;padding:32px;color:#6b7280;">No whitelisted admins yet.</div>';
+  } catch(e) {
+    list.innerHTML = '<div style="text-align:center;padding:24px;color:#dc2626;">Error loading admins.</div>';
+  }
 }
 
 async function addAdminEmail() {
   const emailInput = document.getElementById('access-email-input');
   const roleSelect = document.getElementById('access-role-select');
-  const email = (emailInput.value||'').trim();
-  const role = roleSelect.value;
-  if (!email || !email.includes('@')) { showToast('error','Please enter a valid email.'); return; }
+  const email = (emailInput.value || '').trim().toLowerCase();
+  const role  = roleSelect ? roleSelect.value : 'Admin';
+  if (!email || !email.includes('@')) { showToast('error', 'Please enter a valid email.'); return; }
+  if (!email.endsWith('@gmail.com')) { showToast('error', 'Only @gmail.com addresses are allowed.'); return; }
   try {
-    const res = await fetch('/api/admins/add', { method:'POST', headers:{'Content-Type':'application/json','Authorization':'Bearer '+window.PRIVATIAN_TOKEN}, body:JSON.stringify({email,role}) });
+    const res = await fetch('/api/admins/add', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + window.PRIVATIAN_TOKEN },
+      body: JSON.stringify({ email, role })
+    });
     const data = await res.json();
-    if (!res.ok) throw new Error(data.error||'Failed');
-    emailInput.value='';
-    showToast('success',email+' added as '+role+'.');
+    if (!res.ok) throw new Error(data.error || 'Failed');
+    emailInput.value = '';
+    showToast('success', email + ' added as ' + role + '.');
     loadAccessList();
-  } catch(e) { showToast('error',e.message||'Failed to add.'); }
+  } catch(e) { showToast('error', e.message || 'Failed to add.'); }
 }
 
-async function toggleAdminStatus(id, newStatus) {
+async function toggleAdminStatus(id, newStatus, email) {
+  const me = (window.PRIVATIAN_USER && window.PRIVATIAN_USER.email || '').toLowerCase();
+  if (email && email.toLowerCase() === me) {
+    showToast('error', 'You cannot change your own status.'); return;
+  }
   try {
-    const res = await fetch('/api/admins/update?id='+id, { method:'PATCH', headers:{'Content-Type':'application/json','Authorization':'Bearer '+window.PRIVATIAN_TOKEN}, body:JSON.stringify({status:newStatus}) });
-    if (!res.ok) throw new Error();
-    showToast('success','Status updated.');
+    const res = await fetch('/api/admins/update?id=' + id, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + window.PRIVATIAN_TOKEN },
+      body: JSON.stringify({ status: newStatus })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Failed');
+    showToast('success', 'Status updated to ' + newStatus + '.');
     loadAccessList();
-  } catch(e) { showToast('error','Failed to update.'); }
+  } catch(e) { showToast('error', e.message || 'Failed to update.'); }
 }
 
 async function removeAdmin(id, email) {
-  if (!confirm('Remove '+email+' from the whitelist?')) return;
+  const me = (window.PRIVATIAN_USER && window.PRIVATIAN_USER.email || '').toLowerCase();
+  if (email && email.toLowerCase() === me) {
+    showToast('error', 'You cannot remove your own account.'); return;
+  }
+  if (!confirm('Move ' + email + ' to Recycle? They will lose access immediately.')) return;
   try {
-    const res = await fetch('/api/admins/remove?id='+id, { method:'DELETE', headers:{'Authorization':'Bearer '+window.PRIVATIAN_TOKEN} });
-    if (!res.ok) throw new Error();
-    showToast('success',email+' removed.');
+    const res = await fetch('/api/admins/remove?id=' + id, {
+      method: 'DELETE',
+      headers: { 'Authorization': 'Bearer ' + window.PRIVATIAN_TOKEN }
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Failed');
+    showToast('success', email + ' removed. They will lose access on their next access check.');
     loadAccessList();
-  } catch(e) { showToast('error','Failed to remove.'); }
+  } catch(e) { showToast('error', e.message || 'Failed to remove.'); }
 }
 
-window.addEventListener('privatian:ready', function() { initAccessPage(); });
+async function restoreAdmin(id, email) {
+  try {
+    const res = await fetch('/api/admins/update?id=' + id, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + window.PRIVATIAN_TOKEN },
+      body: JSON.stringify({ status: 'active' })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Failed');
+    showToast('success', email + ' restored to Active.');
+    loadAccessList();
+  } catch(e) { showToast('error', e.message || 'Failed to restore.'); }
+}
+
+// ── Silent access check (runs every 30 min + on tab focus + on sidebar nav) ──
+let _lastAccessCheck = 0;
+let _accessRevoked   = false;
+
+async function checkMyAccess() {
+  if (_accessRevoked || !window.PRIVATIAN_TOKEN) return;
+  _lastAccessCheck = Date.now();
+  try {
+    const res = await fetch('/api/admins/check', {
+      headers: { 'Authorization': 'Bearer ' + window.PRIVATIAN_TOKEN }
+    });
+    if (res.status === 401) { _revokeAccess('session_expired'); return; }
+    const data = await res.json();
+    if (!data.ok) { _revokeAccess(data.reason || 'revoked'); }
+  } catch(e) {
+    // Network error — do not log out on network hiccup, just skip
+    console.warn('[Admin] Access check failed (network?):', e.message);
+  }
+}
+
+function _revokeAccess(reason) {
+  if (_accessRevoked) return;
+  _accessRevoked = true;
+  const msg = reason === 'suspended'      ? 'Your account has been suspended.'
+            : reason === 'deleted'        ? 'Your account has been removed.'
+            : reason === 'session_expired'? 'Your session has expired.'
+            : 'Your admin access has been revoked.';
+  showToast('error', msg + ' Redirecting to login...');
+  setTimeout(function() {
+    // Clear session and redirect
+    document.cookie = 'privatian_session=; Max-Age=0; path=/';
+    window.location.href = '/admin-login.html';
+  }, 3000);
+}
+
+// Run every 30 minutes silently
+setInterval(checkMyAccess, 30 * 60 * 1000);
+
+// On tab focus: check if 5+ minutes since last check
+document.addEventListener('visibilitychange', function() {
+  if (document.visibilityState === 'visible') {
+    if (Date.now() - _lastAccessCheck > 5 * 60 * 1000) {
+      checkMyAccess();
+    }
+  }
+});
+
+// First check 10 seconds after page load (fast initial verification)
+setTimeout(checkMyAccess, 10000);
+
+window.addEventListener('privatian:ready', function() {
+  initAccessPage();
+  checkMyAccess(); // run immediately when session is ready
+});
+
+:center;padding:24px;color:#dc2626;">Error loading admins.</div>';
+  }
+}
+
+async function addAdminEmail() {
+  const emailInput = document.getElementById('access-email-input');
+  const roleSelect = document.getElementById('access-role-select');
+  const email = (emailInput.value || '').trim().toLowerCase();
+  const role  = roleSelect ? roleSelect.value : 'Admin';
+  if (!email || !email.includes('@')) { showToast('error', 'Please enter a valid email.'); return; }
+  if (!email.endsWith('@gmail.com')) { showToast('error', 'Only @gmail.com addresses are allowed.'); return; }
+  try {
+    const res = await fetch('/api/admins/add', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + window.PRIVATIAN_TOKEN },
+      body: JSON.stringify({ email, role })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Failed');
+    emailInput.value = '';
+    showToast('success', email + ' added as ' + role + '.');
+    loadAccessList();
+  } catch(e) { showToast('error', e.message || 'Failed to add.'); }
+}
+
+async function toggleAdminStatus(id, newStatus, email) {
+  const me = (window.PRIVATIAN_USER && window.PRIVATIAN_USER.email || '').toLowerCase();
+  if (email && email.toLowerCase() === me) {
+    showToast('error', 'You cannot change your own status.'); return;
+  }
+  try {
+    const res = await fetch('/api/admins/update?id=' + id, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + window.PRIVATIAN_TOKEN },
+      body: JSON.stringify({ status: newStatus })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Failed');
+    showToast('success', 'Status updated to ' + newStatus + '.');
+    loadAccessList();
+  } catch(e) { showToast('error', e.message || 'Failed to update.'); }
+}
+
+async function removeAdmin(id, email) {
+  const me = (window.PRIVATIAN_USER && window.PRIVATIAN_USER.email || '').toLowerCase();
+  if (email && email.toLowerCase() === me) {
+    showToast('error', 'You cannot remove your own account.'); return;
+  }
+  if (!confirm('Move ' + email + ' to Recycle? They will lose access immediately.')) return;
+  try {
+    const res = await fetch('/api/admins/remove?id=' + id, {
+      method: 'DELETE',
+      headers: { 'Authorization': 'Bearer ' + window.PRIVATIAN_TOKEN }
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Failed');
+    showToast('success', email + ' removed. They will lose access on their next access check.');
+    loadAccessList();
+  } catch(e) { showToast('error', e.message || 'Failed to remove.'); }
+}
+
+async function restoreAdmin(id, email) {
+  try {
+    const res = await fetch('/api/admins/update?id=' + id, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + window.PRIVATIAN_TOKEN },
+      body: JSON.stringify({ status: 'active' })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Failed');
+    showToast('success', email + ' restored to Active.');
+    loadAccessList();
+  } catch(e) { showToast('error', e.message || 'Failed to restore.'); }
+}
+
+// ── Silent access check (runs every 30 min + on tab focus + on sidebar nav) ──
+let _lastAccessCheck = 0;
+let _accessRevoked   = false;
+
+async function checkMyAccess() {
+  if (_accessRevoked || !window.PRIVATIAN_TOKEN) return;
+  _lastAccessCheck = Date.now();
+  try {
+    const res = await fetch('/api/admins/check', {
+      headers: { 'Authorization': 'Bearer ' + window.PRIVATIAN_TOKEN }
+    });
+    if (res.status === 401) { _revokeAccess('session_expired'); return; }
+    const data = await res.json();
+    if (!data.ok) { _revokeAccess(data.reason || 'revoked'); }
+  } catch(e) {
+    // Network error — do not log out on network hiccup, just skip
+    console.warn('[Admin] Access check failed (network?):', e.message);
+  }
+}
+
+function _revokeAccess(reason) {
+  if (_accessRevoked) return;
+  _accessRevoked = true;
+  const msg = reason === 'suspended'      ? 'Your account has been suspended.'
+            : reason === 'deleted'        ? 'Your account has been removed.'
+            : reason === 'session_expired'? 'Your session has expired.'
+            : 'Your admin access has been revoked.';
+  showToast('error', msg + ' Redirecting to login...');
+  setTimeout(function() {
+    // Clear session and redirect
+    document.cookie = 'privatian_session=; Max-Age=0; path=/';
+    window.location.href = '/admin-login.html';
+  }, 3000);
+}
+
+// Run every 30 minutes silently
+setInterval(checkMyAccess, 30 * 60 * 1000);
+
+// On tab focus: check if 5+ minutes since last check
+document.addEventListener('visibilitychange', function() {
+  if (document.visibilityState === 'visible') {
+    if (Date.now() - _lastAccessCheck > 5 * 60 * 1000) {
+      checkMyAccess();
+    }
+  }
+});
+
+// First check 10 seconds after page load (fast initial verification)
+setTimeout(checkMyAccess, 10000);
+
+window.addEventListener('privatian:ready', function() {
+  initAccessPage();
+  checkMyAccess(); // run immediately when session is ready
+});
 
 
-// ═══════════════════════════════════════════════════════════════
+// HEADER SETTINGS PAGE
 // HEADER SETTINGS PAGE
 // ═══════════════════════════════════════════════════════════════
 
