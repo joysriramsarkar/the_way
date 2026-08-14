@@ -1,0 +1,825 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Article Editor — The Privatian Family Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Source+Sans+3:wght@300;400;600;700&display=swap" rel="stylesheet" />
+  <!-- Exact same article styles so it looks identical to published article -->
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="article.css" />
+  <style>
+    /* ── Editor-only overrides (removed in published view) ── */
+    :root {
+      --editor-accent: #0a528e;
+      --editor-hover-border: rgba(10,82,142,.35);
+    }
+
+    body { padding-top: 56px; } /* room for toolbar */
+
+    /* Floating admin toolbar */
+    #editor-toolbar {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 10000;
+      height: 52px;
+      background: #0d1f35;
+      display: flex; align-items: center; gap: 10px;
+      padding: 0 20px;
+      box-shadow: 0 2px 12px rgba(0,0,0,.25);
+    }
+    .etb-back {
+      display: flex; align-items: center; gap: 6px;
+      color: rgba(255,255,255,.65); text-decoration: none;
+      font-family: 'Source Sans 3', sans-serif; font-size: 13px; font-weight: 600;
+      padding: 6px 10px; border-radius: 6px; transition: all .15s;
+    }
+    .etb-back:hover { color: #fff; background: rgba(255,255,255,.08); }
+    .etb-divider { width: 1px; height: 28px; background: rgba(255,255,255,.15); flex-shrink: 0; }
+    .etb-slug-wrap {
+      display: flex; align-items: center; gap: 8px; flex: 1; min-width: 0;
+    }
+    .etb-slug-label {
+      font-family: 'Source Sans 3', sans-serif; font-size: 11px; font-weight: 700;
+      letter-spacing: .07em; text-transform: uppercase; color: rgba(255,255,255,.4);
+      flex-shrink: 0;
+    }
+    #editor-slug {
+      font-family: 'Source Sans 3', sans-serif; font-size: 12.5px; font-weight: 400;
+      color: rgba(255,255,255,.75); background: rgba(255,255,255,.07);
+      border: 1px solid rgba(255,255,255,.12); border-radius: 5px;
+      padding: 4px 10px; outline: none; width: 220px; max-width: 100%;
+      transition: border-color .15s, background .15s;
+    }
+    #editor-slug:focus { border-color: rgba(255,255,255,.35); background: rgba(255,255,255,.12); color: #fff; }
+    .etb-status {
+      font-family: 'Source Sans 3', sans-serif; font-size: 11px; font-weight: 700;
+      letter-spacing: .07em; text-transform: uppercase;
+      padding: 4px 10px; border-radius: 20px; flex-shrink: 0;
+    }
+    .etb-status.draft { background: rgba(255,200,50,.15); color: #ffc832; }
+    .etb-status.published { background: rgba(50,210,120,.15); color: #32d278; }
+    .etb-autosave {
+      font-family: 'Source Sans 3', sans-serif; font-size: 11px;
+      color: rgba(255,255,255,.35); flex-shrink: 0; white-space: nowrap;
+    }
+    .etb-btn {
+      font-family: 'Source Sans 3', sans-serif; font-size: 13px; font-weight: 600;
+      border: none; border-radius: 7px; padding: 7px 16px; cursor: pointer;
+      transition: all .15s; flex-shrink: 0;
+    }
+    .etb-btn-ghost {
+      background: rgba(255,255,255,.08); color: rgba(255,255,255,.75);
+      border: 1px solid rgba(255,255,255,.15);
+    }
+    .etb-btn-ghost:hover { background: rgba(255,255,255,.15); color: #fff; }
+    .etb-btn-save { background: rgba(10,82,142,.8); color: #fff; }
+    .etb-btn-save:hover { background: #0a528e; }
+    .etb-btn-publish { background: #1d8a4e; color: #fff; }
+    .etb-btn-publish:hover { background: #178042; }
+    .etb-btn-unpublish { background: rgba(220,38,38,.7); color: #fff; }
+    .etb-btn-unpublish:hover { background: #dc2626; }
+
+    /* Editable field highlight on hover/focus */
+    [contenteditable] {
+      outline: none;
+      border-radius: 3px;
+      transition: box-shadow .15s, background .15s;
+    }
+    [contenteditable]:hover {
+      box-shadow: 0 0 0 2px var(--editor-hover-border);
+    }
+    [contenteditable]:focus {
+      box-shadow: 0 0 0 2px rgba(10,82,142,.55);
+      background: rgba(10,82,142,.03);
+    }
+
+    /* Hero image upload zone */
+    #editor-hero-zone {
+      position: relative; cursor: pointer;
+      border-radius: 3px; transition: opacity .2s;
+    }
+    #editor-hero-zone:hover { opacity: .88; }
+    #editor-hero-zone .hero-overlay {
+      position: absolute; inset: 0;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      background: rgba(13,31,53,.55); border-radius: 3px;
+      opacity: 0; transition: opacity .2s; pointer-events: none;
+      color: #fff; font-family: 'Source Sans 3', sans-serif; font-size: 14px; font-weight: 600;
+      gap: 8px;
+    }
+    #editor-hero-zone:hover .hero-overlay { opacity: 1; }
+    #editor-hero-zone.empty-zone {
+      min-height: 280px; background: #f0f4f8;
+      border: 2px dashed #adc4da; border-radius: 4px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    #editor-hero-zone.empty-zone .hero-overlay { opacity: 1; background: none; color: #5a7a9a; }
+
+    /* Section pill — make it a dropdown overlay */
+    #editor-section-wrap { position: relative; display: inline-block; cursor: pointer; }
+    #editor-section-wrap::after {
+      content: ' ▾'; font-size: 10px; opacity: .7;
+    }
+    .section-dropdown {
+      position: absolute; top: calc(100% + 6px); left: 0; z-index: 100;
+      background: #fff; border: 1px solid #d4dde6; border-radius: 8px;
+      box-shadow: 0 8px 24px rgba(0,0,0,.12); min-width: 180px;
+      display: none; overflow: hidden;
+    }
+    .section-dropdown.open { display: block; }
+    .section-option {
+      padding: 10px 16px; font-family: 'Source Sans 3', sans-serif;
+      font-size: 13px; font-weight: 600; cursor: pointer;
+      color: #374151; transition: background .1s;
+    }
+    .section-option:hover { background: #f0f4f8; color: #0a528e; }
+    .section-option-custom {
+      padding: 8px 12px; border-top: 1px solid #e5e7eb;
+    }
+    .section-option-custom input {
+      width: 100%; border: 1px solid #d1d5db; border-radius: 5px;
+      padding: 5px 8px; font-size: 12px; outline: none;
+    }
+
+    /* Add block button */
+    #add-block-btn {
+      display: flex; align-items: center; justify-content: center;
+      width: 32px; height: 32px; border-radius: 50%;
+      background: #e8f1f9; border: 2px dashed #adc4da;
+      cursor: pointer; color: #5a7a9a;
+      font-size: 20px; line-height: 1; transition: all .15s;
+      margin: 16px auto 0; position: relative;
+    }
+    #add-block-btn:hover { background: #0a528e; border-color: #0a528e; color: #fff; }
+    .add-block-menu {
+      position: absolute; bottom: calc(100% + 8px); left: 50%; transform: translateX(-50%);
+      background: #fff; border: 1px solid #d4dde6; border-radius: 10px;
+      box-shadow: 0 8px 28px rgba(0,0,0,.14); min-width: 200px;
+      display: none; overflow: hidden;
+    }
+    #add-block-btn.menu-open .add-block-menu { display: block; }
+    .block-option {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 16px; font-family: 'Source Sans 3', sans-serif;
+      font-size: 13px; font-weight: 600; cursor: pointer; color: #374151;
+      transition: background .1s; border-bottom: 1px solid #f3f4f6;
+    }
+    .block-option:last-child { border-bottom: none; }
+    .block-option:hover { background: #f0f4f8; color: #0a528e; }
+    .block-icon { font-size: 16px; width: 20px; text-align: center; }
+
+    /* Inline formatting toolbar */
+    #inline-toolbar {
+      position: fixed; z-index: 9999; background: #0d1f35; border-radius: 8px;
+      box-shadow: 0 4px 16px rgba(0,0,0,.3); padding: 4px 6px;
+      display: none; align-items: center; gap: 2px;
+    }
+    #inline-toolbar.visible { display: flex; }
+    .itb-btn {
+      width: 30px; height: 28px; border: none; background: none; cursor: pointer;
+      color: rgba(255,255,255,.75); border-radius: 5px; font-size: 13px;
+      font-weight: 700; transition: all .12s; display: flex; align-items: center; justify-content: center;
+    }
+    .itb-btn:hover { background: rgba(255,255,255,.15); color: #fff; }
+    .itb-divider { width: 1px; height: 18px; background: rgba(255,255,255,.2); margin: 0 3px; }
+
+    /* Delete block button — appears on hover */
+    .deletable-block { position: relative; }
+    .delete-block-btn {
+      position: absolute; right: -36px; top: 50%; transform: translateY(-50%);
+      width: 26px; height: 26px; border-radius: 50%; background: #fee2e2;
+      border: none; cursor: pointer; color: #dc2626;
+      display: none; align-items: center; justify-content: center;
+      font-size: 14px; transition: background .12s;
+    }
+    .deletable-block:hover .delete-block-btn { display: flex; }
+    .delete-block-btn:hover { background: #dc2626; color: #fff; }
+
+    /* Toast */
+    #editor-toast {
+      position: fixed; bottom: 24px; right: 24px; z-index: 99999;
+      background: #0d1f35; color: #fff;
+      font-family: 'Source Sans 3', sans-serif; font-size: 13px; font-weight: 600;
+      padding: 12px 20px; border-radius: 10px;
+      box-shadow: 0 4px 20px rgba(0,0,0,.3); max-width: 340px;
+      transform: translateY(80px); opacity: 0;
+      transition: transform .25s, opacity .25s;
+    }
+    #editor-toast.show { transform: translateY(0); opacity: 1; }
+    #editor-toast.success { border-left: 4px solid #32d278; }
+    #editor-toast.error   { border-left: 4px solid #ef4444; }
+
+    /* Hide share sidebar and site header/footer in editor */
+    .article-share-sidebar, #site-header-mount, #site-footer-mount,
+    .article-related, .article-right-aside { display: none !important; }
+    .article-layout {
+      grid-template-columns: 1fr !important;
+      max-width: 760px !important;
+    }
+  </style>
+</head>
+<body class="article-page">
+
+  <!-- ── Floating Admin Toolbar ── -->
+  <div id="editor-toolbar">
+    <a href="admin.html#articles" class="etb-back" id="editor-back-btn">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+      Articles
+    </a>
+    <div class="etb-divider"></div>
+    <div class="etb-slug-wrap">
+      <span class="etb-slug-label">Slug</span>
+      <input type="text" id="editor-slug" placeholder="article-slug-here" />
+    </div>
+    <div class="etb-divider"></div>
+    <span class="etb-status draft" id="editor-status-badge">● DRAFT</span>
+    <span class="etb-autosave" id="editor-autosave-label"></span>
+    <div class="etb-divider"></div>
+    <button class="etb-btn etb-btn-ghost" id="editor-preview-btn" onclick="previewArticle()">Preview</button>
+    <button class="etb-btn etb-btn-save" id="editor-save-btn" onclick="saveArticle()">Save</button>
+    <button class="etb-btn etb-btn-publish" id="editor-publish-btn" onclick="publishArticle()">Publish</button>
+  </div>
+
+  <!-- Inline formatting toolbar (appears on text selection) -->
+  <div id="inline-toolbar">
+    <button class="itb-btn" onclick="execCmd('bold')" title="Bold (Ctrl+B)"><b>B</b></button>
+    <button class="itb-btn" onclick="execCmd('italic')" title="Italic (Ctrl+I)"><i>I</i></button>
+    <button class="itb-btn" onclick="execCmd('underline')" title="Underline"><u>U</u></button>
+    <div class="itb-divider"></div>
+    <button class="itb-btn" onclick="insertLink()" title="Link (Ctrl+K)">🔗</button>
+    <div class="itb-divider"></div>
+    <button class="itb-btn" onclick="execCmd('removeFormat')" title="Clear format">✕</button>
+  </div>
+
+  <!-- Section dropdown -->
+  <div id="section-dropdown-el" class="section-dropdown">
+    <div class="section-option" onclick="setSection('Findings')">Findings</div>
+    <div class="section-option" onclick="setSection('Culture')">Culture</div>
+    <div class="section-option" onclick="setSection('Heritage')">Heritage</div>
+    <div class="section-option" onclick="setSection('Community & Heritage')">Community & Heritage</div>
+    <div class="section-option" onclick="setSection('Opinion')">Opinion</div>
+    <div class="section-option" onclick="setSection('Archive')">Archive</div>
+    <div class="section-option-custom">
+      <input type="text" id="section-custom-input" placeholder="Custom section..." onkeydown="if(event.key==='Enter'){setSection(this.value);}" />
+    </div>
+  </div>
+
+  <!-- ══════════════════ ARTICLE TEMPLATE (editable) ══════════════════ -->
+
+  <!-- Hero Band -->
+  <div class="article-hero-band">
+    <div class="article-hero-inner">
+      <nav class="article-breadcrumb">
+        <a href="index.html" class="breadcrumb-home">Home</a>
+        <span class="breadcrumb-sep">›</span>
+        <span class="breadcrumb-section" id="breadcrumb-section">Section</span>
+      </nav>
+
+      <!-- Section pill — clickable dropdown -->
+      <div id="editor-section-wrap" onclick="toggleSectionDropdown(event)">
+        <span class="article-section-pill" id="editor-section-pill">Section</span>
+      </div>
+
+      <!-- Headline — fully editable -->
+      <h1 class="article-headline" id="editor-headline"
+          contenteditable="true"
+          data-placeholder="Article headline..."
+          spellcheck="true"></h1>
+
+      <!-- Deck -->
+      <p class="article-deck" id="editor-deck"
+         contenteditable="true"
+         data-placeholder="Add a deck/subtitle..."></p>
+
+      <!-- Meta -->
+      <div class="article-meta">
+        <span class="article-author">By <strong contenteditable="true" id="editor-author" data-placeholder="Author name"></strong></span>
+        <span class="meta-dot">·</span>
+        <span contenteditable="true" id="editor-date" class="article-date" data-placeholder="Date"></span>
+        <span class="meta-dot">·</span>
+        <span class="article-readtime" id="editor-readtime">— min read</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Article body layout -->
+  <div class="article-layout">
+    <main class="article-body" id="article-body">
+
+      <!-- Hero image -->
+      <figure class="article-hero-figure">
+        <div id="editor-hero-zone" onclick="triggerImageUpload()">
+          <img id="editor-hero-img" class="article-hero-img"
+               src="" alt="" style="display:none" />
+          <div class="hero-overlay">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>
+            Click to upload hero image
+          </div>
+        </div>
+        <input type="file" id="hero-img-input" accept="image/*" style="display:none" onchange="handleImageUpload(this)" />
+        <figcaption class="article-hero-caption">
+          <span contenteditable="true" id="editor-hero-caption" data-placeholder="Caption text..."></span>
+          <span class="caption-credit" contenteditable="true" id="editor-hero-credit" data-placeholder="Photo credit..."></span>
+        </figcaption>
+      </figure>
+
+      <!-- Article content — editable -->
+      <div class="article-content" id="editor-content">
+        <!-- Populated by JS or user typing -->
+      </div>
+
+      <!-- Add block button -->
+      <div id="add-block-btn" onclick="toggleAddMenu(event)">
+        +
+        <div class="add-block-menu" id="add-block-menu">
+          <div class="block-option" onclick="addBlock('p')"><span class="block-icon">¶</span> Paragraph</div>
+          <div class="block-option" onclick="addBlock('lead')"><span class="block-icon">◉</span> Lead paragraph</div>
+          <div class="block-option" onclick="addBlock('h2')"><span class="block-icon">H2</span> Section heading</div>
+          <div class="block-option" onclick="addBlock('h3')"><span class="block-icon">H3</span> Sub-heading</div>
+          <div class="block-option" onclick="addBlock('blockquote')"><span class="block-icon">❝</span> Pull quote</div>
+          <div class="block-option" onclick="addBlock('img')"><span class="block-icon">🖼</span> Inline image</div>
+          <div class="block-option" onclick="addBlock('hr')"><span class="block-icon">—</span> Divider</div>
+        </div>
+      </div>
+
+      <!-- Author bio -->
+      <div class="article-author-bio" id="editor-author-bio">
+        <div class="author-bio-avatar">
+          <svg width="52" height="52" viewBox="0 0 52 52" fill="none"><circle cx="26" cy="26" r="26" fill="#e8f1f9"/><circle cx="26" cy="20" r="9" fill="#0a528e" opacity="0.35"/><ellipse cx="26" cy="42" rx="16" ry="9" fill="#0a528e" opacity="0.2"/></svg>
+        </div>
+        <div class="author-bio-text">
+          <div class="author-bio-name" contenteditable="true" id="editor-bio-name" data-placeholder="Author Name"></div>
+          <div class="author-bio-role" contenteditable="true" id="editor-bio-role" data-placeholder="Role / Title"></div>
+          <p class="author-bio-desc" contenteditable="true" id="editor-bio-desc" data-placeholder="Short author bio..."></p>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Toast -->
+  <div id="editor-toast"></div>
+
+  <script src="admin-auth.js"></script>
+  <script>
+  /* ═══════════════════════════════════════════════════════════
+     ARTICLE EDITOR — Admin Panel
+  ═══════════════════════════════════════════════════════════ */
+
+  let _articleId  = null;
+  let _articleStatus = 'draft';
+  let _autoSaveTimer = null;
+  let _lastSavedAt   = null;
+  let _dirty = false;
+
+  // ── Init on auth ready ────────────────────────────────────
+  window.addEventListener('privatian:ready', () => {
+    const params = new URLSearchParams(window.location.search);
+    _articleId = params.get('id') || null;
+    if (_articleId) {
+      loadArticle(_articleId);
+    } else {
+      initEmptyEditor();
+    }
+    setupPlaceholders();
+    setupInlineToolbar();
+    startAutoSave();
+    markDirtyOnInput();
+  });
+
+  // ── Load existing article ─────────────────────────────────
+  async function loadArticle(id) {
+    try {
+      const res  = await fetch('/api/articles/get?id=' + id, {
+        headers: { 'Authorization': 'Bearer ' + window.PRIVATIAN_TOKEN }
+      });
+      if (!res.ok) { showToast('Article not found', 'error'); return; }
+      const a = await res.json();
+      populateEditor(a);
+    } catch(e) { showToast('Failed to load article', 'error'); }
+  }
+
+  function populateEditor(a) {
+    _articleId     = a.id;
+    _articleStatus = a.status || 'draft';
+
+    setText('editor-headline',   a.title || '');
+    setText('editor-deck',       a.deck  || '');
+    setText('editor-author',     a.author || '');
+    setText('editor-date',       a.published_at
+      ? new Date(a.published_at).toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'})
+      : new Date(a.created_at || Date.now()).toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'})
+    );
+    setText('editor-bio-name',   a.author || '');
+    setText('editor-bio-role',   a.author_role || '');
+    setText('editor-bio-desc',   a.author_bio  || '');
+    setText('editor-hero-caption', a.hero_caption || '');
+    setText('editor-hero-credit',  a.hero_credit  || '');
+
+    document.getElementById('editor-slug').value = a.slug || '';
+    setSection(a.section || '');
+
+    // Hero image
+    if (a.hero_img_url) {
+      setHeroImage(a.hero_img_url);
+    }
+
+    // Body content
+    const content = document.getElementById('editor-content');
+    if (a.content_html) {
+      content.innerHTML = a.content_html;
+      // Re-attach delete buttons
+      content.querySelectorAll('.deletable-block').forEach(attachDeleteBtn);
+    } else {
+      initEmptyEditor();
+    }
+
+    updateStatusBadge();
+    updateReadTime();
+  }
+
+  function initEmptyEditor() {
+    const content = document.getElementById('editor-content');
+    if (!content.children.length) {
+      addBlock('lead', true);
+      addBlock('p', true);
+    }
+    const today = new Date().toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'});
+    if (!getText('editor-date')) setText('editor-date', today);
+  }
+
+  // ── Save ─────────────────────────────────────────────────
+  async function saveArticle(silent = false) {
+    if (!silent) document.getElementById('editor-save-btn').textContent = 'Saving...';
+
+    const payload = buildPayload();
+    try {
+      const res  = await fetch('/api/articles/save', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + window.PRIVATIAN_TOKEN },
+        body: JSON.stringify(payload)
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Save failed');
+
+      if (!_articleId) {
+        _articleId = data.id;
+        // Update URL without reload
+        const url = new URL(window.location.href);
+        url.searchParams.set('id', _articleId);
+        window.history.replaceState({}, '', url.toString());
+        document.getElementById('editor-slug').value = data.slug;
+      }
+      _dirty = false;
+      _lastSavedAt = new Date();
+      document.getElementById('editor-autosave-label').textContent = 'Saved ' + _lastSavedAt.toLocaleTimeString();
+      if (!silent) showToast('Article saved', 'success');
+    } catch(e) {
+      if (!silent) showToast(e.message || 'Save failed', 'error');
+    } finally {
+      document.getElementById('editor-save-btn').textContent = 'Save';
+    }
+  }
+
+  // ── Publish ───────────────────────────────────────────────
+  async function publishArticle() {
+    if (!_articleId) {
+      await saveArticle(true);
+      if (!_articleId) { showToast('Save first', 'error'); return; }
+    }
+    const btn = document.getElementById('editor-publish-btn');
+    btn.textContent = '...';
+    try {
+      const res  = await fetch('/api/articles/publish?id=' + _articleId, {
+        method: 'POST', headers: { 'Authorization': 'Bearer ' + window.PRIVATIAN_TOKEN }
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed');
+      _articleStatus = data.status;
+      updateStatusBadge();
+      showToast(_articleStatus === 'published' ? 'Article published!' : 'Moved to Draft', 'success');
+    } catch(e) { showToast(e.message, 'error'); }
+    finally { updatePublishBtn(); }
+  }
+
+  function buildPayload() {
+    return {
+      id:           _articleId,
+      slug:         document.getElementById('editor-slug').value.trim() || undefined,
+      title:        getText('editor-headline'),
+      deck:         getText('editor-deck'),
+      section:      document.getElementById('editor-section-pill').textContent.replace(' ▾','').trim(),
+      author:       getText('editor-author'),
+      author_role:  getText('editor-bio-role'),
+      author_bio:   getText('editor-bio-desc'),
+      hero_img_url: document.getElementById('editor-hero-img').src || '',
+      hero_caption: getText('editor-hero-caption'),
+      hero_credit:  getText('editor-hero-credit'),
+      content_html: document.getElementById('editor-content').innerHTML,
+    };
+  }
+
+  // ── Auto-save ─────────────────────────────────────────────
+  function startAutoSave() {
+    setInterval(() => { if (_dirty) saveArticle(true); }, 30000);
+  }
+  function markDirtyOnInput() {
+    document.addEventListener('input', () => { _dirty = true; });
+  }
+
+  // ── Image upload ──────────────────────────────────────────
+  function triggerImageUpload() {
+    document.getElementById('hero-img-input').click();
+  }
+
+  async function handleImageUpload(input) {
+    const file = input.files[0];
+    if (!file) return;
+    // Preview immediately
+    const localUrl = URL.createObjectURL(file);
+    setHeroImage(localUrl);
+    // Upload to server
+    const form = new FormData();
+    form.append('file', file);
+    try {
+      const res  = await fetch('/api/articles/upload', {
+        method: 'POST', headers: { 'Authorization': 'Bearer ' + window.PRIVATIAN_TOKEN },
+        body: form
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Upload failed');
+      setHeroImage(data.url);
+      _dirty = true;
+    } catch(e) { showToast(e.message || 'Upload failed', 'error'); }
+  }
+
+  function setHeroImage(url) {
+    const zone = document.getElementById('editor-hero-zone');
+    const img  = document.getElementById('editor-hero-img');
+    zone.classList.remove('empty-zone');
+    img.src = url;
+    img.style.display = 'block';
+  }
+
+  // ── Add block ─────────────────────────────────────────────
+  function toggleAddMenu(e) {
+    e.stopPropagation();
+    document.getElementById('add-block-btn').classList.toggle('menu-open');
+  }
+  document.addEventListener('click', () => {
+    document.getElementById('add-block-btn').classList.remove('menu-open');
+    closeSectionDropdown();
+  });
+
+  function addBlock(type, silent = false) {
+    if (!silent) document.getElementById('add-block-btn').classList.remove('menu-open');
+    const content = document.getElementById('editor-content');
+    let el;
+
+    if (type === 'p') {
+      el = document.createElement('p');
+      el.contentEditable = 'true';
+      el.className = 'deletable-block';
+      el.dataset.placeholder = 'Write something...';
+    } else if (type === 'lead') {
+      el = document.createElement('p');
+      el.contentEditable = 'true';
+      el.className = 'article-lead deletable-block';
+      el.dataset.placeholder = 'Opening lead paragraph...';
+    } else if (type === 'h2') {
+      el = document.createElement('h2');
+      el.contentEditable = 'true';
+      el.className = 'deletable-block';
+      el.dataset.placeholder = 'Section heading...';
+    } else if (type === 'h3') {
+      el = document.createElement('h3');
+      el.contentEditable = 'true';
+      el.className = 'deletable-block';
+      el.dataset.placeholder = 'Sub-heading...';
+    } else if (type === 'blockquote') {
+      el = document.createElement('blockquote');
+      el.className = 'article-pullquote deletable-block';
+      el.innerHTML = '<p contenteditable="true" data-placeholder="Pull quote text...">\u201C\u201D</p><cite contenteditable="true" data-placeholder="\u2014 Attribution">— </cite>';
+    } else if (type === 'img') {
+      el = document.createElement('figure');
+      el.className = 'article-hero-figure deletable-block';
+      el.innerHTML = `
+        <div class="editor-inline-img-zone" onclick="triggerInlineUpload(this)" style="min-height:180px;background:#f0f4f8;border:2px dashed #adc4da;border-radius:4px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#5a7a9a;font-family:'Source Sans 3',sans-serif;font-size:14px;font-weight:600;gap:8px;">
+          <input type="file" accept="image/*" style="display:none" onchange="handleInlineImageUpload(this)" />
+          <span>Click to add image</span>
+        </div>
+        <figcaption class="article-hero-caption" contenteditable="true" data-placeholder="Image caption..."></figcaption>`;
+    } else if (type === 'hr') {
+      el = document.createElement('hr');
+      el.className = 'deletable-block';
+      el.style.cssText = 'border:none;border-top:2px solid #e4ddd5;margin:2.5em 0;';
+    }
+
+    if (el) {
+      content.appendChild(el);
+      attachDeleteBtn(el);
+      if (el.contentEditable === 'true') {
+        el.focus();
+        // Place cursor at end
+        const range = document.createRange();
+        range.selectNodeContents(el);
+        range.collapse(false);
+        window.getSelection().removeAllRanges();
+        window.getSelection().addRange(range);
+      }
+    }
+  }
+
+  function attachDeleteBtn(block) {
+    if (block.querySelector('.delete-block-btn')) return;
+    const btn = document.createElement('button');
+    btn.className = 'delete-block-btn';
+    btn.innerHTML = '×';
+    btn.title = 'Delete block';
+    btn.onclick = (e) => { e.stopPropagation(); block.remove(); _dirty = true; };
+    block.style.position = 'relative';
+    block.appendChild(btn);
+  }
+
+  // ── Inline image upload ───────────────────────────────────
+  function triggerInlineUpload(zone) {
+    zone.querySelector('input[type="file"]').click();
+  }
+  async function handleInlineImageUpload(input) {
+    const file = input.files[0];
+    if (!file) return;
+    const zone = input.closest('.editor-inline-img-zone');
+    const localUrl = URL.createObjectURL(file);
+    const img = document.createElement('img');
+    img.src = localUrl; img.className = 'article-hero-img'; img.alt = '';
+    zone.replaceWith(img);
+    // Upload
+    const form = new FormData();
+    form.append('file', file);
+    try {
+      const res  = await fetch('/api/articles/upload', {
+        method: 'POST', headers: { 'Authorization': 'Bearer ' + window.PRIVATIAN_TOKEN },
+        body: form
+      });
+      const data = await res.json();
+      if (res.ok) { img.src = data.url; _dirty = true; }
+    } catch(e) {}
+  }
+
+  // ── Section dropdown ──────────────────────────────────────
+  function toggleSectionDropdown(e) {
+    e.stopPropagation();
+    const wrap = document.getElementById('editor-section-wrap');
+    const dd   = document.getElementById('section-dropdown-el');
+    const rect = wrap.getBoundingClientRect();
+    dd.style.top  = (rect.bottom + window.scrollY + 4) + 'px';
+    dd.style.left = rect.left + 'px';
+    dd.style.position = 'absolute';
+    if (!document.body.contains(dd)) document.body.appendChild(dd);
+    dd.classList.toggle('open');
+  }
+  function closeSectionDropdown() {
+    document.getElementById('section-dropdown-el').classList.remove('open');
+  }
+  function setSection(val) {
+    if (!val) return;
+    const pill = document.getElementById('editor-section-pill');
+    pill.textContent = val;
+    document.getElementById('breadcrumb-section').textContent = val;
+    closeSectionDropdown();
+    _dirty = true;
+  }
+
+  // ── Inline formatting toolbar ─────────────────────────────
+  function setupInlineToolbar() {
+    const tb = document.getElementById('inline-toolbar');
+    document.addEventListener('selectionchange', () => {
+      const sel = window.getSelection();
+      if (!sel || sel.isCollapsed || !sel.toString().trim()) {
+        tb.classList.remove('visible'); return;
+      }
+      // Only show inside editor content areas
+      const anchor = sel.anchorNode;
+      const editable = anchor && anchor.nodeType === 3
+        ? anchor.parentElement.closest('[contenteditable]')
+        : anchor && anchor.closest && anchor.closest('[contenteditable]');
+      if (!editable) { tb.classList.remove('visible'); return; }
+
+      const range = sel.getRangeAt(0).getBoundingClientRect();
+      tb.style.top  = (window.scrollY + range.top - 44) + 'px';
+      tb.style.left = (window.scrollX + range.left + range.width/2 - 80) + 'px';
+      tb.classList.add('visible');
+    });
+  }
+
+  function execCmd(cmd, value) {
+    document.execCommand(cmd, false, value || null);
+  }
+
+  function insertLink() {
+    const url = prompt('Enter URL:');
+    if (url) document.execCommand('createLink', false, url);
+  }
+
+  // ── Keyboard shortcuts ────────────────────────────────────
+  document.addEventListener('keydown', (e) => {
+    if (e.ctrlKey || e.metaKey) {
+      if (e.key === 's') { e.preventDefault(); saveArticle(); }
+      if (e.key === 'k') { e.preventDefault(); insertLink(); }
+    }
+    // Enter in headlines → move to deck / next block
+    if (e.key === 'Enter' && e.target.id === 'editor-headline') {
+      e.preventDefault();
+      document.getElementById('editor-deck').focus();
+    }
+  });
+
+  // ── Placeholder handling ───────────────────────────────────
+  function setupPlaceholders() {
+    document.querySelectorAll('[data-placeholder]').forEach(el => {
+      updatePlaceholder(el);
+      el.addEventListener('focus', () => updatePlaceholder(el));
+      el.addEventListener('blur',  () => updatePlaceholder(el));
+      el.addEventListener('input', () => { updateReadTime(); _dirty = true; });
+    });
+  }
+  function updatePlaceholder(el) {
+    if (!el.textContent.trim() && document.activeElement !== el) {
+      el.classList.add('is-empty');
+      el.style.setProperty('--placeholder', `"${el.dataset.placeholder}"`);
+    } else {
+      el.classList.remove('is-empty');
+    }
+  }
+  // CSS for placeholders
+  const placeholderStyle = document.createElement('style');
+  placeholderStyle.textContent = `
+    [contenteditable].is-empty::before {
+      content: var(--placeholder, 'Type here...');
+      color: #b0bec9; pointer-events: none; position: absolute;
+      font-style: italic;
+    }
+    [contenteditable] { position: relative; }
+  `;
+  document.head.appendChild(placeholderStyle);
+
+  // ── Helpers ───────────────────────────────────────────────
+  function getText(id) {
+    const el = document.getElementById(id);
+    return el ? el.textContent.trim() : '';
+  }
+  function setText(id, val) {
+    const el = document.getElementById(id);
+    if (el) el.textContent = val;
+  }
+
+  function updateStatusBadge() {
+    const badge = document.getElementById('editor-status-badge');
+    if (_articleStatus === 'published') {
+      badge.className = 'etb-status published';
+      badge.textContent = '● PUBLISHED';
+    } else {
+      badge.className = 'etb-status draft';
+      badge.textContent = '● DRAFT';
+    }
+    updatePublishBtn();
+  }
+  function updatePublishBtn() {
+    const btn = document.getElementById('editor-publish-btn');
+    if (_articleStatus === 'published') {
+      btn.textContent = 'Unpublish';
+      btn.className = 'etb-btn etb-btn-unpublish';
+    } else {
+      btn.textContent = 'Publish';
+      btn.className = 'etb-btn etb-btn-publish';
+    }
+  }
+  function updateReadTime() {
+    const html = document.getElementById('editor-content').innerHTML;
+    const words = html.replace(/<[^>]*>/g,' ').split(/\s+/).filter(Boolean).length;
+    const mins = Math.max(1, Math.round(words / 200));
+    document.getElementById('editor-readtime').textContent = mins + ' min read';
+  }
+
+  function previewArticle() {
+    if (!_articleId) { showToast('Save first to preview', 'error'); return; }
+    window.open('/article.html?id=' + _articleId, '_blank');
+  }
+
+  function showToast(msg, type = 'success') {
+    const t = document.getElementById('editor-toast');
+    t.textContent = msg;
+    t.className = 'show ' + type;
+    clearTimeout(t._timer);
+    t._timer = setTimeout(() => t.classList.remove('show'), 3000);
+  }
+
+  // ── Auto-date ─────────────────────────────────────────────
+  if (!document.getElementById('editor-date').textContent.trim()) {
+    setText('editor-date',
+      new Date().toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'})
+    );
+  }
+  </script>
+</body>
+</html>

@@ -517,8 +517,9 @@ function navigateTo(page) {
 
   // Inject topbar action buttons
   topbarActions.innerHTML = '';
-  if (page === 'access') { loadAccessList(); }
-  if (page === 'header') { initHeaderPage(); }
+  if (page === 'access')   { loadAccessList(); }
+  if (page === 'header')   { initHeaderPage(); }
+  if (page === 'articles') { initArticlesPage(); }
   if (page === 'sections') {
     // New Section button
     const btn = document.createElement('button');
@@ -1326,7 +1327,6 @@ function bindHsSaveBtn(hs) {
   });
 }
 
-// ── Main init ────────────────────────────────────────────────────
 let _hsInstance = null;
 
 function initHeaderPage() {
@@ -1336,4 +1336,158 @@ function initHeaderPage() {
   renderHsSubsections(_hsInstance);
   bindHsAddForm(_hsInstance);
   bindHsSaveBtn(_hsInstance);
+}
+
+// ══════════════════════════════════════════════════════════════════
+// ARTICLES PAGE
+// ══════════════════════════════════════════════════════════════════
+
+let _allArticles = [];
+
+async function initArticlesPage() {
+  // Show loading
+  document.getElementById('articles-loading').style.display = 'block';
+  document.getElementById('articles-table').style.display  = 'none';
+  document.getElementById('articles-empty').style.display  = 'none';
+
+  try {
+    const res  = await fetch('/api/articles/list', {
+      headers: { 'Authorization': 'Bearer ' + window.PRIVATIAN_TOKEN }
+    });
+    _allArticles = await res.json();
+  } catch(e) {
+    _allArticles = [];
+  }
+
+  document.getElementById('articles-loading').style.display = 'none';
+  renderArticlesTable(_allArticles);
+}
+
+function renderArticlesTable(articles) {
+  const tbody = document.getElementById('articles-tbody');
+  const table = document.getElementById('articles-table');
+  const empty = document.getElementById('articles-empty');
+
+  if (!articles || articles.length === 0) {
+    table.style.display = 'none';
+    empty.style.display = 'block';
+    return;
+  }
+
+  table.style.display = 'table';
+  empty.style.display = 'none';
+
+  tbody.innerHTML = articles.map(a => {
+    const updated = a.updated_at
+      ? new Date(a.updated_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+      : '—';
+    const isPublished = a.status === 'published';
+    const statusBadge = isPublished
+      ? `<span style="display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;background:#d1fae5;color:#065f46;">● Published</span>`
+      : `<span style="display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;background:#fef3c7;color:#92400e;">● Draft</span>`;
+
+    const thumb = a.hero_img_url
+      ? `<img src="${escapeHtml(a.hero_img_url)}" alt="" style="width:48px;height:36px;object-fit:cover;border-radius:3px;flex-shrink:0;" loading="lazy"/>`
+      : `<div style="width:48px;height:36px;border-radius:3px;background:#e5e7eb;flex-shrink:0;"></div>`;
+
+    return `<tr style="border-bottom:1px solid #f3f4f6;transition:background .1s;" onmouseover="this.style.background='#fafafa'" onmouseout="this.style.background=''">
+      <td style="padding:12px 16px;">
+        <div style="display:flex;align-items:center;gap:12px;">
+          ${thumb}
+          <div style="min-width:0;">
+            <div style="font-size:13.5px;font-weight:600;color:#111827;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:280px;">${escapeHtml(a.title || 'Untitled')}</div>
+            <div style="font-size:11px;color:#9ca3af;margin-top:2px;">${escapeHtml(a.slug || '')}</div>
+          </div>
+        </div>
+      </td>
+      <td style="padding:12px 16px;font-size:12.5px;color:#6b7280;">${escapeHtml(a.section || '—')}</td>
+      <td style="padding:12px 16px;font-size:12.5px;color:#6b7280;">${escapeHtml(a.author || '—')}</td>
+      <td style="padding:12px 16px;">${statusBadge}</td>
+      <td style="padding:12px 16px;font-size:12px;color:#9ca3af;">${updated}</td>
+      <td style="padding:12px 16px;text-align:right;">
+        <div style="display:flex;align-items:center;justify-content:flex-end;gap:6px;">
+          <a href="admin-article-editor.html?id=${escapeHtml(a.id)}"
+             style="display:inline-flex;align-items:center;gap:5px;padding:5px 11px;border-radius:6px;font-size:12px;font-weight:600;background:#e8f1f9;color:#0a528e;text-decoration:none;transition:background .12s;"
+             onmouseover="this.style.background='#0a528e';this.style.color='#fff'"
+             onmouseout="this.style.background='#e8f1f9';this.style.color='#0a528e'">
+            Edit
+          </a>
+          <button onclick="toggleArticleStatus('${a.id}', this)"
+            style="display:inline-flex;align-items:center;padding:5px 11px;border-radius:6px;font-size:12px;font-weight:600;border:1px solid #e5e7eb;background:#fff;color:#374151;cursor:pointer;transition:all .12s;"
+            title="${isPublished ? 'Move to Draft' : 'Publish'}">
+            ${isPublished ? 'Unpublish' : 'Publish'}
+          </button>
+          <button onclick="deleteArticleConfirm('${a.id}', '${escapeHtml((a.title||'Untitled').replace(/'/g,"\\'"))}')"
+            style="display:inline-flex;align-items:center;padding:5px 9px;border-radius:6px;font-size:12px;font-weight:600;border:1px solid #fee2e2;background:#fff;color:#dc2626;cursor:pointer;transition:all .12s;"
+            title="Delete">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+          </button>
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function filterArticles() {
+  const q      = (document.getElementById('articles-search').value || '').toLowerCase();
+  const status = document.getElementById('articles-filter-status').value;
+  const filtered = _allArticles.filter(a => {
+    const matchQ = !q ||
+      (a.title  || '').toLowerCase().includes(q) ||
+      (a.author || '').toLowerCase().includes(q) ||
+      (a.slug   || '').toLowerCase().includes(q) ||
+      (a.section|| '').toLowerCase().includes(q);
+    const matchStatus = !status || a.status === status;
+    return matchQ && matchStatus;
+  });
+  renderArticlesTable(filtered);
+}
+
+async function toggleArticleStatus(id, btn) {
+  btn.disabled = true;
+  btn.textContent = '...';
+  try {
+    const res  = await fetch('/api/articles/publish?id=' + id, {
+      method: 'POST', headers: { 'Authorization': 'Bearer ' + window.PRIVATIAN_TOKEN }
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Failed');
+    // Update local data
+    const article = _allArticles.find(a => a.id === id);
+    if (article) article.status = data.status;
+    renderArticlesTable(_allArticles);
+    _showAdminToast(data.status === 'published' ? 'Article published' : 'Moved to draft', 'success');
+  } catch(e) {
+    _showAdminToast(e.message, 'error');
+    btn.disabled = false;
+    btn.textContent = btn.textContent === '...' ? 'Publish' : btn.textContent;
+  }
+}
+
+function deleteArticleConfirm(id, title) {
+  _confirmModal({
+    title: 'Delete Article',
+    message: `Are you sure you want to permanently delete "<strong>${escapeHtml(title)}</strong>"? This cannot be undone.`,
+    confirmLabel: 'Delete',
+    danger: true,
+    onConfirm: () => _doDeleteArticle(id)
+  });
+}
+
+async function _doDeleteArticle(id) {
+  try {
+    const res  = await fetch('/api/articles/delete?id=' + id, {
+      method: 'DELETE', headers: { 'Authorization': 'Bearer ' + window.PRIVATIAN_TOKEN }
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Failed');
+    _allArticles = _allArticles.filter(a => a.id !== id);
+    renderArticlesTable(_allArticles);
+    _showAdminToast('Article deleted', 'success');
+  } catch(e) { _showAdminToast(e.message, 'error'); }
+}
+
+// Handle direct navigation via hash (e.g. admin.html#articles)
+if (window.location.hash === '#articles') {
+  window.addEventListener('privatian:ready', () => navigateTo('articles'));
 }

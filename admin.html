@@ -67,7 +67,6 @@
               <polyline points="10 9 9 9 8 9"/>
             </svg>
             <span>Articles</span>
-            <span class="nav-badge nav-badge--soon">Soon</span>
           </a>
         </li>
         <li>
@@ -292,16 +291,53 @@
       </div>
     </section>
 
-    <!-- PAGE: ARTICLES (placeholder) -->
+    <!-- PAGE: ARTICLES -->
     <section class="page" id="page-articles">
-      <div class="card coming-soon-card">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="52" height="52">
-          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-          <polyline points="14 2 14 8 20 8"/>
-          <line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>
-        </svg>
-        <h2>Articles</h2>
-        <p>Article management — coming in next phase.</p>
+      <!-- Page header -->
+      <div class="page-header" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px;">
+        <div>
+          <h1 class="page-title" style="margin:0 0 4px;">Articles</h1>
+          <p class="page-subtitle" style="margin:0;">Manage all published and draft articles</p>
+        </div>
+        <a href="admin-article-editor.html" class="btn btn-primary" id="new-article-btn"
+           style="display:inline-flex;align-items:center;gap:8px;padding:10px 20px;background:#0a528e;color:#fff;border-radius:8px;text-decoration:none;font-size:13px;font-weight:700;font-family:inherit;transition:background .15s;">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          New Article
+        </a>
+      </div>
+
+      <!-- Filters bar -->
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap;">
+        <input type="text" id="articles-search" placeholder="Search articles..." oninput="filterArticles()"
+          style="flex:1;min-width:180px;padding:8px 12px;border:1px solid #e5e7eb;border-radius:7px;font-size:13px;font-family:inherit;outline:none;" />
+        <select id="articles-filter-status" onchange="filterArticles()"
+          style="padding:8px 12px;border:1px solid #e5e7eb;border-radius:7px;font-size:13px;font-family:inherit;background:#fff;outline:none;cursor:pointer;">
+          <option value="">All Status</option>
+          <option value="published">Published</option>
+          <option value="draft">Draft</option>
+        </select>
+      </div>
+
+      <!-- Article list -->
+      <div class="card" style="padding:0;overflow:hidden;">
+        <div id="articles-loading" style="padding:40px;text-align:center;color:#9ca3af;font-size:13px;">Loading articles...</div>
+        <table id="articles-table" style="width:100%;border-collapse:collapse;display:none;">
+          <thead>
+            <tr style="border-bottom:2px solid #e5e7eb;">
+              <th style="padding:12px 16px;text-align:left;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#6b7280;">Article</th>
+              <th style="padding:12px 16px;text-align:left;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#6b7280;width:120px;">Section</th>
+              <th style="padding:12px 16px;text-align:left;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#6b7280;width:100px;">Author</th>
+              <th style="padding:12px 16px;text-align:left;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#6b7280;width:90px;">Status</th>
+              <th style="padding:12px 16px;text-align:left;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#6b7280;width:100px;">Updated</th>
+              <th style="padding:12px 16px;text-align:right;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#6b7280;width:100px;">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="articles-tbody"></tbody>
+        </table>
+        <div id="articles-empty" style="padding:56px 24px;text-align:center;display:none;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#d1d5db" stroke-width="1.2" width="48" height="48" style="margin:0 auto 16px;display:block;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          <p style="color:#9ca3af;font-size:14px;margin:0;">No articles yet. <a href="admin-article-editor.html" style="color:#0a528e;font-weight:600;">Create your first article →</a></p>
+        </div>
       </div>
     </section>
 
