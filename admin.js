@@ -1,109 +1,60 @@
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-   THE PRIVATIAN FAMILY — ADMIN JS
-   Sections CRUD Â· localStorage sync Â· Toast Â· Modal
-â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+/* =================================================================
+   THE PRIVATIAN FAMILY - ADMIN JS
+   Sections CRUD - Supabase API - Toast - Modal
+================================================================= */
 
-const STORAGE_KEY = 'privatian_sections';
+// -- API helpers (sections endpoints) --
+function _authHeaders() {
+  return {
+    'Content-Type': 'application/json',
+    'Authorization': 'Bearer ' + (window.PRIVATIAN_TOKEN || '')
+  };
+}
+async function _apiGet(url) {
+  const r = await fetch(url, { headers: { 'Authorization': 'Bearer ' + (window.PRIVATIAN_TOKEN || '') } });
+  if (!r.ok) { const d = await r.json().catch(() => ({})); throw new Error(d.error || 'Request failed'); }
+  return r.json();
+}
+async function _apiPost(url, body) {
+  const r = await fetch(url, { method: 'POST', headers: _authHeaders(), body: JSON.stringify(body) });
+  if (!r.ok) { const d = await r.json().catch(() => ({})); throw new Error(d.error || 'Request failed'); }
+  return r.json();
+}
+async function _apiPut(url, body) {
+  const r = await fetch(url, { method: 'PUT', headers: _authHeaders(), body: JSON.stringify(body) });
+  if (!r.ok) { const d = await r.json().catch(() => ({})); throw new Error(d.error || 'Request failed'); }
+  return r.json();
+}
+async function _apiPatch(url) {
+  const r = await fetch(url, { method: 'PATCH', headers: { 'Authorization': 'Bearer ' + (window.PRIVATIAN_TOKEN || '') } });
+  if (!r.ok) { const d = await r.json().catch(() => ({})); throw new Error(d.error || 'Request failed'); }
+  return r.json();
+}
+async function _apiDelete(url) {
+  const r = await fetch(url, { method: 'DELETE', headers: { 'Authorization': 'Bearer ' + (window.PRIVATIAN_TOKEN || '') } });
+  if (!r.ok) { const d = await r.json().catch(() => ({})); throw new Error(d.error || 'Request failed'); }
+  return r.json();
+}
 
-// â”€â”€ Default seed sections (mirrors main website nav) â”€â”€â”€â”€â”€â”€â”€
-const DEFAULT_SECTIONS = [
-  { id: 'all',                name: 'All',                 slug: '',                   locked: true,  deleted: false, createdAt: '2024-01-01T00:00:00Z' },
-  { id: 'findings',           name: 'Findings',            slug: 'findings',            locked: false, deleted: false, createdAt: '2024-01-01T00:00:00Z' },
-  { id: 'community-heritage', name: 'Community & Heritage', slug: 'community-heritage',  locked: false, deleted: false, createdAt: '2024-01-01T00:00:00Z' },
-  { id: 'culture',            name: 'Culture',             slug: 'culture',             locked: false, deleted: false, createdAt: '2024-01-01T00:00:00Z' },
-  { id: 'privacy-values',     name: 'Privacy & Values',    slug: 'privacy-values',      locked: false, deleted: false, createdAt: '2024-01-01T00:00:00Z' },
-  { id: 'nation-world',       name: 'Nation & World',      slug: 'nation-world',        locked: false, deleted: false, createdAt: '2024-01-01T00:00:00Z' },
-  { id: 'arts-legacy',        name: 'Arts & Legacy',       slug: 'arts-legacy',         locked: false, deleted: false, createdAt: '2024-01-01T00:00:00Z' },
-  { id: 'work-economy',       name: 'Work & Economy',      slug: 'work-economy',        locked: false, deleted: false, createdAt: '2024-01-01T00:00:00Z' },
-];
-
-// â”€â”€ SVG icons â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-const ICONS = {
-  pencil: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="15" height="15"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>`,
-  trash:  `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="15" height="15"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>`,
-  restore:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="15" height="15"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4.95"/></svg>`,
-  xCircle:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="15" height="15"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>`,
-  lock:   `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="13" height="13"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>`,
-  plus:   `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" width="15" height="15"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>`,
-  check:  `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" width="16" height="16"><polyline points="20 6 9 17 4 12"/></svg>`,
-  warn:   `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" width="16" height="16"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>`,
-  error:  `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" width="16" height="16"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>`,
-  xSmall: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>`,
-  upload: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="15" height="15"><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/></svg>`,
+// -- Locked "All" pseudo-section (UI-only, never stored in DB) --
+const ALL_SECTION = {
+  id: 'all', name: 'All', slug: '', locked: true,
+  deleted: false, createdAt: '2024-01-01T00:00:00Z'
 };
 
-// â”€â”€ Data layer â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-function loadSections() {
+// -- Load all sections (active + trashed) from API --
+async function loadSectionsFromAPI() {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (raw) return JSON.parse(raw);
-  } catch(e) {}
-  return null;
-}
-
-function saveSections(sections) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(sections));
-}
-
-// â”€â”€ Apply Changes — push active sections to main website â”€â”€â”€
-const APPLIED_KEY = 'privatian_applied_sections';
-
-async function applyChanges() {
-  const active = sections.filter(s => !s.deleted && !s.locked);
-  const payload = {
-    sections: active.map(s => ({ id: s.id, name: s.name, slug: s.slug || '' })),
-    appliedAt: new Date().toISOString(),
-  };
-  localStorage.setItem(APPLIED_KEY, JSON.stringify(payload));
-
-  const btn = document.getElementById('apply-changes-btn');
-  const origHTML = btn ? btn.innerHTML : '';
-  if (btn) { btn.disabled = true; btn.innerHTML = ICONS.upload + ' Saving to DB...'; }
-
-  let saved = false;
-  try {
-    if (typeof db_saveSections === 'function') saved = await db_saveSections(sections);
-  } catch(e) { console.warn('[Admin] applyChanges save failed:', e.message); }
-
-  if (btn) {
-    btn.innerHTML = ICONS.check + (saved ? ' Saved to DB!' : ' Applied!');
-    btn.style.background = 'var(--success)';
-    btn.style.borderColor = 'var(--success)';
-    setTimeout(function() {
-      btn.innerHTML = origHTML;
-      btn.disabled = false;
-      btn.style.background = '';
-      btn.style.borderColor = '';
-    }, 2500);
+    const data = await _apiGet('/api/sections?status=all');
+    sections = [ALL_SECTION, ...data];
+    render();
+    updateSyncBadge(true);
+  } catch(e) {
+    console.warn('[Admin] loadSectionsFromAPI failed:', e.message);
+    // Show empty state gracefully - do not crash
+    sections = [ALL_SECTION];
+    render();
   }
-
-  showToast('success', saved
-    ? 'Saved to database! Main site updates automatically.'
-    : 'Applied locally. Check Supabase connection.');
-}
-function initData() {
-  let sections = loadSections();
-  if (!sections) {
-    sections = DEFAULT_SECTIONS.map(s => ({ ...s }));
-    saveSections(sections);
-  } else {
-    // Migrate: fix missing slugs AND correct wrong slugs on built-in default sections
-    let changed = false;
-    sections.forEach(s => {
-      const defaultMatch = DEFAULT_SECTIONS.find(d => d.id === s.id);
-      if (s.slug === undefined) {
-        // Slug missing — add it
-        s.slug = s.locked ? '' : (defaultMatch ? defaultMatch.slug : genSlug(s.name));
-        changed = true;
-      } else if (defaultMatch && !s.locked && defaultMatch.slug && s.slug !== defaultMatch.slug) {
-        // Built-in section has wrong slug (e.g. from old auto-generation) — correct it
-        s.slug = defaultMatch.slug;
-        changed = true;
-      }
-    });
-    if (changed) saveSections(sections);
-  }
-  return sections;
 }
 
 function genId(name) {
@@ -280,84 +231,105 @@ function renderTrash(trash) {
 }
 
 // â”€â”€ Actions â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-function addSection(name, slug) {
+async function addSection(name, slug) {
   const trimmed = name.trim();
   const slugVal = slug.trim();
-  const exists = sections.some(s => !s.deleted && s.name.toLowerCase() === trimmed.toLowerCase());
-  if (exists) return 'A section with that name already exists.';
-  const slugExists = slugVal && sections.some(s => !s.deleted && s.slug === slugVal);
-  if (slugExists) return 'A section with that URL slug already exists.';
-  sections.push({
-    id: genId(trimmed),
-    name: trimmed,
-    slug: slugVal,
-    locked: false,
-    deleted: false,
-    createdAt: new Date().toISOString(),
-  });
-  saveSections(sections);
-  render();
-  showToast('success', `Section "${trimmed}" created.`);
-  return null;
+  // Optimistic duplicate check (in-memory, fast)
+  if (sections.some(s => !s.deleted && !s.locked && s.name.toLowerCase() === trimmed.toLowerCase()))
+    return 'A section with that name already exists.';
+  if (slugVal && sections.some(s => !s.deleted && !s.locked && s.slug === slugVal))
+    return 'A section with that URL slug already exists.';
+  try {
+    const created = await _apiPost('/api/sections', {
+      name: trimmed, slug: slugVal, admin_id: genId(trimmed)
+    });
+    sections.push(created);
+    render();
+    showToast('success', `Section "${trimmed}" created.`);
+    return null;
+  } catch(e) {
+    return e.message || 'Failed to create section.';
+  }
 }
 
-function renameSection(id, name, slug) {
+async function renameSection(id, name, slug) {
   const trimmed = name.trim();
   const slugVal = slug.trim();
-  const exists = sections.some(s => s.id !== id && !s.deleted && s.name.toLowerCase() === trimmed.toLowerCase());
-  if (exists) return 'A section with that name already exists.';
-  const slugExists = slugVal && sections.some(s => s.id !== id && !s.deleted && s.slug === slugVal);
-  if (slugExists) return 'A section with that URL slug already exists.';
-  const s = sections.find(s => s.id === id);
-  if (!s) return 'Section not found.';
-  s.name = trimmed;
-  s.slug = slugVal;
-  saveSections(sections);
-  render();
-  showToast('success', `Renamed to "${trimmed}".`);
-  return null;
+  // Optimistic duplicate check
+  if (sections.some(s => s.id !== id && !s.deleted && !s.locked && s.name.toLowerCase() === trimmed.toLowerCase()))
+    return 'A section with that name already exists.';
+  if (slugVal && sections.some(s => s.id !== id && !s.deleted && !s.locked && s.slug === slugVal))
+    return 'A section with that URL slug already exists.';
+  try {
+    const updated = await _apiPut(`/api/sections?id=${encodeURIComponent(id)}`, { name: trimmed, slug: slugVal });
+    const local = sections.find(s => s.id === id);
+    if (local) { local.name = updated.name; local.slug = updated.slug; }
+    render();
+    showToast('success', `Renamed to "${trimmed}".`);
+    return null;
+  } catch(e) {
+    return e.message || 'Failed to rename section.';
+  }
 }
 
-function deleteSection(id) {
+async function deleteSection(id) {
   const s = sections.find(s => s.id === id);
   if (!s || s.locked) return;
   const name = s.name;
+  // Optimistic UI update
   s.deleted = true;
   s.deletedAt = new Date().toISOString();
-  saveSections(sections);
-  if (typeof db_syncSection === 'function') db_syncSection(s, sections.indexOf(s));
   render();
-
-  // Show toast with undo
-  showToast('warning', `"${name}" moved to Trash.`, 'Undo', () => {
-    s.deleted = false;
-    delete s.deletedAt;
-    saveSections(sections);
-    render();
-    showToast('success', `"${name}" restored.`);
+  showToast('warning', `"${name}" moved to Trash.`, 'Undo', async () => {
+    // Undo: restore via API
+    try {
+      await _apiPatch(`/api/sections?id=${encodeURIComponent(id)}`);
+      s.deleted = false; delete s.deletedAt;
+      render();
+      showToast('success', `"${name}" restored.`);
+    } catch(e) {
+      showToast('error', 'Undo failed: ' + e.message);
+      await loadSectionsFromAPI();
+    }
   });
+  // Persist to DB
+  try {
+    await _apiDelete(`/api/sections?id=${encodeURIComponent(id)}`);
+  } catch(e) {
+    // Rollback optimistic update on failure
+    s.deleted = false; delete s.deletedAt;
+    render();
+    showToast('error', 'Failed to delete: ' + e.message);
+  }
 }
 
-function restoreSection(id) {
+async function restoreSection(id) {
   const s = sections.find(s => s.id === id);
   if (!s) return;
-  s.deleted = false;
-  delete s.deletedAt;
-  saveSections(sections);
-  render();
-  showToast('success', `"${s.name}" restored to Active.`);
+  try {
+    await _apiPatch(`/api/sections?id=${encodeURIComponent(id)}`);
+    s.deleted = false; delete s.deletedAt;
+    render();
+    showToast('success', `"${s.name}" restored to Active.`);
+  } catch(e) {
+    showToast('error', 'Restore failed: ' + e.message);
+    await loadSectionsFromAPI();
+  }
 }
 
-function permanentlyDelete(id) {
+async function permanentlyDelete(id) {
   const idx = sections.findIndex(s => s.id === id);
   if (idx === -1) return;
   const name = sections[idx].name;
-  const deletedId = sections[idx].id;
   sections.splice(idx, 1);
-  saveSections(sections);
-  if (window._sb) window._sb.from('sections').delete().eq('admin_id', deletedId).then(function(){}).catch(function(){});
   render();
-  showToast('error', `"${name}" permanently deleted.`);
+  try {
+    await _apiDelete(`/api/sections?id=${encodeURIComponent(id)}&mode=permanent`);
+    showToast('error', `"${name}" permanently deleted.`);
+  } catch(e) {
+    showToast('error', 'Permanent delete failed: ' + e.message);
+    await loadSectionsFromAPI();
+  }
 }
 
 // â”€â”€ Modal — Add / Edit â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
@@ -443,7 +415,7 @@ if (slugInput) {
   });
 }
 
-modalSaveBtn.addEventListener('click', () => {
+modalSaveBtn.addEventListener('click', async () => {
   const nameVal = nameInput.value.trim();
   const slugVal = slugInput ? slugInput.value.trim() : '';
   if (!nameVal) { showModalError('Section name cannot be empty.'); return; }
@@ -451,9 +423,11 @@ modalSaveBtn.addEventListener('click', () => {
     showModalError('URL slug: only lowercase letters, numbers, and hyphens allowed.');
     return;
   }
+  modalSaveBtn.disabled = true;
   const err = editingId
-    ? renameSection(editingId, nameVal, slugVal)
-    : addSection(nameVal, slugVal);
+    ? await renameSection(editingId, nameVal, slugVal)
+    : await addSection(nameVal, slugVal);
+  modalSaveBtn.disabled = false;
   if (err) { showModalError(err); return; }
   closeModal();
 });
@@ -477,8 +451,8 @@ function closeConfirmModal() {
   pendingDeleteId = null;
 }
 
-confirmDeleteBtn.addEventListener('click', () => {
-  if (pendingDeleteId) permanentlyDelete(pendingDeleteId);
+confirmDeleteBtn.addEventListener('click', async () => {
+  if (pendingDeleteId) await permanentlyDelete(pendingDeleteId);
   closeConfirmModal();
 });
 confirmCancelBtn.addEventListener('click', closeConfirmModal);
@@ -531,19 +505,6 @@ function navigateTo(page) {
   if (page === 'access') { loadAccessList(); }
   if (page === 'header') { initHeaderPage(); }
   if (page === 'sections') {
-    // Apply Changes button
-    const applyBtn = document.createElement('button');
-    applyBtn.className = 'btn btn--apply';
-    applyBtn.id = 'apply-changes-btn';
-    applyBtn.innerHTML = `${ICONS.upload} Apply Changes`;
-    applyBtn.addEventListener('click', applyChanges);
-    topbarActions.appendChild(applyBtn);
-
-    // Divider
-    const sep = document.createElement('span');
-    sep.className = 'topbar-sep';
-    topbarActions.appendChild(sep);
-
     // New Section button
     const btn = document.createElement('button');
     btn.className = 'btn btn--primary';
@@ -600,84 +561,37 @@ function escapeHtml(str) {
     .replace(/"/g,'&quot;');
 }
 
-// â”€â”€ INIT â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-sections = initData();
+// -- INIT: boot the sections page, load data from API --
 navigateTo('sections');
+sections = [ALL_SECTION]; // show immediately while API loads
 render();
+loadSectionsFromAPI();   // async: fetches /api/sections?status=all
 
-// ── Supabase startup sync (cross-browser truth) ──────────────────
-(async function() {
-  try {
-    // Wait for Supabase client to initialize
-    let waited = 0;
-    while (!window._sb && waited < 3000) {
-      await new Promise(function(r){ setTimeout(r, 200); });
-      waited += 200;
-    }
-    if (!window._sb) return;
-    const sbSections = typeof db_getAllAdminSections === 'function'
-      ? await db_getAllAdminSections() : null;
-    if (!sbSections || sbSections.length === 0) return;
-    // Merge: Supabase is source of truth; keep local-only items (just added, not yet synced)
-    const localOnly = sections.filter(function(s) {
-      return !sbSections.find(function(sb) { return sb.id === s.id; });
-    });
-    sections = sbSections.concat(localOnly);
-    saveSections(sections);
-    render();
-    updateSyncBadge();
-  } catch(e) {
-    console.warn('[Admin] Supabase startup sync failed:', e.message);
-  }
-})();
 
-// ── Supabase sync utility ─────────────────────────────────────────
+// -- Sync utility (API-based) --
 let _lastSyncedAt = null;
 
-async function syncFromSupabase(silent) {
-  if (!window._sb) return false;
-  try {
-    const sbSections = typeof db_getAllAdminSections === 'function'
-      ? await db_getAllAdminSections() : null;
-    if (!sbSections || sbSections.length === 0) return false;
-    const localOnly = sections.filter(function(s) {
-      return !sbSections.find(function(r) { return r.id === s.id; });
-    });
-    sections = sbSections.concat(localOnly);
-    saveSections(sections);
-    render();
-    _lastSyncedAt = new Date();
-    updateSyncBadge();
-    if (!silent) showToast('success', 'Synced from database.');
-    return true;
-  } catch(e) {
-    console.warn('[Admin] syncFromSupabase failed:', e.message);
-    return false;
-  }
-}
-
-function updateSyncBadge() {
+function updateSyncBadge(done) {
+  _lastSyncedAt = new Date();
   const el = document.getElementById('sync-badge');
-  if (!el || !_lastSyncedAt) return;
-  const s = Math.round((Date.now() - _lastSyncedAt.getTime()) / 1000);
-  el.textContent = s < 5 ? 'Synced just now' : ('Synced ' + s + 's ago');
+  if (!el) return;
+  el.textContent = 'Synced ✓';
   el.title = _lastSyncedAt.toLocaleTimeString();
 }
 
-// Update sync badge every 30 seconds
-setInterval(function() { updateSyncBadge(); }, 30000);
-
-// Auto-refresh from Supabase when tab becomes visible (another admin may have made changes)
+// Auto-refresh from API when tab becomes visible
+let _lastVisibleSync = 0;
 document.addEventListener('visibilitychange', function() {
   if (document.visibilityState === 'visible') {
-    var since = _lastSyncedAt ? Date.now() - _lastSyncedAt.getTime() : Infinity;
-    if (since > 15000) { // Only sync if 15+ seconds have passed
-      syncFromSupabase(true);
+    const since = Date.now() - _lastVisibleSync;
+    if (since > 20000) {
+      _lastVisibleSync = Date.now();
+      loadSectionsFromAPI();
     }
   }
 });
 
-// Inject sync badge into page header area
+// Inject sync badge (click to refresh)
 (function() {
   function injectSyncBadge() {
     var pageHeader = document.querySelector('.page-header');
@@ -686,8 +600,8 @@ document.addEventListener('visibilitychange', function() {
     badge.id = 'sync-badge';
     badge.style.cssText = 'font-size:11px;color:#9ca3af;margin-left:8px;cursor:pointer;';
     badge.title = 'Click to refresh from database';
-    badge.textContent = 'Loading from DB...';
-    badge.onclick = function() { syncFromSupabase(false); };
+    badge.textContent = 'Loading...';
+    badge.onclick = function() { loadSectionsFromAPI(); };
     pageHeader.appendChild(badge);
   }
   if (document.readyState === 'loading') {
@@ -696,7 +610,6 @@ document.addEventListener('visibilitychange', function() {
     setTimeout(injectSyncBadge, 500);
   }
 })();
-
 
 
 
