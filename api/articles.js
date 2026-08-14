@@ -63,8 +63,8 @@ module.exports = async function handler(req, res) {
 
     const {
       id: bodyId, title = '', deck = '', section = '', author = '', author_role = '',
-      author_bio = '', hero_img_url = '', hero_caption = '', hero_credit = '',
-      content_html = '', slug: bodySlug
+      author_bio = '', author_photo_url = '', hero_img_url = '', hero_caption = '',
+      hero_credit = '', content_html = '', slug: bodySlug
     } = req.body || {};
 
     const client = sb();
@@ -72,7 +72,7 @@ module.exports = async function handler(req, res) {
     if (bodyId) {
       // UPDATE
       const updates = {
-        title, deck, section, author, author_role, author_bio,
+        title, deck, section, author, author_role, author_bio, author_photo_url,
         hero_img_url, hero_caption, hero_credit, content_html,
         updated_at: new Date().toISOString(),
       };
@@ -89,7 +89,7 @@ module.exports = async function handler(req, res) {
         slug = slug + '-' + (Math.max(...nums) + 1);
       }
       const { data, error } = await client.from('articles').insert({
-        slug, title, deck, section, author, author_role, author_bio,
+        slug, title, deck, section, author, author_role, author_bio, author_photo_url,
         hero_img_url, hero_caption, hero_credit, content_html,
         status: 'draft', created_by: session.email,
       }).select().single();
@@ -124,6 +124,39 @@ module.exports = async function handler(req, res) {
     const { error } = await sb().from('articles').delete().eq('id', id);
     if (error) return res.status(500).json({ error: error.message });
     return res.status(200).json({ success: true });
+  }
+
+  // ── UPLOAD (image) ───────────────────────────────────────────────
+  // POST /api/articles?action=upload  multipart/form-data  field: file
+  if (action === 'upload' && req.method === 'POST') {
+    const session = requireAuth(req, res);
+    if (!session) return;
+
+    // Parse multipart — use built-in formidable-style via Vercel's body parser
+    // Vercel does NOT auto-parse multipart; we need the raw buffer.
+    // Best approach: store in Supabase Storage via signed upload URL pattern.
+    // Since we don't have formidable, store image as base64 data URL temporarily
+    // and let the client handle it via Supabase Storage JS SDK.
+    // HOWEVER: simplest production approach — return a Supabase Storage signed URL
+    // for client-side direct upload.
+
+    const { createClient: sc } = require('@supabase/supabase-js');
+    const client = sc(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
+    const fileName = 'article-imgs/' + Date.now() + '-' + Math.random().toString(36).slice(2) + '.jpg';
+
+    // Create a signed upload URL (client will PUT the file directly to Supabase Storage)
+    const { data: signedData, error: signErr } = await client.storage
+      .from('article-images')
+      .createSignedUploadUrl(fileName);
+
+    if (signErr) return res.status(500).json({ error: signErr.message });
+    const publicUrl = client.storage.from('article-images').getPublicUrl(fileName).data.publicUrl;
+    return res.status(200).json({
+      uploadUrl: signedData.signedUrl,
+      token: signedData.token,
+      path: fileName,
+      publicUrl,
+    });
   }
 
   return res.status(400).json({ error: 'Unknown action or method' });
