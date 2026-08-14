@@ -28,11 +28,12 @@ module.exports = async function handler(req, res) {
   const sb = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
   const { data } = await sb
     .from('allowed_admins')
-    .select('status')
+    .select('status, role')
     .ilike('email', session.email)
     .single();
 
   if (!data) return res.status(200).json({ ok: false, reason: 'not_found' });
   if (data.status !== 'active') return res.status(200).json({ ok: false, reason: data.status });
-  return res.status(200).json({ ok: true });
+  // Return DB role so client can detect stale JWT role (e.g. Admin→Moderator downgrade)
+  return res.status(200).json({ ok: true, role: data.role });
 };

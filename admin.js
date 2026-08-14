@@ -989,15 +989,21 @@ async function checkMyAccess() {
     const res  = await fetch('/api/admins/check', { headers: { 'Authorization': 'Bearer ' + window.PRIVATIAN_TOKEN } });
     if (res.status === 401) { _revokeAccess('session_expired'); return; }
     const data = await res.json();
-    if (!data.ok) _revokeAccess(data.reason || 'revoked');
+    if (!data.ok) { _revokeAccess(data.reason || 'revoked'); return; }
+    // Role mismatch: DB role changed mid-session — force re-login so JWT is reissued correctly
+    const jwtRole = window.PRIVATIAN_USER && window.PRIVATIAN_USER.role;
+    if (data.role && jwtRole && data.role !== jwtRole) {
+      _revokeAccess('role_changed');
+    }
   } catch(e) { console.warn('[Admin] Access check error:', e.message); }
 }
 
 function _revokeAccess(reason) {
   if (_accessRevoked) return;
   _accessRevoked = true;
-  const msg = reason === 'suspended'       ? 'Your account has been suspended.'
-            : reason === 'deleted'         ? 'Your account has been removed.'
+  const msg = reason === 'suspended'    ? 'Your account has been suspended.'
+            : reason === 'deleted'      ? 'Your account has been removed.'
+            : reason === 'role_changed' ? 'Your role has been updated. Please sign in again.'
             : reason === 'session_expired' ? 'Your session has expired.'
             : 'Your admin access has been revoked.';
   showToast('error', msg + ' Redirecting to login...');

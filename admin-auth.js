@@ -115,6 +115,13 @@
       return;
     }
 
+    // Role mismatch: JWT says Admin but DB says Moderator (or vice-versa) — force re-login
+    // so the new JWT correctly reflects the current role.
+    if (dbCheck.role && dbCheck.role !== user.role) {
+      redirectToLogin('Your role has been updated. Please sign in again to continue.');
+      return;
+    }
+
     window.PRIVATIAN_USER  = user;
     window.PRIVATIAN_TOKEN = token;
 

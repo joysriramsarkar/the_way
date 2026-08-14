@@ -1,4 +1,5 @@
-const jwt = require('jsonwebtoken');
+const jwt  = require('jsonwebtoken');
+const { createClient } = require('@supabase/supabase-js');
 
 function verifySession(req) {
   let token = null;
@@ -19,10 +20,40 @@ function requireAuth(req, res) {
   return s;
 }
 
-function requireAdmin(req, res) {
+/**
+ * requireAdmin: JWT check + live DB role check.
+ * Prevents stale-JWT privilege escalation when a user is downgraded mid-session.
+ * Returns the session object on success, null on failure (after sending error response).
+ */
+async function requireAdmin(req, res) {
   const s = requireAuth(req, res);
   if (!s) return null;
-  if (s.role !== 'Admin') { res.status(403).json({ error: 'Admin role required' }); return null; }
+
+  // Live DB check: verify the role in DB is still 'Admin' and account is active.
+  // This catches mid-session role downgrades (Admin → Moderator) even before JWT expires.
+  try {
+    const sb = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
+    const { data } = await sb
+      .from('allowed_admins')
+      .select('role, status')
+      .ilike('email', s.email)
+      .maybeSingle();
+
+    if (!data || data.status !== 'active' || data.role !== 'Admin') {
+      res.status(403).json({
+        error: 'Admin role required',
+        reason: !data ? 'not_found' : data.role !== 'Admin' ? 'role_changed' : data.status
+      });
+      return null;
+    }
+  } catch(e) {
+    // If DB check fails (network/config), fall back to JWT role as a safety net
+    if (s.role !== 'Admin') {
+      res.status(403).json({ error: 'Admin role required' });
+      return null;
+    }
+  }
+
   return s;
 }
 
