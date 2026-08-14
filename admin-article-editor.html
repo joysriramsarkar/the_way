@@ -3,823 +3,801 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Article Editor — The Privatian Family Admin</title>
+  <title>Article Editor — The Privatian Family</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Source+Sans+3:wght@300;400;600;700&display=swap" rel="stylesheet" />
-  <!-- Exact same article styles so it looks identical to published article -->
   <link rel="stylesheet" href="style.css" />
   <link rel="stylesheet" href="article.css" />
   <style>
-    /* ── Editor-only overrides (removed in published view) ── */
-    :root {
-      --editor-accent: #0a528e;
-      --editor-hover-border: rgba(10,82,142,.35);
-    }
+/* ══ EDITOR SHELL ══════════════════════════════════════════════ */
+*, *::before, *::after { box-sizing: border-box; }
+:root {
+  --navy: #0a528e;
+  --dark: #0d1f35;
+  --serif: 'Libre Baskerville', Georgia, serif;
+  --sans:  'Source Sans 3', system-ui, sans-serif;
+  --tb-h:  52px;
+  --content-w: 720px;
+  --radius: 8px;
+}
+html { scroll-behavior: smooth; }
+body { padding-top: var(--tb-h); background: #f8f9fb; margin: 0; }
 
-    body { padding-top: 56px; } /* room for toolbar */
+/* ── TOP TOOLBAR ─────────────────────────────────────────────── */
+#ed-toolbar {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 9999;
+  height: var(--tb-h);
+  background: #0d1f35;
+  display: flex; align-items: center; gap: 10px;
+  padding: 0 18px;
+  border-bottom: 1px solid rgba(255,255,255,.08);
+  box-shadow: 0 2px 16px rgba(0,0,0,.3);
+}
+.tb-back {
+  display: inline-flex; align-items: center; gap: 7px;
+  color: rgba(255,255,255,.6); text-decoration: none;
+  font: 600 12px/1 var(--sans); letter-spacing: .04em;
+  padding: 6px 10px; border-radius: 6px; transition: .15s; flex-shrink: 0;
+}
+.tb-back:hover { background: rgba(255,255,255,.09); color: #fff; }
+.tb-sep { width: 1px; height: 26px; background: rgba(255,255,255,.12); flex-shrink: 0; }
+.tb-slug-wrap { display: flex; align-items: center; gap: 8px; flex: 1; min-width: 0; }
+.tb-label { font: 700 10px/1 var(--sans); letter-spacing: .08em; text-transform: uppercase; color: rgba(255,255,255,.35); flex-shrink: 0; }
+#ed-slug {
+  font: 400 12.5px/1 var(--sans); color: rgba(255,255,255,.7);
+  background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.12);
+  border-radius: 5px; padding: 5px 10px; outline: none;
+  width: 220px; max-width: 100%;
+  transition: border-color .15s, background .15s;
+}
+#ed-slug:focus { border-color: rgba(255,255,255,.3); background: rgba(255,255,255,.12); color: #fff; }
+.tb-status { 
+  font: 700 10px/1 var(--sans); letter-spacing: .09em; text-transform: uppercase;
+  padding: 4px 10px; border-radius: 20px; flex-shrink: 0; white-space: nowrap;
+}
+.tb-status.draft     { background: rgba(251,191,36,.12); color: #fbbf24; }
+.tb-status.published { background: rgba(52,211,153,.12); color: #34d399; }
+#ed-autosave {
+  font: 400 11px/1 var(--sans); color: rgba(255,255,255,.28);
+  flex-shrink: 0; white-space: nowrap; min-width: 120px; text-align: right;
+}
+.tb-btn {
+  font: 600 12.5px/1 var(--sans); border: none; border-radius: 7px;
+  padding: 8px 16px; cursor: pointer; transition: all .15s; flex-shrink: 0; white-space: nowrap;
+}
+.tb-btn-preview { background: rgba(255,255,255,.08); color: rgba(255,255,255,.7); border: 1px solid rgba(255,255,255,.14); }
+.tb-btn-preview:hover { background: rgba(255,255,255,.15); color: #fff; }
+.tb-btn-save { background: rgba(10,82,142,.85); color: #fff; border: 1px solid rgba(10,82,142,.4); }
+.tb-btn-save:hover { background: #0a528e; }
+.tb-btn-save:disabled { opacity: .5; cursor: default; }
+.tb-btn-publish { background: #1a7a4a; color: #fff; }
+.tb-btn-publish:hover { background: #158040; }
+.tb-btn-unpublish { background: rgba(220,38,38,.8); color: #fff; }
+.tb-btn-unpublish:hover { background: #dc2626; }
 
-    /* Floating admin toolbar */
-    #editor-toolbar {
-      position: fixed; top: 0; left: 0; right: 0; z-index: 10000;
-      height: 52px;
-      background: #0d1f35;
-      display: flex; align-items: center; gap: 10px;
-      padding: 0 20px;
-      box-shadow: 0 2px 12px rgba(0,0,0,.25);
-    }
-    .etb-back {
-      display: flex; align-items: center; gap: 6px;
-      color: rgba(255,255,255,.65); text-decoration: none;
-      font-family: 'Source Sans 3', sans-serif; font-size: 13px; font-weight: 600;
-      padding: 6px 10px; border-radius: 6px; transition: all .15s;
-    }
-    .etb-back:hover { color: #fff; background: rgba(255,255,255,.08); }
-    .etb-divider { width: 1px; height: 28px; background: rgba(255,255,255,.15); flex-shrink: 0; }
-    .etb-slug-wrap {
-      display: flex; align-items: center; gap: 8px; flex: 1; min-width: 0;
-    }
-    .etb-slug-label {
-      font-family: 'Source Sans 3', sans-serif; font-size: 11px; font-weight: 700;
-      letter-spacing: .07em; text-transform: uppercase; color: rgba(255,255,255,.4);
-      flex-shrink: 0;
-    }
-    #editor-slug {
-      font-family: 'Source Sans 3', sans-serif; font-size: 12.5px; font-weight: 400;
-      color: rgba(255,255,255,.75); background: rgba(255,255,255,.07);
-      border: 1px solid rgba(255,255,255,.12); border-radius: 5px;
-      padding: 4px 10px; outline: none; width: 220px; max-width: 100%;
-      transition: border-color .15s, background .15s;
-    }
-    #editor-slug:focus { border-color: rgba(255,255,255,.35); background: rgba(255,255,255,.12); color: #fff; }
-    .etb-status {
-      font-family: 'Source Sans 3', sans-serif; font-size: 11px; font-weight: 700;
-      letter-spacing: .07em; text-transform: uppercase;
-      padding: 4px 10px; border-radius: 20px; flex-shrink: 0;
-    }
-    .etb-status.draft { background: rgba(255,200,50,.15); color: #ffc832; }
-    .etb-status.published { background: rgba(50,210,120,.15); color: #32d278; }
-    .etb-autosave {
-      font-family: 'Source Sans 3', sans-serif; font-size: 11px;
-      color: rgba(255,255,255,.35); flex-shrink: 0; white-space: nowrap;
-    }
-    .etb-btn {
-      font-family: 'Source Sans 3', sans-serif; font-size: 13px; font-weight: 600;
-      border: none; border-radius: 7px; padding: 7px 16px; cursor: pointer;
-      transition: all .15s; flex-shrink: 0;
-    }
-    .etb-btn-ghost {
-      background: rgba(255,255,255,.08); color: rgba(255,255,255,.75);
-      border: 1px solid rgba(255,255,255,.15);
-    }
-    .etb-btn-ghost:hover { background: rgba(255,255,255,.15); color: #fff; }
-    .etb-btn-save { background: rgba(10,82,142,.8); color: #fff; }
-    .etb-btn-save:hover { background: #0a528e; }
-    .etb-btn-publish { background: #1d8a4e; color: #fff; }
-    .etb-btn-publish:hover { background: #178042; }
-    .etb-btn-unpublish { background: rgba(220,38,38,.7); color: #fff; }
-    .etb-btn-unpublish:hover { background: #dc2626; }
+/* ── CANVAS WRAPPER ──────────────────────────────────────────── */
+#ed-canvas {
+  max-width: var(--content-w);
+  margin: 0 auto;
+  padding: 0 0 80px;
+}
 
-    /* Editable field highlight on hover/focus */
-    [contenteditable] {
-      outline: none;
-      border-radius: 3px;
-      transition: box-shadow .15s, background .15s;
-    }
-    [contenteditable]:hover {
-      box-shadow: 0 0 0 2px var(--editor-hover-border);
-    }
-    [contenteditable]:focus {
-      box-shadow: 0 0 0 2px rgba(10,82,142,.55);
-      background: rgba(10,82,142,.03);
-    }
+/* ── HERO BAND (title area) ──────────────────────────────────── */
+#ed-hero-band {
+  background: #fff;
+  border-bottom: 1px solid #e8e0d4;
+  padding: 40px 32px 36px;
+  margin-bottom: 0;
+}
 
-    /* Hero image upload zone */
-    #editor-hero-zone {
-      position: relative; cursor: pointer;
-      border-radius: 3px; transition: opacity .2s;
-    }
-    #editor-hero-zone:hover { opacity: .88; }
-    #editor-hero-zone .hero-overlay {
-      position: absolute; inset: 0;
-      display: flex; flex-direction: column; align-items: center; justify-content: center;
-      background: rgba(13,31,53,.55); border-radius: 3px;
-      opacity: 0; transition: opacity .2s; pointer-events: none;
-      color: #fff; font-family: 'Source Sans 3', sans-serif; font-size: 14px; font-weight: 600;
-      gap: 8px;
-    }
-    #editor-hero-zone:hover .hero-overlay { opacity: 1; }
-    #editor-hero-zone.empty-zone {
-      min-height: 280px; background: #f0f4f8;
-      border: 2px dashed #adc4da; border-radius: 4px;
-      display: flex; align-items: center; justify-content: center;
-    }
-    #editor-hero-zone.empty-zone .hero-overlay { opacity: 1; background: none; color: #5a7a9a; }
+/* Section picker */
+.ed-section-picker {
+  position: relative; display: inline-block; margin-bottom: 18px;
+}
+#ed-section-pill {
+  display: inline-flex; align-items: center; gap: 6px;
+  font: 700 11px/1 var(--sans); letter-spacing: .1em; text-transform: uppercase;
+  color: #fff; background: var(--navy); padding: 5px 12px 5px 14px;
+  border-radius: 3px; cursor: pointer; user-select: none;
+  transition: opacity .15s;
+}
+#ed-section-pill:hover { opacity: .85; }
+#ed-section-pill svg { flex-shrink: 0; }
+.ed-section-dd {
+  display: none; position: absolute; top: calc(100% + 8px); left: 0; z-index: 200;
+  background: #fff; border: 1px solid #dde4ea; border-radius: 10px;
+  box-shadow: 0 8px 32px rgba(0,0,0,.13);
+  min-width: 190px; overflow: hidden;
+}
+.ed-section-dd.open { display: block; }
+.ed-section-opt {
+  padding: 11px 18px; font: 600 13px/1 var(--sans); color: #374151;
+  cursor: pointer; transition: background .1s;
+}
+.ed-section-opt:hover { background: #f0f5fa; color: var(--navy); }
+.ed-section-opt.active { color: var(--navy); background: #e8f1f9; }
 
-    /* Section pill — make it a dropdown overlay */
-    #editor-section-wrap { position: relative; display: inline-block; cursor: pointer; }
-    #editor-section-wrap::after {
-      content: ' ▾'; font-size: 10px; opacity: .7;
-    }
-    .section-dropdown {
-      position: absolute; top: calc(100% + 6px); left: 0; z-index: 100;
-      background: #fff; border: 1px solid #d4dde6; border-radius: 8px;
-      box-shadow: 0 8px 24px rgba(0,0,0,.12); min-width: 180px;
-      display: none; overflow: hidden;
-    }
-    .section-dropdown.open { display: block; }
-    .section-option {
-      padding: 10px 16px; font-family: 'Source Sans 3', sans-serif;
-      font-size: 13px; font-weight: 600; cursor: pointer;
-      color: #374151; transition: background .1s;
-    }
-    .section-option:hover { background: #f0f4f8; color: #0a528e; }
-    .section-option-custom {
-      padding: 8px 12px; border-top: 1px solid #e5e7eb;
-    }
-    .section-option-custom input {
-      width: 100%; border: 1px solid #d1d5db; border-radius: 5px;
-      padding: 5px 8px; font-size: 12px; outline: none;
-    }
+/* Editable fields */
+.ed-headline {
+  font-family: var(--serif); font-size: clamp(28px, 4vw, 44px); font-weight: 700;
+  line-height: 1.18; color: #0d1f35; margin: 0 0 18px; letter-spacing: -.01em;
+  outline: none; min-height: 1.2em;
+}
+.ed-deck {
+  font-family: var(--serif); font-size: clamp(16px, 2vw, 20px); font-weight: 400;
+  line-height: 1.55; color: #4a6070; margin: 0 0 24px; font-style: italic;
+  outline: none; min-height: 1.6em;
+}
+.ed-meta {
+  display: flex; align-items: baseline; flex-wrap: wrap; gap: 6px 10px;
+  font: 400 13px/1 var(--sans); color: #6b7f92;
+  padding-top: 20px; border-top: 1px solid #e4ddd5;
+}
+.ed-meta strong { color: #0d1f35; font-weight: 700; }
+.meta-dot { color: #b0bec9; }
+[data-ed]:empty:not(:focus)::before {
+  content: attr(data-ph); color: #b8c8d4; pointer-events: none;
+  font-style: normal; font-weight: 400;
+}
 
-    /* Add block button */
-    #add-block-btn {
-      display: flex; align-items: center; justify-content: center;
-      width: 32px; height: 32px; border-radius: 50%;
-      background: #e8f1f9; border: 2px dashed #adc4da;
-      cursor: pointer; color: #5a7a9a;
-      font-size: 20px; line-height: 1; transition: all .15s;
-      margin: 16px auto 0; position: relative;
-    }
-    #add-block-btn:hover { background: #0a528e; border-color: #0a528e; color: #fff; }
-    .add-block-menu {
-      position: absolute; bottom: calc(100% + 8px); left: 50%; transform: translateX(-50%);
-      background: #fff; border: 1px solid #d4dde6; border-radius: 10px;
-      box-shadow: 0 8px 28px rgba(0,0,0,.14); min-width: 200px;
-      display: none; overflow: hidden;
-    }
-    #add-block-btn.menu-open .add-block-menu { display: block; }
-    .block-option {
-      display: flex; align-items: center; gap: 10px;
-      padding: 10px 16px; font-family: 'Source Sans 3', sans-serif;
-      font-size: 13px; font-weight: 600; cursor: pointer; color: #374151;
-      transition: background .1s; border-bottom: 1px solid #f3f4f6;
-    }
-    .block-option:last-child { border-bottom: none; }
-    .block-option:hover { background: #f0f4f8; color: #0a528e; }
-    .block-icon { font-size: 16px; width: 20px; text-align: center; }
+/* ── ARTICLE BODY AREA ───────────────────────────────────────── */
+#ed-body {
+  background: #fff;
+  padding: 32px 32px 40px;
+  border-bottom: 1px solid #e8e0d4;
+}
 
-    /* Inline formatting toolbar */
-    #inline-toolbar {
-      position: fixed; z-index: 9999; background: #0d1f35; border-radius: 8px;
-      box-shadow: 0 4px 16px rgba(0,0,0,.3); padding: 4px 6px;
-      display: none; align-items: center; gap: 2px;
-    }
-    #inline-toolbar.visible { display: flex; }
-    .itb-btn {
-      width: 30px; height: 28px; border: none; background: none; cursor: pointer;
-      color: rgba(255,255,255,.75); border-radius: 5px; font-size: 13px;
-      font-weight: 700; transition: all .12s; display: flex; align-items: center; justify-content: center;
-    }
-    .itb-btn:hover { background: rgba(255,255,255,.15); color: #fff; }
-    .itb-divider { width: 1px; height: 18px; background: rgba(255,255,255,.2); margin: 0 3px; }
+/* Hero image zone */
+#ed-img-zone {
+  position: relative; cursor: pointer; border-radius: 4px;
+  overflow: hidden; margin-bottom: 12px;
+  min-height: 260px; background: #f2f5f8;
+  border: 2px dashed #c9d8e4;
+  display: flex; align-items: center; justify-content: center;
+  transition: border-color .2s, background .2s;
+}
+#ed-img-zone:hover { border-color: var(--navy); background: #e8f1f9; }
+#ed-img-zone.has-image { min-height: unset; border: none; background: none; }
+#ed-img-zone.has-image:hover::after {
+  content: ''; position: absolute; inset: 0;
+  background: rgba(13,31,53,.45); border-radius: 4px;
+}
+.img-zone-placeholder {
+  display: flex; flex-direction: column; align-items: center; gap: 10px;
+  color: #7a9ab2; pointer-events: none;
+}
+.img-zone-placeholder svg { opacity: .6; }
+.img-zone-placeholder span { font: 600 13px/1 var(--sans); }
+.img-zone-placeholder small { font: 400 11px/1 var(--sans); color: #9db5c3; }
+#ed-hero-img { width: 100%; height: auto; max-height: 520px; object-fit: cover; display: block; border-radius: 2px; }
+.img-change-btn {
+  position: absolute; bottom: 12px; right: 12px; z-index: 10;
+  font: 600 11px/1 var(--sans); padding: 6px 12px; border-radius: 6px;
+  background: rgba(13,31,53,.8); color: #fff; border: 1px solid rgba(255,255,255,.2);
+  cursor: pointer; opacity: 0; transition: opacity .2s;
+}
+#ed-img-zone:hover .img-change-btn { opacity: 1; }
+.ed-fig-caption {
+  display: flex; gap: 16px; align-items: flex-start;
+  padding-top: 10px; border-top: 1px solid #eee; margin-bottom: 28px;
+}
+.ed-fig-caption-text {
+  flex: 1; font: 400 12.5px/1.5 var(--sans); color: #7a8d9e; outline: none;
+  min-height: 18px;
+}
+.ed-fig-credit {
+  font: 400 11px/1.5 var(--sans); color: #a0b0bc; outline: none;
+  min-height: 16px; flex-shrink: 0;
+}
 
-    /* Delete block button — appears on hover */
-    .deletable-block { position: relative; }
-    .delete-block-btn {
-      position: absolute; right: -36px; top: 50%; transform: translateY(-50%);
-      width: 26px; height: 26px; border-radius: 50%; background: #fee2e2;
-      border: none; cursor: pointer; color: #dc2626;
-      display: none; align-items: center; justify-content: center;
-      font-size: 14px; transition: background .12s;
-    }
-    .deletable-block:hover .delete-block-btn { display: flex; }
-    .delete-block-btn:hover { background: #dc2626; color: #fff; }
+/* Content blocks */
+#ed-content { outline: none; }
+#ed-content > * { position: relative; }
+#ed-content p {
+  font-family: var(--serif); font-size: 18px; line-height: 1.78; color: #1a2d3e; margin: 0 0 1.5em;
+  outline: none;
+}
+#ed-content p.lead { font-size: 20px !important; line-height: 1.65 !important; color: #0d1f35 !important; }
+#ed-content h2 {
+  font: 700 13px/1 var(--sans); letter-spacing: .1em; text-transform: uppercase;
+  color: var(--navy); margin: 2.4em 0 .9em; padding-top: 1.4em;
+  border-top: 2px solid var(--navy); outline: none;
+}
+#ed-content h3 {
+  font-family: var(--serif); font-size: 22px; font-weight: 700; color: #0d1f35;
+  margin: 2em 0 .7em; outline: none;
+}
+#ed-content blockquote.article-pullquote { outline: none; }
+#ed-content blockquote.article-pullquote p { outline: none; }
+#ed-content blockquote.article-pullquote cite { outline: none; }
+#ed-content figure { margin: 0 0 2em; }
+#ed-content figure img { width: 100%; border-radius: 3px; }
+#ed-content figure figcaption { font: 400 12px/1.5 var(--sans); color: #7a8d9e; padding-top: 8px; border-top: 1px solid #eee; margin-top: 8px; outline: none; }
+#ed-content hr { border: none; border-top: 2px solid #e4ddd5; margin: 2.5em 0; }
 
-    /* Toast */
-    #editor-toast {
-      position: fixed; bottom: 24px; right: 24px; z-index: 99999;
-      background: #0d1f35; color: #fff;
-      font-family: 'Source Sans 3', sans-serif; font-size: 13px; font-weight: 600;
-      padding: 12px 20px; border-radius: 10px;
-      box-shadow: 0 4px 20px rgba(0,0,0,.3); max-width: 340px;
-      transform: translateY(80px); opacity: 0;
-      transition: transform .25s, opacity .25s;
-    }
-    #editor-toast.show { transform: translateY(0); opacity: 1; }
-    #editor-toast.success { border-left: 4px solid #32d278; }
-    #editor-toast.error   { border-left: 4px solid #ef4444; }
+/* Block hover: show delete btn on left */
+#ed-content > [data-block] {
+  padding-left: 40px; margin-left: -40px;
+  transition: background .12s;
+}
+#ed-content > [data-block]::before {
+  content: '⋮⋮'; position: absolute; left: 6px; top: 50%; transform: translateY(-50%);
+  font-size: 14px; color: transparent; cursor: grab; letter-spacing: -2px;
+  transition: color .15s;
+}
+#ed-content > [data-block]:hover::before { color: #c4cdd6; }
+.block-del {
+  position: absolute; right: -32px; top: 50%; transform: translateY(-50%);
+  width: 24px; height: 24px; border-radius: 50%;
+  background: #fee2e2; border: none; color: #dc2626;
+  font-size: 15px; line-height: 1; cursor: pointer;
+  display: none; align-items: center; justify-content: center;
+  transition: background .12s;
+}
+#ed-content > [data-block]:hover .block-del { display: flex; }
+.block-del:hover { background: #dc2626; color: #fff; }
 
-    /* Hide share sidebar and site header/footer in editor */
-    .article-share-sidebar, #site-header-mount, #site-footer-mount,
-    .article-related, .article-right-aside { display: none !important; }
-    .article-layout {
-      grid-template-columns: 1fr !important;
-      max-width: 760px !important;
-    }
+/* Add-block bar */
+#ed-add-bar {
+  display: flex; align-items: center; gap: 8px;
+  margin-top: 24px; padding: 12px 0 0;
+  border-top: 1px dashed #d0dae3;
+}
+#ed-add-bar span { font: 600 11px/1 var(--sans); letter-spacing: .06em; text-transform: uppercase; color: #9db5c3; }
+.add-block-btn {
+  display: inline-flex; align-items: center; gap: 5px;
+  font: 600 12px/1 var(--sans); color: var(--navy);
+  background: #e8f1f9; border: 1px solid #c8daea;
+  padding: 6px 12px; border-radius: 20px; cursor: pointer;
+  transition: all .15s;
+}
+.add-block-btn:hover { background: var(--navy); color: #fff; border-color: var(--navy); }
+.add-block-btn svg { flex-shrink: 0; }
+
+/* ── AUTHOR BIO ───────────────────────────────────────────────── */
+#ed-bio-card {
+  background: #f7f9fb; border: 1px solid #e4eaf0; border-radius: 10px;
+  padding: 24px; margin: 32px 32px 0;
+  display: grid; grid-template-columns: 52px 1fr; gap: 16px; align-items: start;
+}
+.bio-avatar { flex-shrink: 0; }
+.bio-fields { display: flex; flex-direction: column; gap: 6px; }
+.bio-name {
+  font: 700 15px/1.3 var(--sans); color: #0d1f35; outline: none;
+  min-height: 20px; padding: 2px 0;
+}
+.bio-role {
+  font: 600 12px/1.3 var(--sans); color: #5a7a9a; letter-spacing: .04em; outline: none;
+  min-height: 18px; padding: 2px 0;
+}
+.bio-desc {
+  font: 400 13.5px/1.55 var(--sans); color: #4a6070; outline: none;
+  min-height: 40px; padding: 4px 0;
+}
+
+/* ── INLINE FORMATTING TOOLBAR ───────────────────────────────── */
+#ed-inline-tb {
+  position: fixed; z-index: 99999;
+  background: #0d1f35; border-radius: 9px;
+  box-shadow: 0 6px 24px rgba(0,0,0,.35);
+  padding: 5px 8px; display: none; align-items: center; gap: 2px;
+  pointer-events: all;
+}
+#ed-inline-tb.show { display: flex; }
+.itb-btn {
+  width: 30px; height: 28px; border: none; background: none; cursor: pointer;
+  color: rgba(255,255,255,.7); border-radius: 5px; font: 700 13px/1 var(--sans);
+  display: flex; align-items: center; justify-content: center;
+  transition: all .12s;
+}
+.itb-btn:hover { background: rgba(255,255,255,.15); color: #fff; }
+.itb-sep { width: 1px; height: 18px; background: rgba(255,255,255,.18); margin: 0 4px; }
+
+/* ── TOAST ────────────────────────────────────────────────────── */
+#ed-toast {
+  position: fixed; bottom: 24px; right: 24px; z-index: 99999;
+  font: 600 13px/1.3 var(--sans);
+  background: #0d1f35; color: #fff;
+  padding: 12px 20px; border-radius: 10px;
+  box-shadow: 0 4px 20px rgba(0,0,0,.25);
+  transform: translateY(80px); opacity: 0;
+  transition: transform .28s, opacity .28s;
+  max-width: 320px;
+}
+#ed-toast.show { transform: translateY(0); opacity: 1; }
+#ed-toast.ok   { border-left: 4px solid #34d399; }
+#ed-toast.err  { border-left: 4px solid #f87171; }
+#ed-toast.info { border-left: 4px solid #60a5fa; }
+
+/* ── MISC ─────────────────────────────────────────────────────── */
+/* Hide public site elements in editor */
+#site-header-mount, #site-footer-mount, .article-share-sidebar,
+.article-related, .article-right-aside { display: none !important; }
+.article-layout { grid-template-columns: 1fr !important; }
+[contenteditable] { -webkit-user-modify: read-write; }
   </style>
 </head>
 <body class="article-page">
 
-  <!-- ── Floating Admin Toolbar ── -->
-  <div id="editor-toolbar">
-    <a href="admin.html#articles" class="etb-back" id="editor-back-btn">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
-      Articles
-    </a>
-    <div class="etb-divider"></div>
-    <div class="etb-slug-wrap">
-      <span class="etb-slug-label">Slug</span>
-      <input type="text" id="editor-slug" placeholder="article-slug-here" />
-    </div>
-    <div class="etb-divider"></div>
-    <span class="etb-status draft" id="editor-status-badge">● DRAFT</span>
-    <span class="etb-autosave" id="editor-autosave-label"></span>
-    <div class="etb-divider"></div>
-    <button class="etb-btn etb-btn-ghost" id="editor-preview-btn" onclick="previewArticle()">Preview</button>
-    <button class="etb-btn etb-btn-save" id="editor-save-btn" onclick="saveArticle()">Save</button>
-    <button class="etb-btn etb-btn-publish" id="editor-publish-btn" onclick="publishArticle()">Publish</button>
+<!-- ══ TOP TOOLBAR ══════════════════════════════════════════════ -->
+<div id="ed-toolbar">
+  <a href="admin.html#articles" class="tb-back">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+    Articles
+  </a>
+  <div class="tb-sep"></div>
+  <div class="tb-slug-wrap">
+    <span class="tb-label">Slug</span>
+    <input type="text" id="ed-slug" placeholder="article-slug" />
   </div>
+  <div class="tb-sep"></div>
+  <span id="ed-status" class="tb-status draft">● Draft</span>
+  <span id="ed-autosave"></span>
+  <div class="tb-sep"></div>
+  <button class="tb-btn tb-btn-preview" onclick="previewArticle()">Preview</button>
+  <button class="tb-btn tb-btn-save" id="ed-save-btn" onclick="saveArticle()">Save Draft</button>
+  <button class="tb-btn tb-btn-publish" id="ed-pub-btn" onclick="publishArticle()">Publish</button>
+</div>
 
-  <!-- Inline formatting toolbar (appears on text selection) -->
-  <div id="inline-toolbar">
-    <button class="itb-btn" onclick="execCmd('bold')" title="Bold (Ctrl+B)"><b>B</b></button>
-    <button class="itb-btn" onclick="execCmd('italic')" title="Italic (Ctrl+I)"><i>I</i></button>
-    <button class="itb-btn" onclick="execCmd('underline')" title="Underline"><u>U</u></button>
-    <div class="itb-divider"></div>
-    <button class="itb-btn" onclick="insertLink()" title="Link (Ctrl+K)">🔗</button>
-    <div class="itb-divider"></div>
-    <button class="itb-btn" onclick="execCmd('removeFormat')" title="Clear format">✕</button>
-  </div>
+<!-- ══ INLINE TOOLBAR ═══════════════════════════════════════════ -->
+<div id="ed-inline-tb">
+  <button class="itb-btn" onmousedown="e(event,'bold')" title="Bold"><b>B</b></button>
+  <button class="itb-btn" onmousedown="e(event,'italic')" title="Italic"><i>I</i></button>
+  <button class="itb-btn" onmousedown="e(event,'underline')" title="Underline"><u>U</u></button>
+  <div class="itb-sep"></div>
+  <button class="itb-btn" onmousedown="insertLink(event)" title="Link">🔗</button>
+  <div class="itb-sep"></div>
+  <button class="itb-btn" onmousedown="e(event,'removeFormat')" title="Clear">✕</button>
+</div>
 
-  <!-- Section dropdown -->
-  <div id="section-dropdown-el" class="section-dropdown">
-    <div class="section-option" onclick="setSection('Findings')">Findings</div>
-    <div class="section-option" onclick="setSection('Culture')">Culture</div>
-    <div class="section-option" onclick="setSection('Heritage')">Heritage</div>
-    <div class="section-option" onclick="setSection('Community & Heritage')">Community & Heritage</div>
-    <div class="section-option" onclick="setSection('Opinion')">Opinion</div>
-    <div class="section-option" onclick="setSection('Archive')">Archive</div>
-    <div class="section-option-custom">
-      <input type="text" id="section-custom-input" placeholder="Custom section..." onkeydown="if(event.key==='Enter'){setSection(this.value);}" />
-    </div>
-  </div>
+<!-- ══ ARTICLE CANVAS ═══════════════════════════════════════════ -->
+<div id="ed-canvas">
 
-  <!-- ══════════════════ ARTICLE TEMPLATE (editable) ══════════════════ -->
+  <!-- HERO BAND -->
+  <div id="ed-hero-band">
 
-  <!-- Hero Band -->
-  <div class="article-hero-band">
-    <div class="article-hero-inner">
-      <nav class="article-breadcrumb">
-        <a href="index.html" class="breadcrumb-home">Home</a>
-        <span class="breadcrumb-sep">›</span>
-        <span class="breadcrumb-section" id="breadcrumb-section">Section</span>
-      </nav>
-
-      <!-- Section pill — clickable dropdown -->
-      <div id="editor-section-wrap" onclick="toggleSectionDropdown(event)">
-        <span class="article-section-pill" id="editor-section-pill">Section</span>
+    <!-- Section Picker (preset only, no custom) -->
+    <div class="ed-section-picker" id="ed-sec-picker">
+      <div id="ed-section-pill" onclick="toggleSecDd(event)">
+        <span id="ed-sec-label">Select Section</span>
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
       </div>
-
-      <!-- Headline — fully editable -->
-      <h1 class="article-headline" id="editor-headline"
-          contenteditable="true"
-          data-placeholder="Article headline..."
-          spellcheck="true"></h1>
-
-      <!-- Deck -->
-      <p class="article-deck" id="editor-deck"
-         contenteditable="true"
-         data-placeholder="Add a deck/subtitle..."></p>
-
-      <!-- Meta -->
-      <div class="article-meta">
-        <span class="article-author">By <strong contenteditable="true" id="editor-author" data-placeholder="Author name"></strong></span>
-        <span class="meta-dot">·</span>
-        <span contenteditable="true" id="editor-date" class="article-date" data-placeholder="Date"></span>
-        <span class="meta-dot">·</span>
-        <span class="article-readtime" id="editor-readtime">— min read</span>
+      <div class="ed-section-dd" id="ed-sec-dd">
+        <div class="ed-section-opt" onclick="setSection('Findings')">Findings</div>
+        <div class="ed-section-opt" onclick="setSection('Culture')">Culture</div>
+        <div class="ed-section-opt" onclick="setSection('Heritage')">Heritage</div>
+        <div class="ed-section-opt" onclick="setSection('Community &amp; Heritage')">Community &amp; Heritage</div>
+        <div class="ed-section-opt" onclick="setSection('Opinion')">Opinion</div>
+        <div class="ed-section-opt" onclick="setSection('Archive')">Archive</div>
       </div>
+    </div>
+
+    <!-- Headline -->
+    <h1 class="ed-headline" id="ed-headline"
+        contenteditable="true"
+        data-ed data-ph="Article headline..."
+        spellcheck="true"></h1>
+
+    <!-- Deck -->
+    <p class="ed-deck" id="ed-deck"
+       contenteditable="true"
+       data-ed data-ph="Add a compelling subtitle..."></p>
+
+    <!-- Meta -->
+    <div class="ed-meta">
+      <span>By <strong contenteditable="true" id="ed-author" data-ed data-ph="Author name" style="min-width:80px;display:inline-block;outline:none;"></strong></span>
+      <span class="meta-dot">·</span>
+      <span contenteditable="true" id="ed-date" data-ed data-ph="Date" style="outline:none;min-width:80px;display:inline-block;"></span>
+      <span class="meta-dot">·</span>
+      <span id="ed-readtime" style="color:#6b7f92;">— min read</span>
     </div>
   </div>
 
-  <!-- Article body layout -->
-  <div class="article-layout">
-    <main class="article-body" id="article-body">
+  <!-- BODY -->
+  <div id="ed-body">
 
-      <!-- Hero image -->
-      <figure class="article-hero-figure">
-        <div id="editor-hero-zone" onclick="triggerImageUpload()">
-          <img id="editor-hero-img" class="article-hero-img"
-               src="" alt="" style="display:none" />
-          <div class="hero-overlay">
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>
-            Click to upload hero image
-          </div>
-        </div>
-        <input type="file" id="hero-img-input" accept="image/*" style="display:none" onchange="handleImageUpload(this)" />
-        <figcaption class="article-hero-caption">
-          <span contenteditable="true" id="editor-hero-caption" data-placeholder="Caption text..."></span>
-          <span class="caption-credit" contenteditable="true" id="editor-hero-credit" data-placeholder="Photo credit..."></span>
-        </figcaption>
-      </figure>
-
-      <!-- Article content — editable -->
-      <div class="article-content" id="editor-content">
-        <!-- Populated by JS or user typing -->
+    <!-- Hero image -->
+    <div id="ed-img-zone" onclick="triggerImgUpload()">
+      <div class="img-zone-placeholder" id="ed-img-placeholder">
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5-4 4-2-2-5 5"/></svg>
+        <span>Click to upload hero image</span>
+        <small>JPG, PNG, WebP · max 5MB</small>
       </div>
+      <img id="ed-hero-img" src="" alt="" style="display:none;" />
+      <button class="img-change-btn" onclick="triggerImgUpload();event.stopPropagation()">Change image</button>
+    </div>
+    <input type="file" id="ed-img-input" accept="image/*" style="display:none;" onchange="handleHeroUpload(this)" />
 
-      <!-- Add block button -->
-      <div id="add-block-btn" onclick="toggleAddMenu(event)">
-        +
-        <div class="add-block-menu" id="add-block-menu">
-          <div class="block-option" onclick="addBlock('p')"><span class="block-icon">¶</span> Paragraph</div>
-          <div class="block-option" onclick="addBlock('lead')"><span class="block-icon">◉</span> Lead paragraph</div>
-          <div class="block-option" onclick="addBlock('h2')"><span class="block-icon">H2</span> Section heading</div>
-          <div class="block-option" onclick="addBlock('h3')"><span class="block-icon">H3</span> Sub-heading</div>
-          <div class="block-option" onclick="addBlock('blockquote')"><span class="block-icon">❝</span> Pull quote</div>
-          <div class="block-option" onclick="addBlock('img')"><span class="block-icon">🖼</span> Inline image</div>
-          <div class="block-option" onclick="addBlock('hr')"><span class="block-icon">—</span> Divider</div>
-        </div>
-      </div>
+    <!-- Caption / credit -->
+    <div class="ed-fig-caption">
+      <div class="ed-fig-caption-text" contenteditable="true" id="ed-caption" data-ed data-ph="Caption text..."></div>
+      <div class="ed-fig-credit" contenteditable="true" id="ed-credit" data-ed data-ph="Photo credit..."></div>
+    </div>
 
-      <!-- Author bio -->
-      <div class="article-author-bio" id="editor-author-bio">
-        <div class="author-bio-avatar">
-          <svg width="52" height="52" viewBox="0 0 52 52" fill="none"><circle cx="26" cy="26" r="26" fill="#e8f1f9"/><circle cx="26" cy="20" r="9" fill="#0a528e" opacity="0.35"/><ellipse cx="26" cy="42" rx="16" ry="9" fill="#0a528e" opacity="0.2"/></svg>
-        </div>
-        <div class="author-bio-text">
-          <div class="author-bio-name" contenteditable="true" id="editor-bio-name" data-placeholder="Author Name"></div>
-          <div class="author-bio-role" contenteditable="true" id="editor-bio-role" data-placeholder="Role / Title"></div>
-          <p class="author-bio-desc" contenteditable="true" id="editor-bio-desc" data-placeholder="Short author bio..."></p>
-        </div>
-      </div>
-    </main>
+    <!-- Article content -->
+    <div id="ed-content" role="textbox" aria-multiline="true"></div>
+
+    <!-- Add block controls -->
+    <div id="ed-add-bar">
+      <span>Insert</span>
+      <button class="add-block-btn" onclick="addBlock('p')">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Paragraph
+      </button>
+      <button class="add-block-btn" onclick="addBlock('lead')">Lead</button>
+      <button class="add-block-btn" onclick="addBlock('h2')">Heading</button>
+      <button class="add-block-btn" onclick="addBlock('h3')">Sub-heading</button>
+      <button class="add-block-btn" onclick="addBlock('blockquote')">Pull quote</button>
+      <button class="add-block-btn" onclick="addBlock('figure')">Image</button>
+      <button class="add-block-btn" onclick="addBlock('hr')">Divider</button>
+    </div>
   </div>
 
-  <!-- Toast -->
-  <div id="editor-toast"></div>
+  <!-- AUTHOR BIO -->
+  <div id="ed-bio-card">
+    <div class="bio-avatar">
+      <svg width="52" height="52" viewBox="0 0 52 52" fill="none"><circle cx="26" cy="26" r="26" fill="#e8f1f9"/><circle cx="26" cy="20" r="9" fill="#0a528e" opacity=".3"/><ellipse cx="26" cy="42" rx="16" ry="9" fill="#0a528e" opacity=".18"/></svg>
+    </div>
+    <div class="bio-fields">
+      <div class="bio-name" contenteditable="true" id="ed-bio-name" data-ed data-ph="Author Name"></div>
+      <div class="bio-role" contenteditable="true" id="ed-bio-role" data-ed data-ph="Role · Publication"></div>
+      <div class="bio-desc" contenteditable="true" id="ed-bio-desc" data-ed data-ph="Short author bio..."></div>
+    </div>
+  </div>
 
-  <script src="admin-auth.js"></script>
-  <script>
-  /* ═══════════════════════════════════════════════════════════
-     ARTICLE EDITOR — Admin Panel
-  ═══════════════════════════════════════════════════════════ */
+</div><!-- /ed-canvas -->
 
-  let _articleId  = null;
-  let _articleStatus = 'draft';
-  let _autoSaveTimer = null;
-  let _lastSavedAt   = null;
-  let _dirty = false;
+<div id="ed-toast"></div>
 
-  // ── Init on auth ready ────────────────────────────────────
-  window.addEventListener('privatian:ready', () => {
-    const params = new URLSearchParams(window.location.search);
-    _articleId = params.get('id') || null;
-    if (_articleId) {
-      loadArticle(_articleId);
-    } else {
-      initEmptyEditor();
-    }
-    setupPlaceholders();
-    setupInlineToolbar();
-    startAutoSave();
-    markDirtyOnInput();
-  });
+<script src="admin-auth.js"></script>
+<script>
+/* ══ ARTICLE EDITOR v2 ══════════════════════════════════════════
+   Professional in-theme WYSIWYG editor for The Privatian Family
+═══════════════════════════════════════════════════════════════ */
 
-  // ── Load existing article ─────────────────────────────────
-  async function loadArticle(id) {
-    try {
-      const res  = await fetch('/api/articles?action=get&id=' + id, {
-        headers: { 'Authorization': 'Bearer ' + window.PRIVATIAN_TOKEN }
-      });
-      if (!res.ok) { showToast('Article not found', 'error'); return; }
-      const a = await res.json();
-      populateEditor(a);
-    } catch(e) { showToast('Failed to load article', 'error'); }
-  }
+let _id     = null;
+let _status = 'draft';
+let _dirty  = false;
+let _saving = false;
 
-  function populateEditor(a) {
-    _articleId     = a.id;
-    _articleStatus = a.status || 'draft';
-
-    setText('editor-headline',   a.title || '');
-    setText('editor-deck',       a.deck  || '');
-    setText('editor-author',     a.author || '');
-    setText('editor-date',       a.published_at
-      ? new Date(a.published_at).toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'})
-      : new Date(a.created_at || Date.now()).toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'})
-    );
-    setText('editor-bio-name',   a.author || '');
-    setText('editor-bio-role',   a.author_role || '');
-    setText('editor-bio-desc',   a.author_bio  || '');
-    setText('editor-hero-caption', a.hero_caption || '');
-    setText('editor-hero-credit',  a.hero_credit  || '');
-
-    document.getElementById('editor-slug').value = a.slug || '';
-    setSection(a.section || '');
-
-    // Hero image
-    if (a.hero_img_url) {
-      setHeroImage(a.hero_img_url);
-    }
-
-    // Body content
-    const content = document.getElementById('editor-content');
-    if (a.content_html) {
-      content.innerHTML = a.content_html;
-      // Re-attach delete buttons
-      content.querySelectorAll('.deletable-block').forEach(attachDeleteBtn);
-    } else {
-      initEmptyEditor();
-    }
-
-    updateStatusBadge();
-    updateReadTime();
-  }
-
-  function initEmptyEditor() {
-    const content = document.getElementById('editor-content');
-    if (!content.children.length) {
-      addBlock('lead', true);
-      addBlock('p', true);
-    }
-    const today = new Date().toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'});
-    if (!getText('editor-date')) setText('editor-date', today);
-  }
-
-  // ── Save ─────────────────────────────────────────────────
-  async function saveArticle(silent = false) {
-    if (!silent) document.getElementById('editor-save-btn').textContent = 'Saving...';
-
-    const payload = buildPayload();
-    try {
-      const res  = await fetch('/api/articles?action=save', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + window.PRIVATIAN_TOKEN },
-        body: JSON.stringify(payload)
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Save failed');
-
-      if (!_articleId) {
-        _articleId = data.id;
-        // Update URL without reload
-        const url = new URL(window.location.href);
-        url.searchParams.set('id', _articleId);
-        window.history.replaceState({}, '', url.toString());
-        document.getElementById('editor-slug').value = data.slug;
-      }
-      _dirty = false;
-      _lastSavedAt = new Date();
-      document.getElementById('editor-autosave-label').textContent = 'Saved ' + _lastSavedAt.toLocaleTimeString();
-      if (!silent) showToast('Article saved', 'success');
-    } catch(e) {
-      if (!silent) showToast(e.message || 'Save failed', 'error');
-    } finally {
-      document.getElementById('editor-save-btn').textContent = 'Save';
-    }
-  }
-
-  // ── Publish ───────────────────────────────────────────────
-  async function publishArticle() {
-    if (!_articleId) {
-      await saveArticle(true);
-      if (!_articleId) { showToast('Save first', 'error'); return; }
-    }
-    const btn = document.getElementById('editor-publish-btn');
-    btn.textContent = '...';
-    try {
-      const res  = await fetch('/api/articles?action=publish&id=' + _articleId, {
-        method: 'POST', headers: { 'Authorization': 'Bearer ' + window.PRIVATIAN_TOKEN }
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Failed');
-      _articleStatus = data.status;
-      updateStatusBadge();
-      showToast(_articleStatus === 'published' ? 'Article published!' : 'Moved to Draft', 'success');
-    } catch(e) { showToast(e.message, 'error'); }
-    finally { updatePublishBtn(); }
-  }
-
-  function buildPayload() {
-    return {
-      id:           _articleId,
-      slug:         document.getElementById('editor-slug').value.trim() || undefined,
-      title:        getText('editor-headline'),
-      deck:         getText('editor-deck'),
-      section:      document.getElementById('editor-section-pill').textContent.replace(' ▾','').trim(),
-      author:       getText('editor-author'),
-      author_role:  getText('editor-bio-role'),
-      author_bio:   getText('editor-bio-desc'),
-      hero_img_url: document.getElementById('editor-hero-img').src || '',
-      hero_caption: getText('editor-hero-caption'),
-      hero_credit:  getText('editor-hero-credit'),
-      content_html: document.getElementById('editor-content').innerHTML,
-    };
-  }
-
-  // ── Auto-save ─────────────────────────────────────────────
-  function startAutoSave() {
-    setInterval(() => { if (_dirty) saveArticle(true); }, 30000);
-  }
-  function markDirtyOnInput() {
-    document.addEventListener('input', () => { _dirty = true; });
-  }
-
-  // ── Image upload ──────────────────────────────────────────
-  function triggerImageUpload() {
-    document.getElementById('hero-img-input').click();
-  }
-
-  async function handleImageUpload(input) {
-    const file = input.files[0];
-    if (!file) return;
-    // Preview immediately
-    const localUrl = URL.createObjectURL(file);
-    setHeroImage(localUrl);
-    // Upload to server
-    const form = new FormData();
-    form.append('file', file);
-    try {
-      const res  = await fetch('/api/articles/upload', {
-        method: 'POST', headers: { 'Authorization': 'Bearer ' + window.PRIVATIAN_TOKEN },
-        body: form
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Upload failed');
-      setHeroImage(data.url);
-      _dirty = true;
-    } catch(e) { showToast(e.message || 'Upload failed', 'error'); }
-  }
-
-  function setHeroImage(url) {
-    const zone = document.getElementById('editor-hero-zone');
-    const img  = document.getElementById('editor-hero-img');
-    zone.classList.remove('empty-zone');
-    img.src = url;
-    img.style.display = 'block';
-  }
-
-  // ── Add block ─────────────────────────────────────────────
-  function toggleAddMenu(e) {
-    e.stopPropagation();
-    document.getElementById('add-block-btn').classList.toggle('menu-open');
-  }
+// ── Boot ───────────────────────────────────────────────────────
+window.addEventListener('privatian:ready', () => {
+  const p = new URLSearchParams(location.search);
+  _id = p.get('id') || null;
+  _id ? loadArticle(_id) : initEmpty();
+  bindInlineTb();
+  startAutoSave();
+  document.addEventListener('input', () => { _dirty = true; updateReadTime(); });
   document.addEventListener('click', () => {
-    document.getElementById('add-block-btn').classList.remove('menu-open');
-    closeSectionDropdown();
+    document.getElementById('ed-sec-dd').classList.remove('open');
   });
+  // date default
+  if (!document.getElementById('ed-date').textContent.trim())
+    document.getElementById('ed-date').textContent = fmtDate(new Date());
+});
 
-  function addBlock(type, silent = false) {
-    if (!silent) document.getElementById('add-block-btn').classList.remove('menu-open');
-    const content = document.getElementById('editor-content');
-    let el;
+// ── Load ───────────────────────────────────────────────────────
+async function loadArticle(id) {
+  try {
+    const r = await apiFetch('/api/articles?action=get&id=' + id);
+    const a = await r.json();
+    if (!r.ok) throw new Error(a.error);
+    populate(a);
+  } catch(e) { toast('Failed to load article', 'err'); }
+}
 
-    if (type === 'p') {
-      el = document.createElement('p');
-      el.contentEditable = 'true';
-      el.className = 'deletable-block';
-      el.dataset.placeholder = 'Write something...';
-    } else if (type === 'lead') {
-      el = document.createElement('p');
-      el.contentEditable = 'true';
-      el.className = 'article-lead deletable-block';
-      el.dataset.placeholder = 'Opening lead paragraph...';
-    } else if (type === 'h2') {
-      el = document.createElement('h2');
-      el.contentEditable = 'true';
-      el.className = 'deletable-block';
-      el.dataset.placeholder = 'Section heading...';
-    } else if (type === 'h3') {
-      el = document.createElement('h3');
-      el.contentEditable = 'true';
-      el.className = 'deletable-block';
-      el.dataset.placeholder = 'Sub-heading...';
-    } else if (type === 'blockquote') {
-      el = document.createElement('blockquote');
-      el.className = 'article-pullquote deletable-block';
-      el.innerHTML = '<p contenteditable="true" data-placeholder="Pull quote text...">\u201C\u201D</p><cite contenteditable="true" data-placeholder="\u2014 Attribution">— </cite>';
-    } else if (type === 'img') {
+function populate(a) {
+  _id = a.id; _status = a.status || 'draft';
+  set('ed-headline', a.title || '');
+  set('ed-deck',     a.deck  || '');
+  set('ed-author',   a.author || '');
+  set('ed-date',     a.published_at
+    ? fmtDate(new Date(a.published_at))
+    : fmtDate(new Date(a.created_at || Date.now())));
+  set('ed-bio-name', a.author      || '');
+  set('ed-bio-role', a.author_role || '');
+  set('ed-bio-desc', a.author_bio  || '');
+  set('ed-caption',  a.hero_caption || '');
+  set('ed-credit',   a.hero_credit  || '');
+  document.getElementById('ed-slug').value = a.slug || '';
+  if (a.section) setSection(a.section);
+  if (a.hero_img_url) showHeroImg(a.hero_img_url);
+  if (a.content_html) {
+    document.getElementById('ed-content').innerHTML = a.content_html;
+    document.querySelectorAll('#ed-content [data-block]').forEach(attachDel);
+  } else {
+    initEmpty();
+  }
+  updateStatus(); updateReadTime();
+}
+
+function initEmpty() {
+  const c = document.getElementById('ed-content');
+  if (!c.children.length) {
+    addBlock('lead', true);
+    addBlock('p', true);
+  }
+}
+
+// ── Save ───────────────────────────────────────────────────────
+async function saveArticle(silent = false) {
+  if (_saving) return;
+  _saving = true;
+  const btn = document.getElementById('ed-save-btn');
+  if (!silent) { btn.disabled = true; btn.textContent = 'Saving…'; }
+  setAutosave('Saving…');
+
+  const body = buildPayload();
+  try {
+    const r = await apiFetch('/api/articles?action=save', { method: 'POST', body: JSON.stringify(body) });
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.error || 'Save failed');
+    if (!_id) {
+      _id = d.id;
+      const u = new URL(location.href);
+      u.searchParams.set('id', _id);
+      history.replaceState({}, '', u.toString());
+      document.getElementById('ed-slug').value = d.slug || '';
+    }
+    _dirty = false;
+    setAutosave('Saved ' + new Date().toLocaleTimeString());
+    if (!silent) toast('Draft saved', 'ok');
+  } catch(e) {
+    setAutosave('Save failed');
+    if (!silent) toast(e.message || 'Save failed', 'err');
+  } finally {
+    _saving = false;
+    if (!silent) { btn.disabled = false; btn.textContent = 'Save Draft'; }
+  }
+}
+
+// ── Publish ────────────────────────────────────────────────────
+async function publishArticle() {
+  if (!_id) { await saveArticle(true); if (!_id) { toast('Save failed', 'err'); return; } }
+  const btn = document.getElementById('ed-pub-btn');
+  btn.disabled = true; btn.textContent = '…';
+  try {
+    const r = await apiFetch('/api/articles?action=publish&id=' + _id, { method: 'POST' });
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.error || 'Failed');
+    _status = d.status;
+    updateStatus();
+    toast(_status === 'published' ? '🎉 Article published!' : 'Moved to draft', 'ok');
+  } catch(e) { toast(e.message, 'err'); }
+  finally { btn.disabled = false; updatePubBtn(); }
+}
+
+function buildPayload() {
+  return {
+    id:          _id,
+    slug:        document.getElementById('ed-slug').value.trim() || undefined,
+    title:       get('ed-headline'),
+    deck:        get('ed-deck'),
+    section:     document.getElementById('ed-sec-label').textContent.replace('Select Section','').trim(),
+    author:      get('ed-author'),
+    author_role: get('ed-bio-role'),
+    author_bio:  get('ed-bio-desc'),
+    hero_img_url: document.getElementById('ed-hero-img').src || '',
+    hero_caption: get('ed-caption'),
+    hero_credit:  get('ed-credit'),
+    content_html: document.getElementById('ed-content').innerHTML,
+  };
+}
+
+// Auto-save every 10s
+function startAutoSave() {
+  setInterval(() => { if (_dirty && !_saving) saveArticle(true); }, 10000);
+}
+
+// ── Image upload ───────────────────────────────────────────────
+function triggerImgUpload() {
+  document.getElementById('ed-img-input').click();
+}
+
+async function handleHeroUpload(input) {
+  const f = input.files[0]; if (!f) return;
+  showHeroImg(URL.createObjectURL(f));
+  const form = new FormData(); form.append('file', f);
+  try {
+    const r = await fetch('/api/articles?action=upload', {
+      method: 'POST', headers: { Authorization: 'Bearer ' + window.PRIVATIAN_TOKEN }, body: form
+    });
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.error || 'Upload failed');
+    showHeroImg(d.url); _dirty = true;
+  } catch(e) { toast(e.message || 'Upload failed', 'err'); }
+}
+
+function showHeroImg(url) {
+  const zone = document.getElementById('ed-img-zone');
+  const img  = document.getElementById('ed-hero-img');
+  const ph   = document.getElementById('ed-img-placeholder');
+  zone.classList.add('has-image');
+  ph.style.display = 'none';
+  img.src = url; img.style.display = 'block';
+}
+
+// ── Blocks ─────────────────────────────────────────────────────
+function addBlock(type, silent = false) {
+  const c = document.getElementById('ed-content');
+  let el;
+  switch(type) {
+    case 'p':
+      el = mk('p'); el.className = 'article-p'; break;
+    case 'lead':
+      el = mk('p'); el.className = 'article-lead'; break;
+    case 'h2':
+      el = mk('h2'); break;
+    case 'h3':
+      el = mk('h3'); break;
+    case 'blockquote':
+      el = mk('blockquote');
+      el.className = 'article-pullquote';
+      el.innerHTML =
+        '<p contenteditable="true" data-ed data-ph="\u201CQuote text here\u2026\u201D"></p>' +
+        '<cite contenteditable="true" data-ed data-ph="\u2014 Attribution"></cite>';
+      el.removeAttribute('contenteditable');
+      break;
+    case 'figure':
       el = document.createElement('figure');
-      el.className = 'article-hero-figure deletable-block';
-      el.innerHTML = `
-        <div class="editor-inline-img-zone" onclick="triggerInlineUpload(this)" style="min-height:180px;background:#f0f4f8;border:2px dashed #adc4da;border-radius:4px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#5a7a9a;font-family:'Source Sans 3',sans-serif;font-size:14px;font-weight:600;gap:8px;">
-          <input type="file" accept="image/*" style="display:none" onchange="handleInlineImageUpload(this)" />
-          <span>Click to add image</span>
-        </div>
-        <figcaption class="article-hero-caption" contenteditable="true" data-placeholder="Image caption..."></figcaption>`;
-    } else if (type === 'hr') {
+      el.innerHTML =
+        '<div class="ed-inline-img" onclick="this.querySelector(\'input\').click()" ' +
+        'style="min-height:160px;background:#f2f5f8;border:2px dashed #c9d8e4;border-radius:4px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#7a9ab2;font:600 13px/1 var(--sans);gap:8px;">' +
+        '<input type="file" accept="image/*" style="display:none" onchange="handleInlineImg(this)" />' +
+        '<span>Click to add image</span></div>' +
+        '<figcaption contenteditable="true" data-ed data-ph="Image caption…"></figcaption>';
+      el.removeAttribute('contenteditable');
+      break;
+    case 'hr':
       el = document.createElement('hr');
-      el.className = 'deletable-block';
-      el.style.cssText = 'border:none;border-top:2px solid #e4ddd5;margin:2.5em 0;';
-    }
+      el.removeAttribute('contenteditable');
+      break;
+    default: return;
+  }
+  el.dataset.block = type;
+  if (type !== 'blockquote' && type !== 'figure' && type !== 'hr') {
+    el.contentEditable = 'true';
+    el.dataset.ed = '';
+    el.dataset.ph = type === 'h2' ? 'Section heading…' : type === 'h3' ? 'Sub-heading…' : type === 'lead' ? 'Opening paragraph…' : 'Write here…';
+  }
+  c.appendChild(el);
+  attachDel(el);
+  if (el.contentEditable === 'true') {
+    el.focus();
+    placeCaretEnd(el);
+  }
+}
 
-    if (el) {
-      content.appendChild(el);
-      attachDeleteBtn(el);
-      if (el.contentEditable === 'true') {
-        el.focus();
-        // Place cursor at end
-        const range = document.createRange();
-        range.selectNodeContents(el);
-        range.collapse(false);
-        window.getSelection().removeAllRanges();
-        window.getSelection().addRange(range);
-      }
-    }
-  }
+function attachDel(el) {
+  if (el.querySelector('.block-del')) return;
+  if (el.tagName === 'HR') { el.style.position = 'relative'; }
+  const btn = document.createElement('button');
+  btn.className = 'block-del'; btn.innerHTML = '×'; btn.title = 'Delete';
+  btn.onmousedown = ev => { ev.preventDefault(); el.remove(); _dirty = true; };
+  el.appendChild(btn);
+}
 
-  function attachDeleteBtn(block) {
-    if (block.querySelector('.delete-block-btn')) return;
-    const btn = document.createElement('button');
-    btn.className = 'delete-block-btn';
-    btn.innerHTML = '×';
-    btn.title = 'Delete block';
-    btn.onclick = (e) => { e.stopPropagation(); block.remove(); _dirty = true; };
-    block.style.position = 'relative';
-    block.appendChild(btn);
-  }
-
-  // ── Inline image upload ───────────────────────────────────
-  function triggerInlineUpload(zone) {
-    zone.querySelector('input[type="file"]').click();
-  }
-  async function handleInlineImageUpload(input) {
-    const file = input.files[0];
-    if (!file) return;
-    const zone = input.closest('.editor-inline-img-zone');
-    const localUrl = URL.createObjectURL(file);
-    const img = document.createElement('img');
-    img.src = localUrl; img.className = 'article-hero-img'; img.alt = '';
-    zone.replaceWith(img);
-    // Upload
-    const form = new FormData();
-    form.append('file', file);
-    try {
-      const res  = await fetch('/api/articles/upload', {
-        method: 'POST', headers: { 'Authorization': 'Bearer ' + window.PRIVATIAN_TOKEN },
-        body: form
-      });
-      const data = await res.json();
-      if (res.ok) { img.src = data.url; _dirty = true; }
-    } catch(e) {}
-  }
-
-  // ── Section dropdown ──────────────────────────────────────
-  function toggleSectionDropdown(e) {
-    e.stopPropagation();
-    const wrap = document.getElementById('editor-section-wrap');
-    const dd   = document.getElementById('section-dropdown-el');
-    const rect = wrap.getBoundingClientRect();
-    dd.style.top  = (rect.bottom + window.scrollY + 4) + 'px';
-    dd.style.left = rect.left + 'px';
-    dd.style.position = 'absolute';
-    if (!document.body.contains(dd)) document.body.appendChild(dd);
-    dd.classList.toggle('open');
-  }
-  function closeSectionDropdown() {
-    document.getElementById('section-dropdown-el').classList.remove('open');
-  }
-  function setSection(val) {
-    if (!val) return;
-    const pill = document.getElementById('editor-section-pill');
-    pill.textContent = val;
-    document.getElementById('breadcrumb-section').textContent = val;
-    closeSectionDropdown();
-    _dirty = true;
-  }
-
-  // ── Inline formatting toolbar ─────────────────────────────
-  function setupInlineToolbar() {
-    const tb = document.getElementById('inline-toolbar');
-    document.addEventListener('selectionchange', () => {
-      const sel = window.getSelection();
-      if (!sel || sel.isCollapsed || !sel.toString().trim()) {
-        tb.classList.remove('visible'); return;
-      }
-      // Only show inside editor content areas
-      const anchor = sel.anchorNode;
-      const editable = anchor && anchor.nodeType === 3
-        ? anchor.parentElement.closest('[contenteditable]')
-        : anchor && anchor.closest && anchor.closest('[contenteditable]');
-      if (!editable) { tb.classList.remove('visible'); return; }
-
-      const range = sel.getRangeAt(0).getBoundingClientRect();
-      tb.style.top  = (window.scrollY + range.top - 44) + 'px';
-      tb.style.left = (window.scrollX + range.left + range.width/2 - 80) + 'px';
-      tb.classList.add('visible');
+async function handleInlineImg(input) {
+  const f = input.files[0]; if (!f) return;
+  const zone = input.closest('.ed-inline-img');
+  const img = document.createElement('img');
+  img.src = URL.createObjectURL(f);
+  zone.replaceWith(img);
+  const form = new FormData(); form.append('file', f);
+  try {
+    const r = await fetch('/api/articles?action=upload', {
+      method: 'POST', headers: { Authorization: 'Bearer ' + window.PRIVATIAN_TOKEN }, body: form
     });
-  }
+    const d = await r.json();
+    if (r.ok) { img.src = d.url; _dirty = true; }
+  } catch(e) {}
+}
 
-  function execCmd(cmd, value) {
-    document.execCommand(cmd, false, value || null);
-  }
-
-  function insertLink() {
-    const url = prompt('Enter URL:');
-    if (url) document.execCommand('createLink', false, url);
-  }
-
-  // ── Keyboard shortcuts ────────────────────────────────────
-  document.addEventListener('keydown', (e) => {
-    if (e.ctrlKey || e.metaKey) {
-      if (e.key === 's') { e.preventDefault(); saveArticle(); }
-      if (e.key === 'k') { e.preventDefault(); insertLink(); }
-    }
-    // Enter in headlines → move to deck / next block
-    if (e.key === 'Enter' && e.target.id === 'editor-headline') {
-      e.preventDefault();
-      document.getElementById('editor-deck').focus();
-    }
+// ── Section ────────────────────────────────────────────────────
+function toggleSecDd(ev) {
+  ev.stopPropagation();
+  document.getElementById('ed-sec-dd').classList.toggle('open');
+}
+function setSection(val) {
+  document.getElementById('ed-sec-label').textContent = val;
+  document.querySelectorAll('.ed-section-opt').forEach(o => {
+    o.classList.toggle('active', o.textContent.trim() === val);
   });
+  document.getElementById('ed-sec-dd').classList.remove('open');
+  _dirty = true;
+}
 
-  // ── Placeholder handling ───────────────────────────────────
-  function setupPlaceholders() {
-    document.querySelectorAll('[data-placeholder]').forEach(el => {
-      updatePlaceholder(el);
-      el.addEventListener('focus', () => updatePlaceholder(el));
-      el.addEventListener('blur',  () => updatePlaceholder(el));
-      el.addEventListener('input', () => { updateReadTime(); _dirty = true; });
-    });
-  }
-  function updatePlaceholder(el) {
-    if (!el.textContent.trim() && document.activeElement !== el) {
-      el.classList.add('is-empty');
-      el.style.setProperty('--placeholder', `"${el.dataset.placeholder}"`);
-    } else {
-      el.classList.remove('is-empty');
+// ── Inline toolbar ─────────────────────────────────────────────
+function bindInlineTb() {
+  const tb = document.getElementById('ed-inline-tb');
+  document.addEventListener('selectionchange', () => {
+    const sel = getSelection();
+    if (!sel || sel.isCollapsed || !sel.toString().trim()) {
+      tb.classList.remove('show'); return;
     }
-  }
-  // CSS for placeholders
-  const placeholderStyle = document.createElement('style');
-  placeholderStyle.textContent = `
-    [contenteditable].is-empty::before {
-      content: var(--placeholder, 'Type here...');
-      color: #b0bec9; pointer-events: none; position: absolute;
-      font-style: italic;
-    }
-    [contenteditable] { position: relative; }
-  `;
-  document.head.appendChild(placeholderStyle);
+    const node = sel.anchorNode;
+    const ce = node?.nodeType === 3 ? node.parentElement.closest('[contenteditable]') : node?.closest?.('[contenteditable]');
+    if (!ce) { tb.classList.remove('show'); return; }
+    const r = sel.getRangeAt(0).getBoundingClientRect();
+    tb.style.top  = (scrollY + r.top - 46) + 'px';
+    tb.style.left = (scrollX + r.left + r.width / 2 - 80) + 'px';
+    tb.classList.add('show');
+  });
+}
 
-  // ── Helpers ───────────────────────────────────────────────
-  function getText(id) {
-    const el = document.getElementById(id);
-    return el ? el.textContent.trim() : '';
-  }
-  function setText(id, val) {
-    const el = document.getElementById(id);
-    if (el) el.textContent = val;
-  }
+function e(ev, cmd) {
+  ev.preventDefault();
+  document.execCommand(cmd, false, null);
+}
+function insertLink(ev) {
+  ev.preventDefault();
+  const url = prompt('Enter URL:');
+  if (url) document.execCommand('createLink', false, url);
+}
 
-  function updateStatusBadge() {
-    const badge = document.getElementById('editor-status-badge');
-    if (_articleStatus === 'published') {
-      badge.className = 'etb-status published';
-      badge.textContent = '● PUBLISHED';
-    } else {
-      badge.className = 'etb-status draft';
-      badge.textContent = '● DRAFT';
-    }
-    updatePublishBtn();
-  }
-  function updatePublishBtn() {
-    const btn = document.getElementById('editor-publish-btn');
-    if (_articleStatus === 'published') {
-      btn.textContent = 'Unpublish';
-      btn.className = 'etb-btn etb-btn-unpublish';
-    } else {
-      btn.textContent = 'Publish';
-      btn.className = 'etb-btn etb-btn-publish';
-    }
-  }
-  function updateReadTime() {
-    const html = document.getElementById('editor-content').innerHTML;
-    const words = html.replace(/<[^>]*>/g,' ').split(/\s+/).filter(Boolean).length;
-    const mins = Math.max(1, Math.round(words / 200));
-    document.getElementById('editor-readtime').textContent = mins + ' min read';
-  }
+// ── Keyboard shortcuts ─────────────────────────────────────────
+document.addEventListener('keydown', ev => {
+  if ((ev.ctrlKey || ev.metaKey) && ev.key === 's') { ev.preventDefault(); saveArticle(); }
+  if ((ev.ctrlKey || ev.metaKey) && ev.key === 'k') { ev.preventDefault(); const u = prompt('Enter URL:'); if (u) document.execCommand('createLink', false, u); }
+  if (ev.key === 'Enter' && ev.target.id === 'ed-headline') { ev.preventDefault(); document.getElementById('ed-deck').focus(); }
+  if (ev.key === 'Enter' && ev.target.id === 'ed-deck') { ev.preventDefault(); document.getElementById('ed-author').focus(); }
+});
 
-  function previewArticle() {
-    if (!_articleId) { showToast('Save first to preview', 'error'); return; }
-    window.open('/article.html?id=' + _articleId, '_blank');
+// ── Status / UI helpers ────────────────────────────────────────
+function updateStatus() {
+  const badge = document.getElementById('ed-status');
+  badge.className = 'tb-status ' + _status;
+  badge.textContent = _status === 'published' ? '● Published' : '● Draft';
+  updatePubBtn();
+}
+function updatePubBtn() {
+  const btn = document.getElementById('ed-pub-btn');
+  if (_status === 'published') {
+    btn.textContent = 'Unpublish';
+    btn.className = 'tb-btn tb-btn-unpublish';
+  } else {
+    btn.textContent = 'Publish';
+    btn.className = 'tb-btn tb-btn-publish';
   }
+}
+function updateReadTime() {
+  const html = document.getElementById('ed-content').innerHTML;
+  const wc = html.replace(/<[^>]*>/g,' ').split(/\s+/).filter(Boolean).length;
+  document.getElementById('ed-readtime').textContent = Math.max(1, Math.round(wc/200)) + ' min read';
+}
+function setAutosave(msg) {
+  document.getElementById('ed-autosave').textContent = msg;
+}
+function previewArticle() {
+  if (!_id) { toast('Save first to preview', 'info'); return; }
+  window.open('/article.html?id=' + _id, '_blank');
+}
 
-  function showToast(msg, type = 'success') {
-    const t = document.getElementById('editor-toast');
-    t.textContent = msg;
-    t.className = 'show ' + type;
-    clearTimeout(t._timer);
-    t._timer = setTimeout(() => t.classList.remove('show'), 3000);
-  }
+// ── Toast ──────────────────────────────────────────────────────
+function toast(msg, type = 'ok') {
+  const t = document.getElementById('ed-toast');
+  t.textContent = msg;
+  t.className = 'show ' + type;
+  clearTimeout(t._t);
+  t._t = setTimeout(() => t.classList.remove('show'), 3000);
+}
 
-  // ── Auto-date ─────────────────────────────────────────────
-  if (!document.getElementById('editor-date').textContent.trim()) {
-    setText('editor-date',
-      new Date().toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'})
-    );
-  }
-  </script>
+// ── Utils ──────────────────────────────────────────────────────
+function get(id) { return (document.getElementById(id)?.textContent || '').trim(); }
+function set(id, val) { const el = document.getElementById(id); if (el) el.textContent = val; }
+function mk(tag) { return document.createElement(tag); }
+function fmtDate(d) { return d.toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'}); }
+function placeCaretEnd(el) {
+  const r = document.createRange(); r.selectNodeContents(el); r.collapse(false);
+  const s = getSelection(); s.removeAllRanges(); s.addRange(r);
+}
+function apiFetch(url, opts = {}) {
+  return fetch(url, {
+    ...opts,
+    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + window.PRIVATIAN_TOKEN, ...(opts.headers||{}) }
+  });
+}
+</script>
 </body>
 </html>
