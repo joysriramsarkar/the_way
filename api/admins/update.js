@@ -4,7 +4,7 @@ const { createClient } = require('@supabase/supabase-js');
 async function countGmailAdmins(sb, excludeId) {
   const { data } = await sb
     .from('allowed_admins')
-    .select('id, email')
+    .select('id, email, role')
     .eq('status', 'active')
     .eq('role', 'Admin');
   return (data || [])
@@ -29,37 +29,60 @@ module.exports = async function handler(req, res) {
   const { status, role } = req.body || {};
   const updates = {};
   if (status && ['active', 'suspended', 'deleted'].includes(status)) updates.status = status;
-  if (role && ['Admin', 'Moderator'].includes(role)) updates.role = role;
+  if (role  && ['Admin', 'Moderator'].includes(role))               updates.role   = role;
   if (!Object.keys(updates).length) return res.status(400).json({ error: 'No valid updates' });
 
   const sb = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
 
-  // Fetch target
   const { data: target } = await sb.from('allowed_admins').select('*').eq('id', id).single();
   if (!target) return res.status(404).json({ error: 'Admin not found' });
 
-  // Block self-suspend/self-delete
+  // Block self-suspend / self-delete
   if (target.email.toLowerCase() === session.email.toLowerCase()) {
     if (updates.status === 'suspended' || updates.status === 'deleted') {
       return res.status(400).json({ error: 'You cannot suspend or remove your own account.' });
     }
   }
 
-  // Min-2 @gmail.com Admin rule for suspend
-  const willDeactivate = updates.status === 'suspended' || updates.status === 'deleted';
-  const isGmailAdmin = target.status === 'active'
-    && target.role === 'Admin'
-    && target.email.toLowerCase().endsWith('@gmail.com');
+  const isGmailAdmin = target.email.toLowerCase().endsWith('@gmail.com') && target.role === 'Admin';
 
+  // Min-2 Gmail Admin rule: suspending / removing a Gmail Admin
+  const willDeactivate = (updates.status === 'suspended' || updates.status === 'deleted')
+                        && target.status === 'active';
   if (willDeactivate && isGmailAdmin) {
-    // Count remaining active Gmail Admins excluding this one
     const remaining = await countGmailAdmins(sb, id);
     if (remaining < 2) {
       return res.status(400).json({
         error: 'min_admins',
-        message: 'At least 2 Gmail Admin accounts must remain active. Add another Gmail Admin before suspending this one.'
+        message: 'At least 2 Gmail Admin accounts must remain active. Add another Gmail Admin first.'
       });
     }
+  }
+
+  // Min-2 Gmail Admin rule: downgrading Admin → Moderator
+  const willDowngrade = updates.role === 'Moderator' && target.role === 'Admin';
+  if (willDowngrade && isGmailAdmin && target.status === 'active') {
+    const remaining = await countGmailAdmins(sb, id);
+    if (remaining < 2) {
+      return res.status(400).json({
+        error: 'min_admins',
+        message: 'At least 2 Gmail Admin accounts must remain active. Add another Gmail Admin before downgrading this one.'
+      });
+    }
+  }
+
+  // Audit trail
+  let action = null;
+  if (updates.status === 'suspended')  action = 'suspended';
+  if (updates.status === 'active' && target.status === 'suspended') action = 'unsuspended';
+  if (updates.status === 'active' && target.status === 'deleted')   action = 'restored';
+  if (updates.status === 'deleted')    action = 'deleted';
+  if (updates.role && updates.role !== target.role)                 action = 'role_changed_to_' + updates.role;
+
+  if (action) {
+    updates.modified_by     = session.email;
+    updates.modified_at     = new Date().toISOString();
+    updates.modified_action = action;
   }
 
   const { data, error } = await sb

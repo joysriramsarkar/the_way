@@ -15,12 +15,10 @@ module.exports = async function handler(req, res) {
 
   let query = sb
     .from('allowed_admins')
-    .select('id, email, role, added_by, added_at, status')
+    .select('id, email, role, added_by, added_at, status, modified_by, modified_at, modified_action')
     .order('added_at', { ascending: false });
 
-  if (!includeDeleted) {
-    query = query.neq('status', 'deleted');
-  }
+  if (!includeDeleted) query = query.neq('status', 'deleted');
 
   const { data, error } = await query;
   if (error) return res.status(500).json({ error: error.message });
