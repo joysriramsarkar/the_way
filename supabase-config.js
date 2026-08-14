@@ -3,7 +3,7 @@
    Central database connection for all pages
 ═══════════════════════════════════════════════════════════ */
 
-const PRIVATIAN_SUPABASE_URL = 'https://aenhajqsgskimfzvlfr.supabase.co';
+const PRIVATIAN_SUPABASE_URL = 'https://aenhajqjsgskimfzvlfr.supabase.co';
 const PRIVATIAN_SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFlbmhhanFqc2dza2ltZnp2bGZyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY2MDc1MDUsImV4cCI6MjEwMjE4MzUwNX0.q0wmF77hpsb8M7CQOYMq8GrDuQJ32vn1NcWFXTc5UAY';
 
 // Initialize Supabase client
