@@ -1,5 +1,5 @@
 /**
- * THE PRIVATIAN FAMILY â€” Shared Components System
+ * THE PRIVATIAN FAMILY — Shared Components System
  * Renders consistent Header, Sub-header, Navigation, Menu Overlay, Search Overlay, and Footer across all pages.
  */
 
@@ -99,7 +99,7 @@
     <div class="search-overlay-inner">
       <div class="search-input-wrap">
         <svg class="search-icon-inline" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-        <input type="search" id="search-input" class="search-input" placeholder="Search articles, topics, sectionsâ€¦" autocomplete="off" spellcheck="false" />
+        <input type="search" id="search-input" class="search-input" placeholder="Search articles, topics, sections…" autocomplete="off" spellcheck="false" />
         <button class="search-clear-btn" id="search-clear-btn" aria-label="Clear search" hidden>&#10005;</button>
       </div>
       <div id="search-results" class="search-results" aria-live="polite"></div>
@@ -449,7 +449,7 @@
         html += '<div class="search-result-title">' + highlightMatch(a.title, q) + '</div></div>';
       });
       html += '</div>';
-      if (matches.length > 12) html += '<p class="search-hint">' + (matches.length - 12) + ' more â€” refine your search</p>';
+      if (matches.length > 12) html += '<p class="search-hint">' + (matches.length - 12) + ' more — refine your search</p>';
       searchResults.innerHTML = html;
 
       searchResults.querySelectorAll('.search-result-item').forEach(function(item) {
