@@ -633,6 +633,7 @@ document.addEventListener('visibilitychange', function() {
 
 
 
+
 // =================================================================
 // MANAGE ACCESS PAGE
 // =================================================================
@@ -646,10 +647,60 @@ function initAccessPage() {
   if (addBtn) addBtn.addEventListener('click', addAdminEmail);
 }
 
+// -- Inner tab state --
+let _accessTab = 'active';
+
+function _setAccessTab(tab) {
+  _accessTab = tab;
+  ['active','suspended','recycle'].forEach(t => {
+    const btn = document.getElementById('access-tab-' + t);
+    const pnl = document.getElementById('access-panel-' + t);
+    if (btn) btn.classList.toggle('access-tab--active', t === tab);
+    if (pnl) pnl.hidden = (t !== tab);
+  });
+}
+
 async function loadAccessList() {
+  // Inject tab structure into the list container if not already present
   const list = document.getElementById('access-list');
   if (!list) return;
-  list.innerHTML = '<div style="text-align:center;padding:32px;color:#6b7280;">Loading...</div>';
+
+  // First time: inject tabs + panels
+  if (!document.getElementById('access-tab-active')) {
+    list.innerHTML = `
+      <div class="access-tabs" style="display:flex;border-bottom:1px solid #e5e7eb;margin-bottom:0;">
+        <button id="access-tab-active"   class="access-tab access-tab--active" onclick="_setAccessTab('active')">Active</button>
+        <button id="access-tab-suspended" class="access-tab"                   onclick="_setAccessTab('suspended')">Suspended</button>
+        <button id="access-tab-recycle"  class="access-tab"                    onclick="_setAccessTab('recycle')">Recycle</button>
+      </div>
+      <div id="access-panel-active"   ></div>
+      <div id="access-panel-suspended" hidden></div>
+      <div id="access-panel-recycle"  hidden></div>
+    `;
+    // Inject tab styles once
+    if (!document.getElementById('access-tab-style')) {
+      const style = document.createElement('style');
+      style.id = 'access-tab-style';
+      style.textContent = `
+        .access-tab {
+          padding: 10px 20px; font-size: 13px; font-weight: 600;
+          color: #6b7280; background: none; border: none;
+          border-bottom: 2px solid transparent; cursor: pointer;
+          transition: color .15s, border-color .15s;
+        }
+        .access-tab:hover { color: #111827; }
+        .access-tab--active { color: #1e3a5f; border-bottom-color: #1e3a5f; }
+      `;
+      document.head.appendChild(style);
+    }
+  }
+
+  // Show loading in all panels
+  ['active','suspended','recycle'].forEach(t => {
+    const p = document.getElementById('access-panel-' + t);
+    if (p) p.innerHTML = '<div style="text-align:center;padding:28px;color:#9ca3af;font-size:13px;">Loading...</div>';
+  });
+
   try {
     const res = await fetch('/api/admins/list?include_deleted=true', {
       headers: { 'Authorization': 'Bearer ' + window.PRIVATIAN_TOKEN }
@@ -662,48 +713,91 @@ async function loadAccessList() {
     const suspended = all.filter(a => a.status === 'suspended');
     const deleted   = all.filter(a => a.status === 'deleted');
 
-    function adminRow(a) {
+    // Update tab badge counts
+    const tabActive    = document.getElementById('access-tab-active');
+    const tabSuspended = document.getElementById('access-tab-suspended');
+    const tabRecycle   = document.getElementById('access-tab-recycle');
+    if (tabActive)    tabActive.textContent    = `Active (${active.length})`;
+    if (tabSuspended) tabSuspended.textContent = `Suspended (${suspended.length})`;
+    if (tabRecycle)   tabRecycle.textContent   = `Recycle (${deleted.length})`;
+
+    function adminRow(a, panel) {
       const isSelf = a.email.toLowerCase() === me;
-      const statusColor = { active: '#dcfce7', suspended: '#fef3c7', deleted: '#fee2e2' };
-      const statusText  = { active: '#166534', suspended: '#92400e', deleted: '#991b1b' };
-      const roleColor   = a.role === 'Admin' ? '#dbeafe' : '#d1fae5';
-      const roleText    = a.role === 'Admin' ? '#1e40af' : '#065f46';
-      const actions = isSelf
-        ? '<span style="font-size:12px;color:#9ca3af;padding:4px 8px;">(you)</span>'
-        : (a.status === 'deleted'
-          ? `<button onclick="restoreAdmin('${a.id}','${escapeHtml(a.email)}')" style="background:none;border:1px solid #6ee7b7;border-radius:6px;padding:4px 10px;font-size:12px;cursor:pointer;color:#059669;">Restore</button>`
-          : `
-            <button onclick="toggleAdminStatus('${a.id}','${a.status==='active'?'suspended':'active'}','${escapeHtml(a.email)}')" style="background:none;border:1px solid #e5e7eb;border-radius:6px;padding:4px 10px;font-size:12px;cursor:pointer;color:#6b7280;">${a.status==='active'?'Suspend':'Unsuspend'}</button>
-            <button onclick="removeAdmin('${a.id}','${escapeHtml(a.email)}')" style="background:none;border:1px solid #fca5a5;border-radius:6px;padding:4px 10px;font-size:12px;cursor:pointer;color:#dc2626;">Remove</button>
-          `);
-      return `<div style="display:flex;align-items:center;gap:10px;padding:12px 16px;border-bottom:1px solid #e5e7eb;flex-wrap:wrap;">
+      const roleColor = a.role === 'Admin' ? '#dbeafe' : '#d1fae5';
+      const roleText  = a.role === 'Admin' ? '#1e40af' : '#065f46';
+      let actions = '';
+      if (isSelf) {
+        actions = '<span style="font-size:12px;color:#9ca3af;padding:2px 8px;">(you)</span>';
+      } else if (panel === 'recycle') {
+        actions = `<button onclick="restoreAdmin('${a.id}','${escapeHtml(a.email)}')" style="background:#ecfdf5;border:1px solid #6ee7b7;border-radius:6px;padding:4px 12px;font-size:12px;cursor:pointer;color:#059669;font-weight:600;">Restore</button>`;
+      } else {
+        const suspendLabel = a.status === 'active' ? 'Suspend' : 'Unsuspend';
+        const suspendNew   = a.status === 'active' ? 'suspended' : 'active';
+        actions = `
+          <button onclick="toggleAdminStatus('${a.id}','${suspendNew}','${escapeHtml(a.email)}')"
+            style="background:none;border:1px solid #e5e7eb;border-radius:6px;padding:4px 12px;font-size:12px;cursor:pointer;color:#6b7280;">
+            ${suspendLabel}
+          </button>
+          <button onclick="removeAdmin('${a.id}','${escapeHtml(a.email)}')"
+            style="background:none;border:1px solid #fca5a5;border-radius:6px;padding:4px 12px;font-size:12px;cursor:pointer;color:#dc2626;">
+            Remove
+          </button>`;
+      }
+      return `<div style="display:flex;align-items:center;gap:10px;padding:12px 16px;border-bottom:1px solid #f3f4f6;flex-wrap:wrap;">
         <div style="flex:1;min-width:160px;">
           <div style="font-weight:600;font-size:14px;">${escapeHtml(a.email)}</div>
-          <div style="font-size:12px;color:#6b7280;">Added by ${escapeHtml(a.added_by||'—')} &middot; ${new Date(a.added_at).toLocaleDateString()}</div>
+          <div style="font-size:12px;color:#9ca3af;">Added by ${escapeHtml(a.added_by||'system')} &middot; ${new Date(a.added_at).toLocaleDateString('en-US',{year:'numeric',month:'short',day:'numeric'})}</div>
         </div>
-        <span style="background:${roleColor};color:${roleText};border-radius:10px;padding:2px 10px;font-size:12px;font-weight:600;">${escapeHtml(a.role)}</span>
-        <span style="background:${statusColor[a.status]||'#f3f4f6'};color:${statusText[a.status]||'#374151'};border-radius:10px;padding:2px 10px;font-size:12px;font-weight:600;">${escapeHtml(a.status)}</span>
-        <div style="display:flex;gap:6px;">${actions}</div>
+        <span style="background:${roleColor};color:${roleText};border-radius:20px;padding:2px 12px;font-size:11px;font-weight:700;">${escapeHtml(a.role)}</span>
+        <div style="display:flex;gap:6px;align-items:center;">${actions}</div>
       </div>`;
     }
 
-    function section(title, rows, emptyMsg) {
-      if (!rows.length && !emptyMsg) return '';
-      return `<div style="margin-bottom:24px;">
-        <div style="font-size:11px;font-weight:700;color:#6b7280;letter-spacing:.08em;text-transform:uppercase;padding:8px 16px;background:#f9fafb;border-bottom:1px solid #e5e7eb;">${escapeHtml(title)} (${rows.length})</div>
-        ${rows.length ? rows.map(adminRow).join('') : '<div style="padding:16px 16px;color:#9ca3af;font-size:13px;">' + emptyMsg + '</div>'}
-      </div>`;
+    function emptyState(msg) {
+      return `<div style="text-align:center;padding:36px 20px;color:#9ca3af;font-size:13px;">${msg}</div>`;
     }
 
-    list.innerHTML =
-      section('Active', active, 'No active admins.') +
-      section('Suspended', suspended, '') +
-      (deleted.length ? section('Recycle — Removed Accounts', deleted, '') : '');
+    const pActive    = document.getElementById('access-panel-active');
+    const pSuspended = document.getElementById('access-panel-suspended');
+    const pRecycle   = document.getElementById('access-panel-recycle');
 
-    if (!all.length) list.innerHTML = '<div style="text-align:center;padding:32px;color:#6b7280;">No whitelisted admins yet.</div>';
+    if (pActive)    pActive.innerHTML    = active.length    ? active.map(a=>adminRow(a,'active')).join('')       : emptyState('No active admins.');
+    if (pSuspended) pSuspended.innerHTML = suspended.length ? suspended.map(a=>adminRow(a,'suspended')).join('') : emptyState('No suspended accounts.');
+    if (pRecycle)   pRecycle.innerHTML   = deleted.length   ? deleted.map(a=>adminRow(a,'recycle')).join('')     : emptyState('Recycle bin is empty.');
+
+    // Keep current tab visible
+    _setAccessTab(_accessTab);
+
   } catch(e) {
-    list.innerHTML = '<div style="text-align:center;padding:24px;color:#dc2626;">Error loading admins.</div>';
+    ['active','suspended','recycle'].forEach(t => {
+      const p = document.getElementById('access-panel-' + t);
+      if (p) p.innerHTML = '<div style="text-align:center;padding:24px;color:#dc2626;font-size:13px;">Error loading. Please refresh.</div>';
+    });
   }
+}
+
+// -- Min-admins popup --
+function _showMinAdminPopup() {
+  // Simple modal overlay
+  const existing = document.getElementById('min-admin-popup');
+  if (existing) existing.remove();
+  const overlay = document.createElement('div');
+  overlay.id = 'min-admin-popup';
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:9999;display:flex;align-items:center;justify-content:center;';
+  overlay.innerHTML = `
+    <div style="background:#fff;border-radius:14px;padding:32px 28px;max-width:420px;width:90%;box-shadow:0 20px 60px rgba(0,0,0,.2);text-align:center;">
+      <div style="width:52px;height:52px;border-radius:50%;background:#fef3c7;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="2" width="24" height="24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      </div>
+      <h3 style="font-size:17px;font-weight:700;color:#111827;margin:0 0 10px;">Cannot Remove Admin</h3>
+      <p style="font-size:14px;color:#4b5563;line-height:1.6;margin:0 0 20px;">
+        At least <strong>2 Gmail Admin</strong> accounts must remain active at all times.<br><br>
+        Add another <code style="background:#f3f4f6;padding:2px 6px;border-radius:4px;">@gmail.com</code> Admin first, then you can remove this one.
+      </p>
+      <button onclick="document.getElementById('min-admin-popup').remove()" style="background:#1e3a5f;color:#fff;border:none;border-radius:8px;padding:10px 28px;font-size:14px;font-weight:600;cursor:pointer;">Got it</button>
+    </div>`;
+  overlay.addEventListener('click', e => { if (e.target === overlay) overlay.remove(); });
+  document.body.appendChild(overlay);
 }
 
 async function addAdminEmail() {
@@ -739,7 +833,10 @@ async function toggleAdminStatus(id, newStatus, email) {
       body: JSON.stringify({ status: newStatus })
     });
     const data = await res.json();
-    if (!res.ok) throw new Error(data.error || 'Failed');
+    if (!res.ok) {
+      if (data.error === 'min_admins') { _showMinAdminPopup(); return; }
+      throw new Error(data.error || 'Failed');
+    }
     showToast('success', 'Status updated to ' + newStatus + '.');
     loadAccessList();
   } catch(e) { showToast('error', e.message || 'Failed to update.'); }
@@ -750,15 +847,18 @@ async function removeAdmin(id, email) {
   if (email && email.toLowerCase() === me) {
     showToast('error', 'You cannot remove your own account.'); return;
   }
-  if (!confirm('Move ' + email + ' to Recycle? They will lose access immediately.')) return;
+  if (!confirm('Move ' + email + ' to Recycle? They will lose access on their next check.')) return;
   try {
     const res = await fetch('/api/admins/remove?id=' + id, {
       method: 'DELETE',
       headers: { 'Authorization': 'Bearer ' + window.PRIVATIAN_TOKEN }
     });
     const data = await res.json();
-    if (!res.ok) throw new Error(data.error || 'Failed');
-    showToast('success', email + ' removed. They will lose access on their next access check.');
+    if (!res.ok) {
+      if (data.error === 'min_admins') { _showMinAdminPopup(); return; }
+      throw new Error(data.message || data.error || 'Failed');
+    }
+    showToast('success', email + ' moved to Recycle.');
     loadAccessList();
   } catch(e) { showToast('error', e.message || 'Failed to remove.'); }
 }
@@ -773,11 +873,12 @@ async function restoreAdmin(id, email) {
     const data = await res.json();
     if (!res.ok) throw new Error(data.error || 'Failed');
     showToast('success', email + ' restored to Active.');
+    _setAccessTab('active');
     loadAccessList();
   } catch(e) { showToast('error', e.message || 'Failed to restore.'); }
 }
 
-// ── Silent access check (runs every 30 min + on tab focus + on sidebar nav) ──
+// ── Silent access check (30 min + tab focus + sidebar nav) ─────────────────
 let _lastAccessCheck = 0;
 let _accessRevoked   = false;
 
@@ -792,45 +893,39 @@ async function checkMyAccess() {
     const data = await res.json();
     if (!data.ok) { _revokeAccess(data.reason || 'revoked'); }
   } catch(e) {
-    // Network error — do not log out on network hiccup, just skip
-    console.warn('[Admin] Access check failed (network?):', e.message);
+    console.warn('[Admin] Access check network error:', e.message);
   }
 }
 
 function _revokeAccess(reason) {
   if (_accessRevoked) return;
   _accessRevoked = true;
-  const msg = reason === 'suspended'      ? 'Your account has been suspended.'
-            : reason === 'deleted'        ? 'Your account has been removed.'
-            : reason === 'session_expired'? 'Your session has expired.'
+  const msg = reason === 'suspended'       ? 'Your account has been suspended.'
+            : reason === 'deleted'         ? 'Your account has been removed.'
+            : reason === 'session_expired' ? 'Your session has expired.'
             : 'Your admin access has been revoked.';
   showToast('error', msg + ' Redirecting to login...');
   setTimeout(function() {
-    // Clear session and redirect
     document.cookie = 'privatian_session=; Max-Age=0; path=/';
     window.location.href = '/admin-login.html';
   }, 3000);
 }
 
-// Run every 30 minutes silently
 setInterval(checkMyAccess, 30 * 60 * 1000);
 
-// On tab focus: check if 5+ minutes since last check
 document.addEventListener('visibilitychange', function() {
   if (document.visibilityState === 'visible') {
-    if (Date.now() - _lastAccessCheck > 5 * 60 * 1000) {
-      checkMyAccess();
-    }
+    if (Date.now() - _lastAccessCheck > 5 * 60 * 1000) checkMyAccess();
   }
 });
 
-// First check 10 seconds after page load (fast initial verification)
 setTimeout(checkMyAccess, 10000);
 
 window.addEventListener('privatian:ready', function() {
   initAccessPage();
-  checkMyAccess(); // run immediately when session is ready
+  checkMyAccess();
 });
+
 // HEADER SETTINGS PAGE
 // HEADER SETTINGS PAGE
 // ═══════════════════════════════════════════════════════════════

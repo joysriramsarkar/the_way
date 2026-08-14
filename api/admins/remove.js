@@ -1,6 +1,16 @@
 const { requireAdmin } = require('../_lib/auth');
 const { createClient } = require('@supabase/supabase-js');
 
+// Helper: count active @gmail.com Admin accounts
+async function countGmailAdmins(sb) {
+  const { data } = await sb
+    .from('allowed_admins')
+    .select('id, email')
+    .eq('status', 'active')
+    .eq('role', 'Admin');
+  return (data || []).filter(a => a.email.toLowerCase().endsWith('@gmail.com')).length;
+}
+
 module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', req.headers.origin || '*');
   res.setHeader('Access-Control-Allow-Methods', 'DELETE, OPTIONS');
@@ -26,16 +36,18 @@ module.exports = async function handler(req, res) {
     return res.status(400).json({ error: 'You cannot remove your own account.' });
   }
 
-  // Block if only 2 (or fewer) active admins remain — must always keep ≥ 2
-  // Only applies when target is currently active (suspended ones don't count as "coverage")
-  if (target.status === 'active') {
-    const { count } = await sb
-      .from('allowed_admins')
-      .select('id', { count: 'exact', head: true })
-      .eq('status', 'active');
-    if (count <= 2) {
+  // Min-2 @gmail.com Admin rule:
+  // If removing an active @gmail.com Admin, ensure at least 3 exist first (so ≥ 2 remain)
+  const isGmailAdmin = target.status === 'active'
+    && target.role === 'Admin'
+    && target.email.toLowerCase().endsWith('@gmail.com');
+
+  if (isGmailAdmin) {
+    const gmailAdminCount = await countGmailAdmins(sb);
+    if (gmailAdminCount <= 2) {
       return res.status(400).json({
-        error: 'Cannot remove: at least 2 active admins must remain. Add another admin first.'
+        error: 'min_admins',
+        message: 'At least 2 Gmail Admin accounts must remain active. Add another Gmail Admin before removing this one.'
       });
     }
   }
