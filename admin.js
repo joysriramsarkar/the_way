@@ -758,14 +758,20 @@ async function loadAccessList() {
     if (tr) tr.textContent = `Recycle (${deleted.length})`;
 
     function auditLine(a) {
-      // Show the most relevant audit info
+      const fmt = iso => iso ? new Date(iso).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) : '';
+      const LABELS = {
+        suspended:                 'Suspended by',
+        unsuspended:               'Unsuspended by',
+        deleted:                   'Removed by',
+        restored:                  'Restored by',
+        role_changed_to_Admin:     'Promoted to Admin by',
+        role_changed_to_Moderator: 'Downgraded to Moderator by',
+      };
       if (a.modified_by && a.modified_action) {
-        const when = a.modified_at ? new Date(a.modified_at).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) : '';
-        const action = a.modified_action.replace('role_changed_to_', 'role → ');
-        return `${escapeHtml(action)} by <strong>${escapeHtml(a.modified_by)}</strong> &middot; ${when}`;
+        const label = LABELS[a.modified_action] || (a.modified_action + ' by');
+        return `${escapeHtml(label)} <strong>${escapeHtml(a.modified_by)}</strong> &middot; ${fmt(a.modified_at)}`;
       }
-      const when = a.added_at ? new Date(a.added_at).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) : '';
-      return `Added by <strong>${escapeHtml(a.added_by || 'system')}</strong> &middot; ${when}`;
+      return `Added by <strong>${escapeHtml(a.added_by || 'system')}</strong> &middot; ${fmt(a.added_at)}`;
     }
 
     function roleColor(role) {
@@ -996,8 +1002,11 @@ function _revokeAccess(reason) {
             : 'Your admin access has been revoked.';
   showToast('error', msg + ' Redirecting to login...');
   setTimeout(() => {
+    // Clear ALL session data so login page cannot auto-login a suspended/deleted user
+    localStorage.removeItem('privatian_token');
     document.cookie = 'privatian_session=; Max-Age=0; path=/';
-    window.location.href = '/admin-login.html';
+    window.PRIVATIAN_TOKEN = null;
+    window.location.replace('/admin-login.html');
   }, 3000);
 }
 

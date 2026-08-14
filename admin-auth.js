@@ -28,7 +28,24 @@
     } catch(e) { return null; }
   }
 
+  // Live DB check — catches suspended/deleted users even if JWT is still valid
+  async function checkDbAccess(token) {
+    try {
+      const r = await fetch('/api/admins/check', {
+        headers: { 'Authorization': 'Bearer ' + token }
+      });
+      const d = await r.json().catch(() => ({}));
+      return d; // { ok: true } or { ok: false, reason: '...' }
+    } catch(e) { return { ok: true }; } // network error: allow through, periodic check will catch it
+  }
+
+  function clearSession() {
+    localStorage.removeItem(TOKEN_KEY);
+    document.cookie = 'privatian_session=; Max-Age=0; path=/';
+  }
+
   function redirectToLogin(msg) {
+    clearSession();
     if (msg) sessionStorage.setItem('login_message', msg);
     window.location.replace(LOGIN_URL);
   }
@@ -80,13 +97,26 @@
   document.documentElement.style.opacity = '0';
   document.documentElement.style.transition = 'opacity .2s';
 
-  checkSession().then(function (user) {
+  checkSession().then(async function (user) {
     if (!user) {
       redirectToLogin('Session expired. Please sign in again.');
       return;
     }
+
+    // Live DB check: ensure account is still active (catches suspended/deleted mid-session)
+    const token   = getToken();
+    const dbCheck = await checkDbAccess(token);
+    if (!dbCheck.ok) {
+      const reason = dbCheck.reason;
+      const msg = reason === 'suspended' ? 'Your account has been suspended. Contact another admin.'
+                : reason === 'deleted'   ? 'Your account has been removed. Contact another admin.'
+                : 'Your session has expired. Please sign in again.';
+      redirectToLogin(msg);
+      return;
+    }
+
     window.PRIVATIAN_USER  = user;
-    window.PRIVATIAN_TOKEN = getToken();
+    window.PRIVATIAN_TOKEN = token;
 
     window.dispatchEvent(new CustomEvent('privatian:ready', { detail: user }));
 
