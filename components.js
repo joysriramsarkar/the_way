@@ -1,4 +1,4 @@
-﻿/**
+/**
  * THE PRIVATIAN FAMILY â€” Shared Components System
  * Renders consistent Header, Sub-header, Navigation, Menu Overlay, Search Overlay, and Footer across all pages.
  */
@@ -8,6 +8,13 @@
 
   var APPLIED_KEY  = 'privatian_applied_sections';
   var SECTIONS_KEY = 'privatian_sections';
+  var HEADER_SETTINGS_KEY = 'privatian_header_settings';
+  var DEFAULT_SUBSECTIONS = [
+    { id: 'sub-1', label: 'FAMILY LEGACY', href: 'section.html?slug=community-heritage', icon: null, enabled: true },
+    { id: 'sub-2', label: 'EXPERIENCE', href: 'section.html?slug=culture', icon: null, enabled: true },
+    { id: 'sub-3', label: 'THE PRIVATIAN READS', href: 'section.html?slug=findings', icon: null, enabled: true },
+    { id: 'sub-4', label: 'EVENTS', href: 'index.html#events-section', icon: 'calendar', enabled: true }
+  ];
 
   var DEFAULT_SECTIONS = [
     { id: 'findings',  name: 'Findings',             slug: 'findings' },
@@ -31,6 +38,20 @@
     } catch(e) {
       return DEFAULT_SECTIONS;
     }
+  }
+
+  function getHeaderSettings() {
+    try {
+      var raw = localStorage.getItem(HEADER_SETTINGS_KEY);
+      if (raw) {
+        var parsed = JSON.parse(raw);
+        if (!parsed.subsections) {
+          parsed.subsections = DEFAULT_SUBSECTIONS.map(function(s) { return Object.assign({}, s); });
+        }
+        return parsed;
+      }
+    } catch(e) {}
+    return null;
   }
 
   function getQueryParam(name) {
@@ -69,15 +90,7 @@
       </div>
     </div>
     <div class="sub-header" id="sub-header">
-      <div class="sub-header-inner">
-        <a href="section.html?slug=community-heritage" class="sub-link" id="sub-link-1">FAMILY LEGACY</a>
-        <a href="section.html?slug=culture" class="sub-link" id="sub-link-2">EXPERIENCE</a>
-        <a href="section.html?slug=findings" class="sub-link" id="sub-link-3">THE PRIVATIAN READS</a>
-        <a href="index.html#events-section" class="sub-link sub-link-icon" id="sub-link-4">
-          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
-          EVENTS
-        </a>
-      </div>
+      <div class="sub-header-inner" id="sub-header-inner"></div>
     </div>
   </header>
 
@@ -221,15 +234,72 @@
   }
 
   // â”€â”€ 3. POPULATE SECTIONS IN NAV & FOOTER â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+
+  // -- 2b. POPULATE SUB-HEADER TABS DYNAMICALLY
+  function populateSubHeader() {
+    var inner = document.getElementById('sub-header-inner');
+    if (!inner) return;
+    var settings = getHeaderSettings();
+    var subs = (settings && settings.subsections) ? settings.subsections : DEFAULT_SUBSECTIONS;
+    var calSVG = '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>';
+    inner.innerHTML = '';
+    var count = 0;
+    subs.filter(function(s) { return s.enabled !== false; }).forEach(function(s, i) {
+      var a = document.createElement('a');
+      a.href = s.href || '#';
+      a.className = 'sub-link' + (s.icon === 'calendar' ? ' sub-link-icon' : '');
+      a.id = 'sub-link-' + (i + 1);
+      if (s.icon === 'calendar') {
+        a.innerHTML = calSVG + ' ' + s.label;
+      } else {
+        a.textContent = s.label;
+      }
+      inner.appendChild(a);
+      count++;
+    });
+    var subHeader = document.getElementById('sub-header');
+    if (subHeader) subHeader.style.display = count === 0 ? 'none' : '';
+  }
+
+  // -- 2c. APPLY LOGO SETTINGS
+  function applyLogoSettings() {
+    var settings = getHeaderSettings();
+    if (!settings) return;
+    var height = settings.logoHeight || 80;
+    if (settings.logoSvg) {
+      var logoLink = document.querySelector('.site-logo');
+      if (logoLink) {
+        logoLink.innerHTML = settings.logoSvg;
+        var customSvg = logoLink.querySelector('svg');
+        if (customSvg) {
+          customSvg.style.height = height + 'px';
+          customSvg.addEventListener('contextmenu', function(e) { e.preventDefault(); });
+          customSvg.addEventListener('dragstart', function(e) { e.preventDefault(); });
+        }
+      }
+    } else {
+      var logoEl = document.querySelector('#header-logo-svg, .logo-svg');
+      if (logoEl) logoEl.style.height = height + 'px';
+    }
+  }
   function populateSections() {
     var secs = getSections();
 
-    // A. Main Header Nav
+    // Filter nav sections by header settings
+    var hsettings = getHeaderSettings();
+    var enabledIds = (hsettings && hsettings.enabledNavSections !== undefined) ? hsettings.enabledNavSections : null;
+    var navSecs = secs;
+    if (enabledIds !== null) {
+      navSecs = secs.filter(function(s) { return enabledIds.indexOf(s.slug || s.id) !== -1; });
+      navSecs.sort(function(a, b) { return enabledIds.indexOf(a.slug || a.id) - enabledIds.indexOf(b.slug || b.id); });
+    }
+
+    // A. Main Header Nav (filtered by header settings)
     var mainNavList = document.getElementById('main-nav-list');
     if (!mainNavList) mainNavList = document.querySelector('#sec-nav');
     if (mainNavList) {
       mainNavList.innerHTML = '';
-      secs.forEach(function(s, idx) {
+      navSecs.forEach(function(s, idx) {
         var li = document.createElement('li');
         var a  = document.createElement('a');
         a.href = s.slug ? ('section.html?slug=' + s.slug) : '#';
@@ -242,7 +312,7 @@
         li.appendChild(a);
         mainNavList.appendChild(li);
 
-        if (idx < secs.length - 1) {
+        if (idx < navSecs.length - 1) {
           var div = document.createElement('li');
           div.className = 'nav-divider';
           div.setAttribute('aria-hidden', 'true');
@@ -503,6 +573,8 @@
     renderHeader();
     renderFooter();
     populateSections();
+    populateSubHeader();
+    applyLogoSettings();
     initEvents();
   }
 

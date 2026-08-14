@@ -507,6 +507,7 @@ tabTrashBtn.addEventListener('click',  () => switchTab('trash'));
 // â”€â”€ Page navigation â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 const PAGE_CONFIG = {
   sections:  { title: 'Sections',  breadcrumb: 'Sections' },
+  header:    { title: 'Header Settings', breadcrumb: 'Header' },
   dashboard: { title: 'Dashboard', breadcrumb: 'Dashboard' },
   articles:  { title: 'Articles',  breadcrumb: 'Articles' },
   settings:  { title: 'Settings',  breadcrumb: 'Settings' },
@@ -528,6 +529,7 @@ function navigateTo(page) {
   // Inject topbar action buttons
   topbarActions.innerHTML = '';
   if (page === 'access') { loadAccessList(); }
+  if (page === 'header') { initHeaderPage(); }
   if (page === 'sections') {
     // Apply Changes button
     const applyBtn = document.createElement('button');
@@ -760,3 +762,317 @@ async function removeAdmin(id, email) {
 
 window.addEventListener('privatian:ready', function() { initAccessPage(); });
 
+
+// ═══════════════════════════════════════════════════════════════
+// HEADER SETTINGS PAGE
+// ═══════════════════════════════════════════════════════════════
+
+const HEADER_SETTINGS_KEY = 'privatian_header_settings';
+
+const DEFAULT_HEADER_SUBSECTIONS = [
+  { id: 'sub-1', label: 'FAMILY LEGACY', href: 'section.html?slug=community-heritage', icon: null, enabled: true },
+  { id: 'sub-2', label: 'EXPERIENCE', href: 'section.html?slug=culture', icon: null, enabled: true },
+  { id: 'sub-3', label: 'THE PRIVATIAN READS', href: 'section.html?slug=findings', icon: null, enabled: true },
+  { id: 'sub-4', label: 'EVENTS', href: 'index.html#events-section', icon: 'calendar', enabled: true }
+];
+
+function loadHeaderSettings() {
+  try {
+    const raw = localStorage.getItem(HEADER_SETTINGS_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (!parsed.subsections) parsed.subsections = DEFAULT_HEADER_SUBSECTIONS.map(s => ({...s}));
+      return parsed;
+    }
+  } catch(e) {}
+  return {
+    logoSvg: null,
+    logoHeight: 80,
+    enabledNavSections: null,
+    subsections: DEFAULT_HEADER_SUBSECTIONS.map(s => ({...s}))
+  };
+}
+
+function saveHeaderSettings(hs) {
+  hs.updatedAt = new Date().toISOString();
+  localStorage.setItem(HEADER_SETTINGS_KEY, JSON.stringify(hs));
+}
+
+// ── Logo card ───────────────────────────────────────────────────
+function renderHsLogoCard(hs) {
+  const preview = document.getElementById('hs-logo-preview');
+  const svgInput = document.getElementById('hs-logo-svg-input');
+  const slider = document.getElementById('hs-logo-height');
+  const heightVal = document.getElementById('hs-logo-height-val');
+
+  // Set initial values
+  if (svgInput) svgInput.value = hs.logoSvg || '';
+  if (slider) { slider.value = hs.logoHeight || 80; if (heightVal) heightVal.textContent = slider.value; }
+
+  // Preview render
+  function refreshPreview(svgOverride, hOverride) {
+    if (!preview) return;
+    const svg = svgOverride !== undefined ? svgOverride : hs.logoSvg;
+    const h   = hOverride  !== undefined ? hOverride  : (hs.logoHeight || 80);
+    if (svg) {
+      preview.innerHTML = svg;
+      const svgEl = preview.querySelector('svg');
+      if (svgEl) { svgEl.style.height = h + 'px'; svgEl.style.width = 'auto'; svgEl.style.display = 'block'; }
+    } else {
+      preview.innerHTML = '<div class="hs-preview-placeholder"><svg viewBox="0 0 24 24" fill="none" stroke="#c8d8e8" stroke-width="1.2" width="32" height="32"><rect x="2" y="3" width="20" height="6" rx="1"/><line x1="2" y1="14" x2="22" y2="14"/><line x1="2" y1="19" x2="13" y2="19"/></svg><span>Default site logo</span><small>' + h + 'px height</small></div>';
+    }
+  }
+  refreshPreview();
+
+  if (slider) {
+    slider.addEventListener('input', () => {
+      if (heightVal) heightVal.textContent = slider.value;
+      refreshPreview(undefined, parseInt(slider.value));
+    });
+  }
+
+  const applyBtn = document.getElementById('hs-logo-apply-btn');
+  if (applyBtn) {
+    applyBtn.addEventListener('click', () => {
+      const svgVal = svgInput ? svgInput.value.trim() : '';
+      const h = parseInt(slider ? slider.value : 80);
+      // Validate SVG
+      if (svgVal && !svgVal.startsWith('<svg')) {
+        showToast('error', 'Please paste a valid SVG (must start with <svg...)'); return;
+      }
+      hs.logoSvg = svgVal || null;
+      hs.logoHeight = h;
+      saveHeaderSettings(hs);
+      refreshPreview();
+      showToast('success', 'Logo saved! Refresh the main site to see changes.');
+    });
+  }
+
+  const resetBtn = document.getElementById('hs-logo-reset-btn');
+  if (resetBtn) {
+    resetBtn.addEventListener('click', () => {
+      if (svgInput) svgInput.value = '';
+      if (slider) { slider.value = 80; if (heightVal) heightVal.textContent = '80'; }
+      hs.logoSvg = null;
+      hs.logoHeight = 80;
+      saveHeaderSettings(hs);
+      refreshPreview('', 80);
+      showToast('success', 'Logo reset to default.');
+    });
+  }
+}
+
+// ── Nav sections card ───────────────────────────────────────────
+function renderHsNavSections(hs) {
+  const container = document.getElementById('hs-nav-sections-list');
+  if (!container) return;
+
+  const allSecs = sections.filter(s => !s.deleted && !s.locked);
+  const enabledIds = hs.enabledNavSections; // null = all enabled
+
+  if (!allSecs.length) {
+    container.innerHTML = '<p style="color:var(--text-muted);padding:8px 0">No sections found. Add sections in the Sections page first.</p>';
+    return;
+  }
+
+  container.innerHTML = '';
+  allSecs.forEach(s => {
+    const sectionId = s.slug || s.id;
+    const isEnabled = enabledIds === null || enabledIds.indexOf(sectionId) !== -1;
+    const row = document.createElement('div');
+    row.className = 'hs-section-row';
+    row.innerHTML = `
+      <div class="hs-section-info">
+        <span class="hs-section-name">${escapeHtml(s.name)}</span>
+        <span class="hs-slug-chip">${escapeHtml(sectionId)}</span>
+      </div>
+      <label class="hs-toggle" title="${isEnabled ? 'Visible in header nav' : 'Hidden from header nav'}">
+        <input type="checkbox" data-sec-id="${escapeHtml(sectionId)}" ${isEnabled ? 'checked' : ''}>
+        <span class="hs-toggle-track"><span class="hs-toggle-thumb"></span></span>
+      </label>
+    `;
+    container.appendChild(row);
+  });
+}
+
+function getEnabledNavSections() {
+  const cbs = document.querySelectorAll('#hs-nav-sections-list input[type="checkbox"]');
+  if (!cbs.length) return null;
+  const allChecked = Array.from(cbs).every(c => c.checked);
+  if (allChecked) return null;
+  return Array.from(cbs).filter(c => c.checked).map(c => c.getAttribute('data-sec-id'));
+}
+
+// ── Sub-header tabs card ────────────────────────────────────────
+function renderHsSubsections(hs) {
+  const container = document.getElementById('hs-subsections-list');
+  if (!container) return;
+  container.innerHTML = '';
+  hs.subsections.forEach((sub, idx) => buildHsSubRow(container, sub, hs));
+}
+
+function buildHsSubRow(container, sub, hs) {
+  const row = document.createElement('div');
+  row.className = 'hs-sub-row' + (sub.enabled !== false ? '' : ' hs-sub-row--off');
+  row.dataset.subId = sub.id;
+
+  const calBadge = sub.icon === 'calendar' ? '<span class="hs-icon-badge">📅 calendar</span>' : '';
+
+  row.innerHTML = `
+    <div class="hs-sub-main">
+      <div class="hs-sub-info">
+        <span class="hs-sub-lbl">${escapeHtml(sub.label)}</span>
+        ${calBadge}
+        <span class="hs-sub-url">${escapeHtml(sub.href)}</span>
+      </div>
+      <div class="hs-sub-actions">
+        <label class="hs-toggle hs-toggle--sm">
+          <input type="checkbox" ${sub.enabled !== false ? 'checked' : ''} class="hs-sub-toggle-cb">
+          <span class="hs-toggle-track"><span class="hs-toggle-thumb"></span></span>
+        </label>
+        <button class="hs-icon-btn hs-edit-sub-btn" title="Edit">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+        </button>
+        <button class="hs-icon-btn hs-icon-btn--danger hs-del-sub-btn" title="Delete">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+        </button>
+      </div>
+    </div>
+    <div class="hs-sub-edit-form" hidden>
+      <div class="hs-edit-grid">
+        <div class="form-group">
+          <label class="form-label">Label (displayed in uppercase)</label>
+          <input type="text" class="form-input hs-edit-label" value="${escapeHtml(sub.label)}" maxlength="40">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Link URL</label>
+          <input type="text" class="form-input hs-edit-href" value="${escapeHtml(sub.href)}">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Icon</label>
+          <select class="form-input hs-edit-icon">
+            <option value="">None</option>
+            <option value="calendar" ${sub.icon === 'calendar' ? 'selected' : ''}>Calendar (📅)</option>
+          </select>
+        </div>
+        <div class="hs-edit-save-row">
+          <button class="btn btn--primary btn--sm hs-save-edit-btn">Save</button>
+          <button class="btn btn--ghost btn--sm hs-cancel-edit-btn">Cancel</button>
+        </div>
+      </div>
+    </div>
+  `;
+
+  // Toggle enable
+  row.querySelector('.hs-sub-toggle-cb').addEventListener('change', e => {
+    sub.enabled = e.target.checked;
+    row.classList.toggle('hs-sub-row--off', !sub.enabled);
+  });
+
+  // Edit toggle
+  const editForm = row.querySelector('.hs-sub-edit-form');
+  row.querySelector('.hs-edit-sub-btn').addEventListener('click', () => {
+    editForm.hidden = !editForm.hidden;
+  });
+
+  // Save edit
+  row.querySelector('.hs-save-edit-btn').addEventListener('click', () => {
+    const newLabel = row.querySelector('.hs-edit-label').value.trim();
+    const newHref  = row.querySelector('.hs-edit-href').value.trim();
+    const newIcon  = row.querySelector('.hs-edit-icon').value || null;
+    if (!newLabel) { showToast('error', 'Label cannot be empty.'); return; }
+    if (!newHref)  { showToast('error', 'URL cannot be empty.'); return; }
+    sub.label = newLabel.toUpperCase();
+    sub.href  = newHref;
+    sub.icon  = newIcon;
+    // Update display
+    row.querySelector('.hs-sub-lbl').textContent = sub.label;
+    row.querySelector('.hs-sub-url').textContent = sub.href;
+    const badgeEl = row.querySelector('.hs-icon-badge');
+    if (sub.icon === 'calendar') {
+      if (badgeEl) badgeEl.textContent = '📅 calendar';
+      else row.querySelector('.hs-sub-info').insertAdjacentHTML('afterbegin', '<span class="hs-icon-badge">📅 calendar</span>');
+    } else if (badgeEl) { badgeEl.remove(); }
+    editForm.hidden = true;
+  });
+
+  // Cancel edit
+  row.querySelector('.hs-cancel-edit-btn').addEventListener('click', () => { editForm.hidden = true; });
+
+  // Delete
+  row.querySelector('.hs-del-sub-btn').addEventListener('click', () => {
+    if (!confirm('Delete tab "' + sub.label + '"? This cannot be undone.')) return;
+    const idx = hs.subsections.findIndex(s => s.id === sub.id);
+    if (idx !== -1) hs.subsections.splice(idx, 1);
+    row.remove();
+  });
+
+  container.appendChild(row);
+}
+
+// ── Add tab form ────────────────────────────────────────────────
+function bindHsAddForm(hs) {
+  const addBtn     = document.getElementById('hs-add-subsection-btn');
+  const addForm    = document.getElementById('hs-add-form');
+  const confirmBtn = document.getElementById('hs-add-confirm-btn');
+  const cancelBtn  = document.getElementById('hs-add-cancel-btn');
+
+  if (addBtn) addBtn.addEventListener('click', () => { if (addForm) addForm.hidden = false; addBtn.style.display = 'none'; });
+  if (cancelBtn) cancelBtn.addEventListener('click', () => { if (addForm) addForm.hidden = true; if (addBtn) addBtn.style.display = ''; });
+
+  if (confirmBtn) {
+    confirmBtn.addEventListener('click', () => {
+      const label = (document.getElementById('hs-new-label').value || '').trim();
+      const href  = (document.getElementById('hs-new-href').value  || '').trim();
+      const icon  = document.getElementById('hs-new-icon').value || null;
+      if (!label) { showToast('error', 'Tab label is required.'); return; }
+      if (!href)  { showToast('error', 'Link URL is required.'); return; }
+      const newSub = { id: 'sub-' + Date.now(), label: label.toUpperCase(), href, icon: icon || null, enabled: true };
+      hs.subsections.push(newSub);
+      const container = document.getElementById('hs-subsections-list');
+      if (container) buildHsSubRow(container, newSub, hs);
+      document.getElementById('hs-new-label').value = '';
+      document.getElementById('hs-new-href').value  = '';
+      document.getElementById('hs-new-icon').value  = '';
+      if (addForm) addForm.hidden = true;
+      if (addBtn) addBtn.style.display = '';
+      showToast('success', 'Tab added! Click "Apply Header Changes" to save.');
+    });
+  }
+}
+
+// ── Save button ─────────────────────────────────────────────────
+function bindHsSaveBtn(hs) {
+  const saveBtn = document.getElementById('hs-save-btn');
+  if (!saveBtn) return;
+  saveBtn.addEventListener('click', () => {
+    // Collect enabled nav sections
+    hs.enabledNavSections = getEnabledNavSections();
+    // Collect logo
+    const svgInput = document.getElementById('hs-logo-svg-input');
+    const slider   = document.getElementById('hs-logo-height');
+    if (svgInput) hs.logoSvg = svgInput.value.trim() || null;
+    if (slider) hs.logoHeight = parseInt(slider.value) || 80;
+
+    saveHeaderSettings(hs);
+
+    const orig = saveBtn.innerHTML;
+    saveBtn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" width="15" height="15"><polyline points="20 6 9 17 4 12"/></svg> Changes Applied!`;
+    saveBtn.style.background = 'var(--success, #1a7a4a)';
+    saveBtn.disabled = true;
+    setTimeout(() => { saveBtn.innerHTML = orig; saveBtn.style.background = ''; saveBtn.disabled = false; }, 2500);
+    showToast('success', 'Header settings saved! Refresh the main site to see changes.');
+  });
+}
+
+// ── Main init ────────────────────────────────────────────────────
+let _hsInstance = null;
+
+function initHeaderPage() {
+  _hsInstance = loadHeaderSettings();
+  renderHsLogoCard(_hsInstance);
+  renderHsNavSections(_hsInstance);
+  renderHsSubsections(_hsInstance);
+  bindHsAddForm(_hsInstance);
+  bindHsSaveBtn(_hsInstance);
+}

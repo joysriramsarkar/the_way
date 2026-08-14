@@ -50,6 +50,14 @@
           </a>
         </li>
         <li>
+          <a href="#" class="sidebar-nav-item" data-page="header" id="nav-header">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="2" y="3" width="20" height="6" rx="1"/><line x1="2" y1="14" x2="22" y2="14"/><line x1="2" y1="19" x2="13" y2="19"/>
+            </svg>
+            <span>Header</span>
+          </a>
+        </li>
+        <li>
           <a href="#" class="sidebar-nav-item" data-page="articles" id="nav-articles">
             <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
               <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
@@ -184,6 +192,94 @@
 
     </section>
 
+
+    <!-- PAGE: HEADER SETTINGS -->
+    <section class="page" id="page-header">
+      <div class="hs-page">
+
+        <!-- LOGO CARD -->
+        <div class="hs-card-title">Logo Settings</div>
+        <div class="card hs-card" id="hs-logo-card">
+          <div class="hs-logo-layout">
+            <div class="hs-logo-preview-wrap">
+              <div class="hs-preview-label">Preview</div>
+              <div class="hs-logo-preview" id="hs-logo-preview">
+                <div class="hs-logo-preview-default">Default logo will appear here</div>
+              </div>
+            </div>
+            <div class="hs-logo-controls">
+              <div class="form-group">
+                <label class="form-label" for="hs-logo-svg-input">SVG Code <span style="font-weight:400;color:var(--text-muted)">(paste full &lt;svg&gt; tag — SVG only)</span></label>
+                <textarea id="hs-logo-svg-input" class="form-input hs-svg-textarea" placeholder="Paste your SVG code here&#10;Leave empty to use the default site logo." rows="6"></textarea>
+              </div>
+              <div class="form-group" style="margin-top:14px">
+                <label class="form-label">Logo Height: <strong id="hs-logo-height-val">80</strong>px</label>
+                <div class="hs-range-wrap">
+                  <span class="hs-range-min">40</span>
+                  <input type="range" id="hs-logo-height" class="hs-range" min="40" max="140" value="80" step="2">
+                  <span class="hs-range-max">140</span>
+                </div>
+              </div>
+              <div class="hs-logo-btn-row">
+                <button class="btn btn--ghost btn--sm" id="hs-logo-reset-btn">Reset to Default</button>
+                <button class="btn btn--primary btn--sm" id="hs-logo-apply-btn">Apply Logo</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- NAV SECTIONS CARD -->
+        <div class="hs-card-title">Navigation Sections</div>
+        <div class="card hs-card" id="hs-nav-card">
+          <p class="hs-hint">Toggle to show or hide sections in the header navigation bar. New sections added in the <strong>Sections</strong> page will appear here as disabled by default.</p>
+          <div id="hs-nav-sections-list" class="hs-section-list"></div>
+        </div>
+
+        <!-- SUBSECTIONS CARD -->
+        <div class="hs-card-title">Sub-header Tabs</div>
+        <div class="card hs-card" id="hs-sub-card">
+          <p class="hs-hint">These tabs appear in the secondary bar below the main navigation. Toggle to hide without deleting.</p>
+          <div id="hs-subsections-list" class="hs-sub-list"></div>
+          <button class="btn btn--ghost btn--sm hs-add-tab-btn" id="hs-add-subsection-btn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Add Tab
+          </button>
+          <div class="hs-add-form" id="hs-add-form" hidden>
+            <div class="hs-add-form-grid">
+              <div class="form-group">
+                <label class="form-label" for="hs-new-label">Tab Label</label>
+                <input type="text" id="hs-new-label" class="form-input" placeholder="E.g. CULTURE" maxlength="40">
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="hs-new-href">Link URL</label>
+                <input type="text" id="hs-new-href" class="form-input" placeholder="section.html?slug=culture">
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="hs-new-icon">Icon</label>
+                <select id="hs-new-icon" class="form-input">
+                  <option value="">None</option>
+                  <option value="calendar">Calendar (📅)</option>
+                </select>
+              </div>
+              <div class="hs-add-form-btns">
+                <button class="btn btn--primary btn--sm" id="hs-add-confirm-btn">Add Tab</button>
+                <button class="btn btn--ghost btn--sm" id="hs-add-cancel-btn">Cancel</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- SAVE ROW -->
+        <div class="hs-save-row">
+          <button class="btn btn--apply" id="hs-save-btn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15"><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/></svg>
+            Apply Header Changes
+          </button>
+          <p class="hs-save-note">Changes take effect on the main site after refresh.</p>
+        </div>
+
+      </div>
+    </section>
     <!-- PAGE: DASHBOARD (placeholder) -->
     <section class="page" id="page-dashboard">
       <div class="card coming-soon-card">
