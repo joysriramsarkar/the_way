@@ -569,6 +569,83 @@
   }
 
   // â”€â”€ INITIALIZE ON LOAD â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+
+  // ── LIVE SECTION FETCH (public API, no auth) ──────────────────────
+  // Fetches active sections from /api/sections and:
+  //   1. Updates localStorage cache (so nav stays current)
+  //   2. Re-renders nav immediately
+  //   3. Updates All News column labels on the homepage
+  //   4. Fires 'privatian:sections-loaded' custom event
+  function fetchSectionsFromAPI() {
+    // Only fetch on real HTTP pages (not file://)
+    if (window.location.protocol === 'file:') return;
+
+    fetch('/api/sections?status=active')
+      .then(function(res) {
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        return res.json();
+      })
+      .then(function(data) {
+        if (!Array.isArray(data)) return;
+
+        // Map API response to internal section format
+        var mapped = data.map(function(r) {
+          return { id: r.slug, name: r.name, slug: r.slug };
+        });
+
+        if (mapped.length) {
+          // Update localStorage — admin-set applied list gets replaced with live data
+          try { localStorage.setItem(APPLIED_KEY, JSON.stringify(mapped)); } catch(e) {}
+          // Re-render nav with live data
+          populateSections();
+        }
+
+        // Update All News section labels on the homepage
+        updateAllNewsLabels(data);
+
+        // Broadcast event so other scripts can react
+        try {
+          document.dispatchEvent(new CustomEvent('privatian:sections-loaded', {
+            detail: { sections: mapped }
+          }));
+        } catch(e) {}
+      })
+      .catch(function(err) {
+        // API unavailable — localStorage fallback is already rendered, nothing to do
+        console.warn('[Components] fetchSectionsFromAPI failed (using cache):', err.message);
+      });
+  }
+
+  // Update All News column labels to match live section data.
+  // Columns with a data-section-slug attribute whose section no longer exists
+  // are hidden gracefully; known slugs get their label text updated.
+  function updateAllNewsLabels(apiSections) {
+    var cols = document.querySelectorAll('.news-column[data-section-slug]');
+    if (!cols.length) return;
+    cols.forEach(function(col) {
+      var slug = col.getAttribute('data-section-slug');
+      var sec = null;
+      for (var i = 0; i < apiSections.length; i++) {
+        if (apiSections[i].slug === slug) { sec = apiSections[i]; break; }
+      }
+      var labelEl = col.querySelector('.news-col-label');
+      if (!sec) {
+        // Section deleted / inactive -- hide this column gracefully
+        col.hidden = true;
+        col.setAttribute('aria-hidden', 'true');
+        return;
+      }
+      // Restore if previously hidden
+      col.hidden = false;
+      col.removeAttribute('aria-hidden');
+      // Update label text
+      if (labelEl) labelEl.textContent = sec.name.toUpperCase();
+      // Update any section-link hrefs in the column
+      col.querySelectorAll('a.news-section-link').forEach(function(a) {
+        a.href = 'section.html?slug=' + sec.slug;
+      });
+    });
+  }
   function init() {
     renderHeader();
     renderFooter();
@@ -576,6 +653,7 @@
     populateSubHeader();
     applyLogoSettings();
     initEvents();
+    fetchSectionsFromAPI(); // async: update nav + All News labels from live DB
   }
 
   if (document.readyState === 'complete' || document.readyState === 'interactive') {
