@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" type="image/svg+xml" href="assets/images/favicon.svg" />
+  <link rel="alternate icon" type="image/svg+xml" href="favicon.svg" />
+  <title>লেখা জমা ও সংশোধন পোর্টাল — দ্য ওয়ে (The Way)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&family=Noto+Serif+Bengali:wght@600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="assets/css/style.css" />
+  
+  <style>
+    :root {
+      --portal-bg: #090d14;
+      --portal-card: #121722;
+      --portal-card-border: rgba(255, 255, 255, 0.08);
+      --portal-crimson: #c2182b;
+      --portal-gold: #d97706;
+      --portal-text: #f3f4f6;
+      --portal-muted: #9ca3af;
+    }
+
+    body {
+      background: var(--portal-bg);
+      color: var(--portal-text);
+      font-family: 'Hind Siliguri', 'Inter', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .portal-nav {
+      background: rgba(18, 23, 34, 0.95);
+      backdrop-filter: blur(15px);
+      border-bottom: 1px solid var(--portal-card-border);
+      padding: 14px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .portal-brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      color: #fff;
+    }
+    .portal-brand img { height: 38px; }
+    .portal-brand-text { display: flex; flex-direction: column; }
+    .portal-brand-title { font-weight: 800; font-size: 17px; color: #fff; }
+    .portal-brand-sub { font-size: 11.5px; color: var(--portal-muted); }
+
+    .portal-user-bar {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .user-pill {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--portal-card-border);
+      padding: 5px 12px;
+      border-radius: 20px;
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .role-badge {
+      background: var(--portal-crimson);
+      color: #fff;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 10px;
+    }
+
+    .portal-container {
+      max-width: 900px;
+      width: 100%;
+      margin: 32px auto;
+      padding: 0 20px;
+      flex: 1;
+    }
+
+    .portal-header-box {
+      text-align: center;
+      margin-bottom: 28px;
+    }
+    .portal-title {
+      font-family: 'Noto Serif Bengali', serif;
+      font-size: 28px;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 6px;
+    }
+    .portal-desc {
+      font-size: 14.5px;
+      color: var(--portal-muted);
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    /* Tabs */
+    .portal-tabs {
+      display: flex;
+      background: rgba(255, 255, 255, 0.04);
+      border-radius: 12px;
+      padding: 4px;
+      margin-bottom: 24px;
+      border: 1px solid var(--portal-card-border);
+    }
+    .portal-tab-btn {
+      flex: 1;
+      background: transparent;
+      border: none;
+      color: var(--portal-muted);
+      padding: 12px;
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 600;
+      border-radius: 8px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: all 0.2s;
+    }
+    .portal-tab-btn.active {
+      background: var(--portal-crimson);
+      color: #fff;
+      box-shadow: 0 4px 12px rgba(194, 24, 43, 0.35);
+    }
+
+    .form-card {
+      background: var(--portal-card);
+      border: 1px solid var(--portal-card-border);
+      border-radius: 16px;
+      padding: 32px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    }
+
+    .tab-content { display: none; }
+    .tab-content.active { display: block; animation: fadeIn 0.3s ease; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+    }
+    .full-width { grid-column: span 2; }
+
+    .form-group {
+      margin-bottom: 18px;
+      text-align: left;
+    }
+    .form-label {
+      display: block;
+      font-size: 13.5px;
+      font-weight: 600;
+      color: #e5e7eb;
+      margin-bottom: 6px;
+    }
+    .form-input, .form-select, .form-textarea {
+      width: 100%;
+      background: #0d121c;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 10px;
+      padding: 11px 14px;
+      font-family: inherit;
+      font-size: 14px;
+      color: #fff;
+      outline: none;
+      transition: all 0.2s;
+    }
+    .form-input:focus, .form-select:focus, .form-textarea:focus {
+      border-color: var(--portal-crimson);
+      box-shadow: 0 0 0 3px rgba(194, 24, 43, 0.25);
+      background: #111827;
+    }
+    .form-textarea {
+      min-height: 200px;
+      line-height: 1.6;
+      resize: vertical;
+    }
+
+    .btn-submit {
+      background: linear-gradient(135deg, var(--portal-crimson) 0%, #8b0e1b 100%);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      padding: 14px 28px;
+      font-family: inherit;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s;
+      box-shadow: 0 4px 15px rgba(194, 24, 43, 0.4);
+    }
+    .btn-submit:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 20px rgba(194, 24, 43, 0.6);
+    }
+
+    .msg-banner {
+      border-radius: 10px;
+      padding: 14px 18px;
+      margin-bottom: 22px;
+      display: none;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+    .msg-banner.visible { display: block; animation: fadeIn 0.3s; }
+    .msg-banner.success { background: rgba(6, 78, 59, 0.5); border: 1px solid #065f46; color: #6ee7b7; }
+    .msg-banner.error { background: rgba(127, 29, 29, 0.5); border: 1px solid #991b1b; color: #fca5a5; }
+
+    /* Submissions list table */
+    .submissions-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13.5px;
+      margin-top: 10px;
+    }
+    .submissions-table th {
+      text-align: left;
+      padding: 12px 14px;
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--portal-muted);
+      border-bottom: 1px solid var(--portal-card-border);
+      font-weight: 600;
+    }
+    .submissions-table td {
+      padding: 14px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    .status-badge {
+      display: inline-block;
+      padding: 3px 9px;
+      border-radius: 12px;
+      font-size: 11.5px;
+      font-weight: 700;
+    }
+    .status-pending { background: rgba(217, 119, 6, 0.2); color: #fbbf24; border: 1px solid rgba(217, 119, 6, 0.4); }
+    .status-approved { background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.4); }
+    .status-rejected { background: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.4); }
+  </style>
+</head>
+<body>
+
+  <!-- Top Navigation Bar -->
+  <nav class="portal-nav">
+    <a href="/" class="portal-brand">
+      <img src="assets/images/logo.svg" alt="The Way" onerror="this.src='logo.svg'" />
+      <div class="portal-brand-text">
+        <span class="portal-brand-title">দ্য ওয়ে (The Way)</span>
+        <span class="portal-brand-sub">লেখক ও অবদানকারী পোর্টাল</span>
+      </div>
+    </a>
+
+    <div class="portal-user-bar" id="nav-user-bar">
+      <!-- Injected by script -->
+      <a href="/admin-login.html" class="user-pill" style="color:#fff; text-decoration:none;">
+        🔑 লগইন করুন
+      </a>
+    </div>
+  </nav>
+
+  <div class="portal-container">
+
+    <div class="portal-header-box">
+      <h1 class="portal-title">লেখা জমা ও সংশোধন কেন্দ্র</h1>
+      <p class="portal-desc">আন্তর্জাতিক সমাজতান্ত্রিক চিন্তন, রাজনৈতিক বিশ্লেষণ, শ্রমিক আন্দোলন ও গবেষণাধর্মী লেখা জমা দিন অথবা প্রকাশিত লেখার সংশোধনের প্রস্তাব পাঠান।</p>
+    </div>
+
+    <!-- Alert Banner -->
+    <div id="portal-msg" class="msg-banner" role="alert"></div>
+
+    <!-- Navigation Tabs -->
+    <div class="portal-tabs">
+      <button class="portal-tab-btn active" onclick="switchTab('new-article')">
+        ✍️ নতুন লেখা জমা
+      </button>
+      <button class="portal-tab-btn" onclick="switchTab('revision')">
+        📝 পুরনো লেখা সংশোধন আবেদন
+      </button>
+      <button class="portal-tab-btn" onclick="switchTab('my-list')">
+        📋 আমার জমা ও আবেদনের অবস্থা
+      </button>
+    </div>
+
+    <!-- TAB 1: SUBMIT NEW ARTICLE -->
+    <div id="tab-new-article" class="tab-content active">
+      <div class="form-card">
+        <form id="new-article-form">
+          <div class="form-grid">
+            <div class="form-group full-width">
+              <label class="form-label" for="art-title">লেখার শিরোনাম *</label>
+              <input type="text" id="art-title" class="form-input" placeholder="যেমন: নব্য-সাম্রাজ্যবাদের যুগে গণআন্দোলনের রূপরেখা" required />
+            </div>
+
+            <div class="form-group full-width">
+              <label class="form-label" for="art-deck">সারসংক্ষেপ / সাবটাইটেল (Deck)</label>
+              <input type="text" id="art-deck" class="form-input" placeholder="লেখার মূল বক্তব্যের সংক্ষিপ্ত ১-২ বাক্যের বিবরণ" />
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="art-section">বিভাগ (Section) *</label>
+              <select id="art-section" class="form-select" required>
+                <option value="theory-philosophy">তত্ত্ব ও দর্শন (Theory & Philosophy)</option>
+                <option value="imperialism-geopolitics">সাম্রাজ্যবাদ ও বিশ্ব-রাজনীতি (Imperialism & Geopolitics)</option>
+                <option value="labor-peasant">শ্রম ও গণসংগ্রাম (Labor & Movements)</option>
+                <option value="political-economy">রাজনৈতিক অর্থনীতি (Political Economy)</option>
+                <option value="culture-revolution">সংস্কৃতি ও বিপ্লব (Culture & Revolution)</option>
+                <option value="manifestos-archives">ইশতেহার ও দলিল (Manifestos & Archives)</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="art-author-name">লেখকের নাম *</label>
+              <input type="text" id="art-author-name" class="form-input" placeholder="আপনার নাম" required />
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="art-author-email">যোগাযোগের ইমেইল *</label>
+              <input type="email" id="art-author-email" class="form-input" placeholder="editorial@example.com" required />
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="art-author-role">লেখকের পদবি / ক্ষেত্র</label>
+              <input type="text" id="art-author-role" class="form-input" placeholder="যেমন: শিক্ষক, লেখক, গবেষক" />
+            </div>
+
+            <div class="form-group full-width">
+              <label class="form-label" for="art-hero-img">প্রচ্ছদ ছবির লিংক (ঐচ্ছিক)</label>
+              <input type="url" id="art-hero-img" class="form-input" placeholder="https://example.com/image.jpg" />
+            </div>
+
+            <div class="form-group full-width">
+              <label class="form-label" for="art-content">লেখার পূর্ণ বিষয়বস্তু (HTML বা টেক্সট) *</label>
+              <textarea id="art-content" class="form-textarea" placeholder="আপনার পূর্ণ প্রবন্ধ বা নিবন্ধটি এখানে লিখুন বা পেস্ট করুন..." required></textarea>
+            </div>
+
+            <div class="form-group full-width">
+              <label class="form-label" for="art-notes">সম্পাদকীয় পর্ষদের জন্য কোনো নোট (ঐচ্ছিক)</label>
+              <input type="text" id="art-notes" class="form-input" placeholder="উৎস, পূর্বপ্রকাশিত কিনা ইত্যাদি..." />
+            </div>
+          </div>
+
+          <div style="margin-top: 10px; text-align: right;">
+            <button type="submit" class="btn-submit" id="btn-submit-new">
+              📤 লেখা জমা দিন (Submit Article)
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- TAB 2: REQUEST ARTICLE REVISION -->
+    <div id="tab-revision" class="tab-content">
+      <div class="form-card">
+        <form id="revision-form">
+          <div class="form-grid">
+            <div class="form-group full-width">
+              <label class="form-label" for="rev-article-select">সংশোধনযোগ্য প্রকাশিত লেখা নির্বাচন করুন *</label>
+              <select id="rev-article-select" class="form-select" required onchange="onArticleSelectForRevision(this.value)">
+                <option value="">-- প্রকাশিত লেখা তালিকা লোড হচ্ছে... --</option>
+              </select>
+            </div>
+
+            <div class="form-group full-width">
+              <label class="form-label" for="rev-notes">সংশোধনের বিবরণ ও কারণ *</label>
+              <input type="text" id="rev-notes" class="form-input" placeholder="যেমন: ৩য় অনুচ্ছেদে তথ্যের ভুল সংশোধন করা হয়েছে, নতুন রেফারেন্স যোগ হয়েছে" required />
+            </div>
+
+            <div class="form-group full-width">
+              <label class="form-label" for="rev-title">সংশোধিত শিরোনাম *</label>
+              <input type="text" id="rev-title" class="form-input" required />
+            </div>
+
+            <div class="form-group full-width">
+              <label class="form-label" for="rev-deck">সংশোধিত সারসংক্ষেপ</label>
+              <input type="text" id="rev-deck" class="form-input" />
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="rev-user-name">আপনার নাম *</label>
+              <input type="text" id="rev-user-name" class="form-input" required />
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="rev-user-email">আপনার ইমেইল *</label>
+              <input type="email" id="rev-user-email" class="form-input" required />
+            </div>
+
+            <div class="form-group full-width">
+              <label class="form-label" for="rev-content">সংশোধিত পূর্ণ বিষয়বস্তু (Revised Content) *</label>
+              <textarea id="rev-content" class="form-textarea" required></textarea>
+            </div>
+          </div>
+
+          <div style="margin-top: 10px; text-align: right;">
+            <button type="submit" class="btn-submit" id="btn-submit-rev">
+              📝 সংশোধনের আবেদন পাঠান (Request Revision)
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- TAB 3: MY SUBMISSIONS -->
+    <div id="tab-my-list" class="tab-content">
+      <div class="form-card">
+        <h3 style="margin-bottom: 14px; font-size:18px; color:#fff;">আমার জমাকৃত লেখা ও আবেদনসমূহ</h3>
+        <div id="submissions-list-wrap" style="overflow-x: auto;">
+          <p style="color:var(--portal-muted);">লোড হচ্ছে...</p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    const TOKEN_KEY = 'theway_token';
+    let currentUser = null;
+    let publishedArticles = [];
+
+    function showBanner(type, text) {
+      const b = document.getElementById('portal-msg');
+      b.className = 'msg-banner visible ' + type;
+      b.textContent = text;
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function switchTab(tabId) {
+      document.querySelectorAll('.portal-tab-btn').forEach((btn, idx) => {
+        const ids = ['new-article', 'revision', 'my-list'];
+        btn.classList.toggle('active', ids[idx] === tabId);
+      });
+      document.querySelectorAll('.tab-content').forEach(tc => {
+        tc.classList.toggle('active', tc.id === 'tab-' + tabId);
+      });
+
+      if (tabId === 'my-list') loadMySubmissions();
+    }
+
+    // Check user authentication
+    async function initUser() {
+      const token = localStorage.getItem(TOKEN_KEY) || localStorage.getItem('theway_token');
+      if (token) {
+        try {
+          const res = await fetch('/api/auth?action=me', {
+            headers: { 'Authorization': 'Bearer ' + token }
+          });
+          if (res.ok) {
+            const data = await res.json();
+            currentUser = data.user;
+            renderUserBar(currentUser);
+            // Autofill user name & email in forms
+            if (currentUser) {
+              document.getElementById('art-author-name').value = currentUser.name || '';
+              document.getElementById('art-author-email').value = currentUser.email || '';
+              document.getElementById('rev-user-name').value = currentUser.name || '';
+              document.getElementById('rev-user-email').value = currentUser.email || '';
+            }
+          }
+        } catch (e) {}
+      }
+      loadArticlesList();
+      checkUrlParams();
+    }
+
+    function renderUserBar(u) {
+      const bar = document.getElementById('nav-user-bar');
+      if (!u) return;
+      bar.innerHTML = `
+        <div class="user-pill">
+          <span>👤 <strong>${u.name || u.email}</strong></span>
+          <span class="role-badge">${u.role}</span>
+        </div>
+        ${['Admin', 'Moderator', 'Editor'].includes(u.role) ? '<a href="/admin.html" style="color:#93c5fd;font-weight:600;font-size:13px;text-decoration:none;">⚙️ Admin HQ</a>' : ''}
+        <button onclick="logout()" style="background:none;border:none;color:var(--portal-muted);cursor:pointer;font-size:13px;">🚪 লগআউট</button>
+      `;
+    }
+
+    function logout() {
+      localStorage.removeItem(TOKEN_KEY);
+      localStorage.removeItem('theway_token');
+      window.location.reload();
+    }
+
+    async function loadArticlesList() {
+      try {
+        const res = await fetch('/api/articles?action=list');
+        if (res.ok) {
+          publishedArticles = await res.json();
+          const select = document.getElementById('rev-article-select');
+          select.innerHTML = '<option value="">-- সংশোধন করতে একটি লেখা নির্বাচন করুন --</option>' +
+            publishedArticles.map(a => `<option value="${a.slug}">${a.title} (${a.section_name || a.section})</option>`).join('');
+        }
+      } catch (e) {
+        // Fallback to default articles in config
+        if (window.THE_WAY_CONFIG && window.THE_WAY_CONFIG.defaultArticles) {
+          publishedArticles = window.THE_WAY_CONFIG.defaultArticles;
+          const select = document.getElementById('rev-article-select');
+          select.innerHTML = '<option value="">-- সংশোধন করতে একটি লেখা নির্বাচন করুন --</option>' +
+            publishedArticles.map(a => `<option value="${a.slug}">${a.title}</option>`).join('');
+        }
+      }
+    }
+
+    function onArticleSelectForRevision(slug) {
+      const art = publishedArticles.find(a => a.slug === slug);
+      if (!art) return;
+      document.getElementById('rev-title').value = art.title || '';
+      document.getElementById('rev-deck').value = art.deck || '';
+      document.getElementById('rev-content').value = art.content_html || '';
+    }
+
+    function checkUrlParams() {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('revision') === 'true') {
+        switchTab('revision');
+        const slug = params.get('slug');
+        if (slug) {
+          setTimeout(() => {
+            const select = document.getElementById('rev-article-select');
+            select.value = slug;
+            onArticleSelectForRevision(slug);
+          }, 300);
+        }
+      }
+    }
+
+    // Submit New Article Handler
+    document.getElementById('new-article-form').addEventListener('submit', async function (e) {
+      e.preventDefault();
+      const payload = {
+        submission_type: 'new_article',
+        title: document.getElementById('art-title').value.trim(),
+        deck: document.getElementById('art-deck').value.trim(),
+        section: document.getElementById('art-section').value,
+        author_name: document.getElementById('art-author-name').value.trim(),
+        author_email: document.getElementById('art-author-email').value.trim(),
+        author_role: document.getElementById('art-author-role').value.trim(),
+        hero_img_url: document.getElementById('art-hero-img').value.trim(),
+        content_html: document.getElementById('art-content').value.trim(),
+        revision_notes: document.getElementById('art-notes').value.trim()
+      };
+
+      const btn = document.getElementById('btn-submit-new');
+      btn.disabled = true;
+      btn.textContent = 'জমা হচ্ছে...';
+
+      try {
+        const res = await fetch('/api/submissions?action=submit', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        btn.disabled = false;
+        btn.textContent = '📤 লেখা জমা দিন (Submit Article)';
+
+        if (res.ok && data.success) {
+          showBanner('success', '🎉 ' + data.message);
+          document.getElementById('new-article-form').reset();
+          setTimeout(() => switchTab('my-list'), 1200);
+        } else {
+          showBanner('error', data.error || 'জমা দিতে সমস্যা হয়েছে।');
+        }
+      } catch (err) {
+        btn.disabled = false;
+        btn.textContent = '📤 লেখা জমা দিন (Submit Article)';
+        showBanner('error', 'সার্ভার সংযোগ সমস্যা। আবার চেষ্টা করুন।');
+      }
+    });
+
+    // Submit Revision Request Handler
+    document.getElementById('revision-form').addEventListener('submit', async function (e) {
+      e.preventDefault();
+      const slug = document.getElementById('rev-article-select').value;
+      const art = publishedArticles.find(a => a.slug === slug);
+
+      const payload = {
+        submission_type: 'revision',
+        target_article_slug: slug,
+        target_article_id: art ? art.id : null,
+        title: document.getElementById('rev-title').value.trim(),
+        deck: document.getElementById('rev-deck').value.trim(),
+        section: art ? art.section : 'theory-philosophy',
+        author_name: document.getElementById('rev-user-name').value.trim(),
+        author_email: document.getElementById('rev-user-email').value.trim(),
+        content_html: document.getElementById('rev-content').value.trim(),
+        revision_notes: document.getElementById('rev-notes').value.trim()
+      };
+
+      const btn = document.getElementById('btn-submit-rev');
+      btn.disabled = true;
+      btn.textContent = 'পাঠানো হচ্ছে...';
+
+      try {
+        const res = await fetch('/api/submissions?action=submit', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        btn.disabled = false;
+        btn.textContent = '📝 সংশোধনের আবেদন পাঠান (Request Revision)';
+
+        if (res.ok && data.success) {
+          showBanner('success', '🎉 ' + data.message);
+          document.getElementById('revision-form').reset();
+          setTimeout(() => switchTab('my-list'), 1200);
+        } else {
+          showBanner('error', data.error || 'আবেদন পাঠাতে সমস্যা হয়েছে।');
+        }
+      } catch (err) {
+        btn.disabled = false;
+        btn.textContent = '📝 সংশোধনের আবেদন পাঠান (Request Revision)';
+        showBanner('error', 'সার্ভার সংযোগ সমস্যা। আবার চেষ্টা করুন।');
+      }
+    });
+
+    // Load user's submissions
+    async function loadMySubmissions() {
+      const wrap = document.getElementById('submissions-list-wrap');
+      wrap.innerHTML = '<p style="color:var(--portal-muted);padding:12px;">আবেদনসমূহ লোড হচ্ছে...</p>';
+
+      const token = localStorage.getItem(TOKEN_KEY) || localStorage.getItem('theway_token');
+      const headers = token ? { 'Authorization': 'Bearer ' + token } : {};
+
+      try {
+        const res = await fetch('/api/submissions?action=list&my_only=true', { headers });
+        if (res.ok) {
+          const list = await res.json();
+          if (!list || !list.length) {
+            wrap.innerHTML = '<div style="text-align:center;padding:30px;color:var(--portal-muted);">এখনো কোনো লেখা বা আবেদন জমা দেওয়া হয়নি।</div>';
+            return;
+          }
+
+          wrap.innerHTML = `
+            <table class="submissions-table">
+              <thead>
+                <tr>
+                  <th>শিরোনাম / বিষয়</th>
+                  <th>ধরন</th>
+                  <th>তারিখ</th>
+                  <th>অবস্থা (Status)</th>
+                  <th>সম্পাদকীয় প্রতিক্রিয়া</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${list.map(s => `
+                  <tr>
+                    <td><strong>${s.title}</strong></td>
+                    <td>${s.submission_type === 'revision' ? '📝 সংশোধন আবেদন' : '✍️ নতুন লেখা'}</td>
+                    <td>${new Date(s.created_at).toLocaleDateString('bn-BD')}</td>
+                    <td>
+                      <span class="status-badge status-${s.status}">
+                        ${s.status === 'approved' ? '✓ অনুমোদিত' : s.status === 'rejected' ? '✕ প্রত্যাখ্যাত' : '⏳ বিবেচনাধীন'}
+                      </span>
+                    </td>
+                    <td style="color:var(--portal-muted);font-size:12.5px;">${s.reviewer_feedback || '—'}</td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          `;
+        }
+      } catch (e) {
+        wrap.innerHTML = '<p style="color:#f87171;">তালিকা লোড করতে সমস্যা হয়েছে।</p>';
+      }
+    }
+
+    initUser();
+  </script>
+</body>
+</html>

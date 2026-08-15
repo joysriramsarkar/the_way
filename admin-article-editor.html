@@ -3,6 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" type="image/svg+xml" href="assets/images/favicon.svg" />
+  <link rel="alternate icon" type="image/svg+xml" href="favicon.svg" />
   <title>Article Editor — The Way (দ্য ওয়ে)</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -1351,7 +1353,7 @@ kbd {
               oninput="syncSlug(this.value, 'sd'); DIRTY=true;" />
           </div>
           <div id="sd-slug-preview" style="font:400 11px/1.4 var(--sans);color:#64748b;margin-top:7px;word-break:break-all;">
-            Live Link: <span style="color:#0a528e;font-weight:600;">theprivatianfamily.vercel.app/article/<span id="sd-slug-val">untitled</span></span>
+            Live Link: <span style="color:#0a528e;font-weight:600;">theway-socialism.vercel.app/article/<span id="sd-slug-val">untitled</span></span>
           </div>
         </div>
       </div>
@@ -1440,7 +1442,7 @@ kbd {
           <label class="sd-lbl">Search Preview</label>
           <div class="seo-preview">
             <div class="sp-ttl" id="sp-ttl">Article Title</div>
-            <div class="sp-url">theprivatianfamily.vercel.app/…</div>
+            <div class="sp-url">theway-socialism.vercel.app/…</div>
             <div class="sp-desc" id="sp-desc">Meta description will appear here.</div>
           </div>
         </div>
@@ -1454,8 +1456,8 @@ kbd {
 <input type="file" id="feat-img-inp" accept="image/*" style="display:none" onchange="handleFeatImgFile(this)" />
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="supabase-config.js"></script>
-<script src="admin-auth.js"></script>
+<script src="assets/js/supabase-config.js"></script>
+<script src="assets/js/admin-auth.js"></script>
 <script>
 /* ════════════════════════════════════════════════════════════
    The Way (দ্য ওয়ে) — Article Editor v5
@@ -1478,7 +1480,7 @@ let _lsTimer   = null;
 let _srvTimer  = null;
 
 // ── BOOT ────────────────────────────────────────────────────
-window.addEventListener('privatian:ready', () => {
+window.addEventListener('theway:ready', () => {
   ART_ID = new URLSearchParams(location.search).get('id') || null;
   ART_ID ? loadArticle(ART_ID) : initEmpty();
 
@@ -1564,11 +1566,11 @@ async function loadArticle(id) {
 
   if (!a || !a.id) {
     try {
-      if (typeof PRIVATIAN_SUPABASE_URL !== 'undefined' && typeof PRIVATIAN_SUPABASE_KEY !== 'undefined') {
-        const res = await fetch(`${PRIVATIAN_SUPABASE_URL}/rest/v1/articles?id=eq.${encodeURIComponent(id)}&select=*`, {
+      if (typeof THEWAY_SUPABASE_URL !== 'undefined' && typeof THEWAY_SUPABASE_KEY !== 'undefined') {
+        const res = await fetch(`${THEWAY_SUPABASE_URL}/rest/v1/articles?id=eq.${encodeURIComponent(id)}&select=*`, {
           headers: {
-            'apikey': PRIVATIAN_SUPABASE_KEY,
-            'Authorization': 'Bearer ' + PRIVATIAN_SUPABASE_KEY
+            'apikey': THEWAY_SUPABASE_KEY,
+            'Authorization': 'Bearer ' + THEWAY_SUPABASE_KEY
           }
         });
         if (res.ok) {
@@ -1644,7 +1646,7 @@ function syncSlug(val, src) {
   const slugVal = g('sd-slug-val');
   if (slugVal) slugVal.textContent = clean || 'untitled';
   const spUrl = g('sp-url');
-  if (spUrl) spUrl.textContent = 'theprivatianfamily.vercel.app/article/' + (clean || '…');
+  if (spUrl) spUrl.textContent = 'theway-socialism.vercel.app/article/' + (clean || '…');
 }
 
 // ── SECTIONS FROM DB ─────────────────────────────────────────
@@ -2740,7 +2742,7 @@ function renderColorPalettes(mode) {
   const themeColors = mode === 'text' ? [
     { name: 'Charcoal (Default)', hex: '#1A2D3E' },
     { name: 'Pitch Black', hex: '#000000' },
-    { name: 'Privatian Navy', hex: '#0A528E' },
+    { name: 'TheWay Navy', hex: '#0A528E' },
     { name: 'Slate Gray', hex: '#5A7A9A' },
     { name: 'Burgundy', hex: '#881337' },
     { name: 'Forest Green', hex: '#14532D' },
@@ -2976,11 +2978,11 @@ async function verifyEditorDbSync(shouldToast = false) {
 
   if (!dbOk) {
     try {
-      if (typeof PRIVATIAN_SUPABASE_URL !== 'undefined' && typeof PRIVATIAN_SUPABASE_KEY !== 'undefined') {
-        const res = await fetch(`${PRIVATIAN_SUPABASE_URL}/rest/v1/articles?select=id&limit=1`, {
+      if (typeof THEWAY_SUPABASE_URL !== 'undefined' && typeof THEWAY_SUPABASE_KEY !== 'undefined') {
+        const res = await fetch(`${THEWAY_SUPABASE_URL}/rest/v1/articles?select=id&limit=1`, {
           headers: {
-            'apikey': PRIVATIAN_SUPABASE_KEY,
-            'Authorization': 'Bearer ' + PRIVATIAN_SUPABASE_KEY
+            'apikey': THEWAY_SUPABASE_KEY,
+            'Authorization': 'Bearer ' + THEWAY_SUPABASE_KEY
           }
         });
         if (res.ok) dbOk = true;
@@ -3044,7 +3046,7 @@ function placeEnd(el) {
   const s = getSelection(); s.removeAllRanges(); s.addRange(r);
 }
 function _getTok() {
-  return window.PRIVATIAN_TOKEN || localStorage.getItem('theway_token') || '';
+  return window.THEWAY_TOKEN || localStorage.getItem('theway_token') || '';
 }
 function api(url, opts={}) {
   const tok = _getTok();

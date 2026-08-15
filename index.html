@@ -3,10 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/svg+xml" href="assets/images/favicon.svg" />
+  <link rel="alternate icon" type="image/svg+xml" href="favicon.svg" />
   <title>দ্য ওয়ে (The Way) — আন্তর্জাতিক সমাজতান্ত্রিক চিন্তন ও গণআন্দোলনের উন্মুক্ত পোর্টাল</title>
   <meta name="description" content="নব্য-সাম্রাজ্যবাদ ও নব্য-উদারবাদী বিশ্ব ব্যবস্থার বিরুদ্ধে বিশ্বজনীন মেহনতি মানুষের বিকল্প চিন্তন ও বিপ্লবী গণআন্দোলনের উন্মুক্ত পোর্টাল।">
   <meta name="keywords" content="সমাজতন্ত্র, মার্ক্সবাদ, রাজনৈতিক অর্থনীতি, সাম্রাজ্যবাদ, শ্রমিক আন্দোলন, গ্লোবাল সাউথ, ইকো-সোশ্যালিজম">
-  <link rel="icon" type="image/svg+xml" href="assets/images/logo.svg">
 
   <!-- Social Media OpenGraph -->
   <meta property="og:title" content="দ্য ওয়ে (The Way) — আন্তর্জাতিক সমাজতান্ত্রিক চিন্তন ও গণআন্দোলনের পোর্টাল">
@@ -43,6 +44,11 @@
       <!-- Dynamically populated by assets/js/script.js -->
     </div>
 
+    <!-- Revolutionary Classics Web Books Showcase -->
+    <section class="editorial-section-block" id="books-showcase-mount">
+      <!-- Dynamically populated by assets/js/script.js -->
+    </section>
+
     <!-- Movement Action Center ("সংগঠিত হোন") -->
     <section class="action-center-section">
       <div class="action-center-grid">
@@ -53,12 +59,12 @@
           </p>
           <div class="action-cards-duo">
             <div class="action-item-card">
-              <h4>📚 সমাজতান্ত্রিক পাঠচক্র</h4>
+              <h4><svg class="svg-inline-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--crimson-primary);"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg> সমাজতান্ত্রিক পাঠচক্র</h4>
               <p>মার্ক্স, লেনিন, গ্রামশি ও ফ্যাননের চিন্তা নিয়ে স্থানীয় ও অনলাইন পাঠচক্রে অংশ নিন।</p>
               <button class="btn-solid-crimson" style="padding:0.4rem 0.8rem; font-size:0.8rem;" onclick="TheWayComponents.openModal('action-modal')">নিবন্ধন করুন</button>
             </div>
             <div class="action-item-card">
-              <h4>✍️ লেখা ও গবেষণা পাঠান</h4>
+              <h4><svg class="svg-inline-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--crimson-primary);"><path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/><path d="M2 2l7.586 7.586"/><circle cx="11" cy="11" r="2"/></svg> লেখা ও গবেষণা পাঠান</h4>
               <p>শ্রমিক আন্দোলন, রাজনৈতিক অর্থনীতি ও আন্তর্জাতিক রাজনীতি বিষয়ক আপনার বিশ্লেষণ জমা দিন।</p>
               <button class="btn-solid-crimson" style="padding:0.4rem 0.8rem; font-size:0.8rem;" onclick="TheWayComponents.openModal('submit-modal')">লেখা পাঠান</button>
             </div>
@@ -66,9 +72,9 @@
         </div>
 
         <div class="newsletter-subscribe-box">
-          <h3>📬 সমাজতান্ত্রিক বুলেটিন</h3>
+          <h3><svg class="svg-inline-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--gold-bright);"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg> সমাজতান্ত্রিক বুলেটিন</h3>
           <p>বিশ্বজুড়ে শ্রমিক আন্দোলন, অ্যান্টি-ইম্পেরিয়ালিস্ট রিপোর্ট ও তাত্ত্বিক বিশ্লেষণ প্রতি সপ্তাহে আপনার ইনবক্সে পেতে সাবস্ক্রাইব করুন।</p>
-          <form onsubmit="event.preventDefault(); alert('ধন্যবাদ! আপনার সাবস্ক্রিপশন সফল হয়েছে।');" class="subscribe-form-row">
+          <form onsubmit="TheWayComponents.handleNewsletterSubmit(event, this)" class="subscribe-form-row">
             <input type="email" placeholder="আপনার ইমেইল ঠিকানা..." required class="subscribe-input">
             <button type="submit" class="btn-solid-crimson">সাবস্ক্রাইব</button>
           </form>
@@ -84,6 +90,7 @@
   <!-- Scripts -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="assets/js/supabase-config.js"></script>
+  <script src="assets/js/books-data.js"></script>
   <script src="assets/js/components.js"></script>
   <script src="assets/js/script.js"></script>
 </body>

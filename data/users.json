@@ -1,0 +1,90 @@
+[
+  {
+    "id": "usr_1786809123150_95j9k",
+    "email": "test_reg@example.com",
+    "name": "Test",
+    "password_hash": "7c6614633a98d27b14335e885989dd9d:42180f55ed7c3bd6dc57752de7036dc06493421d1aaa900bc0298d5358f022137b773bc53e9f0eb8b319bca4a30b6ee3c58a3ef7bdf77765d430e4ddb4d40afb",
+    "role": "Contributor",
+    "status": "active",
+    "bio": "দ্য ওয়ে নিয়মিত লেখক ও পাঠক",
+    "added_by": "self_registration",
+    "created_at": "2026-08-15T15:52:03.150Z"
+  },
+  {
+    "id": "usr_1786809221321_82x0e",
+    "email": "writer_1786809217682@example.com",
+    "name": "ড. সৌমিক রায়হান",
+    "password_hash": "793d2f9d2c5c7d7203be9d5c52fa855a:12ed6f22dee38dbeb85f755995618d128af320c9d68d454c6c628342828086a11bc96ccfb93ff143dc8ae5b0e682a295754d40b61db540d6ce01dd549da302c5",
+    "role": "Contributor",
+    "status": "active",
+    "bio": "আন্তর্জাতিক রাজনৈতিক অর্থনীতি ও শ্রমিক অধিকার গবেষক",
+    "added_by": "self_registration",
+    "created_at": "2026-08-15T15:53:41.321Z"
+  },
+  {
+    "id": "usr_1786810590813_j52z8",
+    "email": "writer_1786810588346@example.com",
+    "name": "ড. সৌমিক রায়হান",
+    "password_hash": "ad369b8b7f9988f9f962972ffd728434:b34d6d2ead550c8cf22c649aedaf19bf77e5b9c8d0edfc05e143cc2100848fc2a67966fbd9b791600a21443e450a2f813e46fe3cc09839a37ff7cc17238c5fa9",
+    "role": "Contributor",
+    "status": "active",
+    "bio": "আন্তর্জাতিক রাজনৈতিক অর্থনীতি ও শ্রমিক অধিকার গবেষক",
+    "added_by": "self_registration",
+    "created_at": "2026-08-15T16:16:30.813Z"
+  },
+  {
+    "id": "usr_1786811678792_wyimu",
+    "email": "writer_1786811676437@example.com",
+    "name": "ড. সৌমিক রায়হান",
+    "password_hash": "24f7d095928e6aa54c9a4d8ba69e1bfb:72d2303155bf1c7220f79762e9344bafa5888b6ba3b03ddd7642d36d85c32ead51f33135b3046999af0546519368925db0a1c234048d0eda888af60b78d93e26",
+    "role": "Contributor",
+    "status": "active",
+    "bio": "আন্তর্জাতিক রাজনৈতিক অর্থনীতি ও শ্রমিক অধিকার গবেষক",
+    "added_by": "self_registration",
+    "created_at": "2026-08-15T16:34:38.792Z"
+  },
+  {
+    "id": "usr_1786812924517_sncdx",
+    "email": "writer_1786812921715@example.com",
+    "name": "ড. সৌমিক রায়হান",
+    "password_hash": "edaa15c2de105006550ad0ddb80dffd7:b12e5f79b105df3f96f456dad131177c060e6ab043802b4cdb5ce2f2bb3c87e256a09c49155d75ca2cf1c50a751821c3dcb4a1deb816837ed929f47f5b16a0d5",
+    "role": "Contributor",
+    "status": "active",
+    "bio": "আন্তর্জাতিক রাজনৈতিক অর্থনীতি ও শ্রমিক অধিকার গবেষক",
+    "added_by": "self_registration",
+    "created_at": "2026-08-15T16:55:24.517Z"
+  },
+  {
+    "id": "usr_1786813601108_77i9k",
+    "email": "writer_1786813597693@example.com",
+    "name": "ড. সৌমিক রায়হান",
+    "password_hash": "47b751a5ae507a24711e5e86f41c7598:f7499bb291dbb7a0911219e427b29911ac9b2619fdc2e7edd092ba76b952ee111f328adef909590d04531758d1ad9dd9df22a870d432d979998a432b1c62a6f8",
+    "role": "Contributor",
+    "status": "active",
+    "bio": "আন্তর্জাতিক রাজনৈতিক অর্থনীতি ও শ্রমিক অধিকার গবেষক",
+    "added_by": "self_registration",
+    "created_at": "2026-08-15T17:06:41.108Z"
+  },
+  {
+    "id": "usr_1786820660374_nijnk",
+    "email": "testadmin@theway.org",
+    "name": "Test Admin",
+    "password_hash": "33187a4f2a4799bf27981f2d657ebdca:c5fef737a5bdb3cf3a3915d43572db8729943267a3fc7ff983e75707f3241b357e77348430a57b34b4931a7a5135122fdb5cf999c04856bd59f2cc926009bdbf",
+    "role": "Moderator",
+    "status": "active",
+    "bio": "Admin Tester",
+    "added_by": "self_registration",
+    "created_at": "2026-08-15T19:04:20.374Z"
+  },
+  {
+    "id": "usr_1786823557425_kaync",
+    "email": "example.1@gmail.com",
+    "name": "জয়",
+    "password_hash": "aafd1f247c09a14bc31cfdeea218be54:db07bb462837d318c222fa4429d13e5b37ebe53b2ccbf4ea709401434d3bb67e06f601fcbdb45da72d9bd368d2ff36d146b723eff808449e21c94f1e575e5212",
+    "role": "Contributor",
+    "status": "active",
+    "bio": "দ্য ওয়ে নিয়মিত লেখক ও পাঠক",
+    "added_by": "self_registration",
+    "created_at": "2026-08-15T19:52:37.425Z"
+  }
+]

@@ -31,10 +31,10 @@ function loadEnv() {
 
   // Default Supabase fallbacks for seamless out-of-the-box local testing
   if (!process.env.SUPABASE_URL) {
-    process.env.SUPABASE_URL = 'https://aenhajqjsgskimfzvlfr.supabase.co';
+    process.env.SUPABASE_URL = 'https://gyhkpjjwwiakhpdqatuh.supabase.co';
   }
-  if (!process.env.SUPABASE_SERVICE_KEY) {
-    process.env.SUPABASE_SERVICE_KEY = process.env.SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFlbmhhanFqc2dza2ltZnp2bGZyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY2MDc1MDUsImV4cCI6MjEwMjE4MzUwNX0.q0wmF77hpsb8M7CQOYMq8GrDuQJ32vn1NcWFXTc5UAY';
+  if (!process.env.SUPABASE_ANON_KEY) {
+    process.env.SUPABASE_ANON_KEY = 'sb_publishable_I0VMIhMDmPpuLH0MpEvaKA_c_vDrRSV';
   }
   if (!process.env.SESSION_SECRET) {
     process.env.SESSION_SECRET = 'theway_dev_session_secret_12345';
@@ -114,7 +114,11 @@ const server = http.createServer(async (req, res) => {
           return this;
         };
 
-        delete require.cache[require.resolve(apiFile)];
+        Object.keys(require.cache).forEach(k => {
+          if (k.includes(path.join(__dirname, 'api'))) {
+            delete require.cache[k];
+          }
+        });
         const handler = require(apiFile);
 
         return await handler(req, res);

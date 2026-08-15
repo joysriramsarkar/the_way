@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/svg+xml" href="assets/images/favicon.svg" />
+  <link rel="alternate icon" type="image/svg+xml" href="favicon.svg" />
+  <title>বিপ্লবী উন্মুক্ত গ্রন্থাগার ও ধ্রুপদী ওয়েব বই — দ্য ওয়ে (The Way)</title>
+  <meta name="description" content="কমিউনিস্ট ম্যানিফেস্টো, ভগৎ সিংহের 'কেন আমি নাস্তিক', মার্ক্স, এঙ্গেলস ও লেনিনের ধ্রুপদী সাহিত্যের ডিজিটাল উন্মুক্ত ওয়েব বই সংগ্রহ।">
+  
+  <link rel="stylesheet" href="assets/css/style.css">
+  <style>
+    .library-hero {
+      background: radial-gradient(circle at top right, rgba(194, 24, 43, 0.25), transparent 70%), linear-gradient(135deg, #130608 0%, #0d1117 100%);
+      color: #fff;
+      padding: 3.5rem 2.5rem;
+      border-radius: var(--radius-lg);
+      margin: 2rem 0 2.5rem;
+      border: 1px solid rgba(194, 24, 43, 0.4);
+      box-shadow: 0 12px 36px rgba(0,0,0,0.3);
+      position: relative;
+      overflow: hidden;
+    }
+    .library-hero::before {
+      content: '☭';
+      position: absolute;
+      right: 20px;
+      bottom: -30px;
+      font-size: 160px;
+      color: rgba(255, 255, 255, 0.03);
+      pointer-events: none;
+      font-family: serif;
+    }
+    .library-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(194, 24, 43, 0.35);
+      border: 1px solid rgba(229, 43, 60, 0.6);
+      color: #ff8b94;
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 5px 12px;
+      border-radius: var(--radius-full);
+      margin-bottom: 1rem;
+    }
+    .library-hero h1 {
+      font-family: var(--font-bengali-serif);
+      font-size: 2.5rem;
+      font-weight: 800;
+      line-height: 1.2;
+      margin-bottom: 0.8rem;
+    }
+    .library-hero p {
+      font-size: 1.1rem;
+      color: #e5e7eb;
+      max-width: 760px;
+      line-height: 1.65;
+      margin-bottom: 1.8rem;
+    }
+
+    /* Filter & Search Bar */
+    .library-controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2rem;
+      background: var(--bg-card);
+      padding: 1.2rem;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-color);
+      box-shadow: var(--shadow-sm);
+    }
+    .filter-tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+    .filter-btn {
+      background: var(--bg-body);
+      border: 1px solid var(--border-color);
+      color: var(--text-secondary);
+      font-family: var(--font-bengali-sans);
+      font-size: 0.88rem;
+      font-weight: 600;
+      padding: 6px 14px;
+      border-radius: var(--radius-full);
+      cursor: pointer;
+      transition: all var(--transition-fast);
+    }
+    .filter-btn:hover {
+      border-color: var(--crimson-primary);
+      color: var(--crimson-primary);
+    }
+    .filter-btn.active {
+      background: var(--crimson-primary);
+      border-color: var(--crimson-primary);
+      color: #fff;
+      box-shadow: 0 2px 8px var(--crimson-glow);
+    }
+    .search-box-wrap {
+      position: relative;
+      min-width: 260px;
+    }
+    .search-box-wrap input {
+      width: 100%;
+      padding: 8px 14px 8px 36px;
+      border-radius: var(--radius-full);
+      border: 1px solid var(--border-color);
+      background: var(--bg-body);
+      color: var(--text-primary);
+      font-family: var(--font-bengali-sans);
+      font-size: 0.88rem;
+      outline: none;
+      transition: border-color var(--transition-fast);
+    }
+    .search-box-wrap input:focus {
+      border-color: var(--crimson-primary);
+    }
+    .search-icon {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 0.85rem;
+      opacity: 0.6;
+    }
+
+    /* Books Grid */
+    .books-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+      gap: 2rem;
+      margin-bottom: 4rem;
+    }
+    .book-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      box-shadow: var(--shadow-sm);
+      transition: all var(--transition-normal);
+      position: relative;
+    }
+    .book-card:hover {
+      transform: translateY(-5px);
+      box-shadow: var(--shadow-lg);
+      border-color: var(--border-crimson);
+    }
+    .book-header-visual {
+      height: 180px;
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      color: #fff;
+      position: relative;
+      overflow: hidden;
+    }
+    .book-header-visual::after {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: linear-gradient(to bottom, rgba(0,0,0,0.1), rgba(0,0,0,0.6));
+      pointer-events: none;
+    }
+    .book-tag {
+      align-self: flex-start;
+      background: rgba(0,0,0,0.45);
+      backdrop-filter: blur(4px);
+      padding: 3px 10px;
+      border-radius: var(--radius-full);
+      font-size: 0.75rem;
+      font-weight: 700;
+      border: 1px solid rgba(255,255,255,0.25);
+      z-index: 1;
+    }
+    .book-icon-badge {
+      font-size: 2.2rem;
+      z-index: 1;
+      filter: drop-shadow(0 2px 8px rgba(0,0,0,0.4));
+    }
+    .book-body {
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+    }
+    .book-title {
+      font-family: var(--font-bengali-serif);
+      font-size: 1.45rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 0.35rem;
+      line-height: 1.3;
+    }
+    .book-authors {
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: var(--crimson-primary);
+      margin-bottom: 0.7rem;
+    }
+    .book-summary {
+      font-size: 0.92rem;
+      color: var(--text-secondary);
+      line-height: 1.6;
+      margin-bottom: 1.2rem;
+      flex: 1;
+    }
+    .book-meta-bar {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      padding-top: 0.8rem;
+      border-top: 1px dashed var(--border-color);
+      margin-bottom: 1.2rem;
+    }
+    .book-action-row {
+      display: flex;
+      gap: 0.8rem;
+    }
+    .btn-read-book {
+      flex: 1;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      background: var(--crimson-primary);
+      color: #fff;
+      text-decoration: none;
+      padding: 10px 16px;
+      border-radius: var(--radius-md);
+      font-weight: 700;
+      font-size: 0.92rem;
+      transition: all var(--transition-fast);
+      box-shadow: 0 2px 8px var(--crimson-glow);
+    }
+    .btn-read-book:hover {
+      background: var(--crimson-light);
+      transform: scale(1.02);
+    }
+    .btn-view-toc {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--bg-body);
+      border: 1px solid var(--border-color);
+      color: var(--text-primary);
+      text-decoration: none;
+      padding: 10px 14px;
+      border-radius: var(--radius-md);
+      font-weight: 600;
+      font-size: 0.88rem;
+      transition: all var(--transition-fast);
+    }
+    .btn-view-toc:hover {
+      border-color: var(--border-crimson);
+      color: var(--crimson-primary);
+    }
+
+    /* Library Features Banner */
+    .library-features-strip {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 2rem;
+      margin-bottom: 4rem;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 2rem;
+    }
+    .feature-item {
+      display: flex;
+      gap: 1rem;
+      align-items: flex-start;
+    }
+    .feature-icon {
+      font-size: 2rem;
+      line-height: 1;
+    }
+    .feature-item h4 {
+      font-family: var(--font-bengali-serif);
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin-bottom: 0.3rem;
+    }
+    .feature-item p {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      line-height: 1.5;
+    }
+
+    @media (max-width: 768px) {
+      .books-grid {
+        grid-template-columns: 1fr;
+      }
+      .library-hero {
+        padding: 2rem 1.5rem;
+      }
+      .library-hero h1 {
+        font-size: 1.9rem;
+      }
+    }
+  </style>
+</head>
+<body id="top">
+
+  <!-- Ticker Mount -->
+  <div id="theway-ticker-mount" class="theway-ticker-bar"></div>
+
+  <!-- Header Mount -->
+  <header id="theway-header-mount" class="theway-header"></header>
+
+  <main class="container">
+    
+    <!-- Hero Banner -->
+    <section class="library-hero">
+      <div class="library-badge"><svg class="svg-inline-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--gold-bright);"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg> উন্মুক্ত মার্ক্সীয় জ্ঞানভাণ্ডার</div>
+      <h1>বিপ্লবী ধ্রুপদী উন্মুক্ত পাঠাগার</h1>
+      <p>
+        মার্ক্স, এঙ্গেলস, লেনিন, ম্যাক্সিম গোর্কি এবং শহীদ ভগৎ সিংহের অবিস্মরণীয় ঐতিহাসিক তত্ত্ব ও সাহিত্যকর্মগুলোকে সাজানো হয়েছে আধুনিক ইন্টারেক্টিভ ‘ওয়েব বই (Web Books)’ আকারে। কোনো পেওয়াল নেই, কোনো বিজ্ঞাপন নেই—মেহনতি মানুষের সার্বজনীন মুক্ত জ্ঞানচর্চার জন্য সম্পূর্ণ উন্মুক্ত।
+      </p>
+      <div style="display:flex; gap:1rem; flex-wrap:wrap;">
+        <a href="#books-list" class="btn-solid-crimson" style="padding:10px 22px; font-size:0.95rem;">
+          <svg class="svg-inline-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg> বইয়ের তালিকা দেখুন
+        </a>
+        <a href="book-reader.html?book=maxim-gorky-mother-novel" class="btn-outline-gold" style="padding:10px 22px; font-size:0.95rem; background:rgba(0,0,0,0.3);">
+          <svg class="svg-inline-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> গোর্কির ‘মা’ উপন্যাস পড়ুন
+        </a>
+      </div>
+    </section>
+
+    <!-- Controls / Filters -->
+    <div class="library-controls" id="books-list">
+      <div class="filter-tabs" id="category-filter-tabs">
+        <button class="filter-btn active" data-cat="all">সকল বই (৬)</button>
+        <button class="filter-btn" data-cat="literature">বিপ্লবী সাহিত্য ও উপন্যাস</button>
+        <button class="filter-btn" data-cat="manifesto">ঐতিহাসিক ইশতেহার</button>
+        <button class="filter-btn" data-cat="economy">রাজনৈতিক অর্থনীতি</button>
+        <button class="filter-btn" data-cat="state">রাষ্ট্র ও বিপ্লব</button>
+        <button class="filter-btn" data-cat="philosophy">দর্শন ও যুক্তিবাদ</button>
+      </div>
+
+      <div class="search-box-wrap">
+        <span class="search-icon"><svg class="svg-inline-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span>
+        <input type="text" id="book-search-input" placeholder="বই, লেখক বা বিষয় খুঁজুন...">
+      </div>
+    </div>
+
+    <!-- Books Grid -->
+    <div class="books-grid" id="books-grid-container">
+      <!-- Injected via JavaScript -->
+    </div>
+
+    <!-- Features Banner -->
+    <div class="library-features-strip">
+      <div class="feature-item">
+        <div class="feature-icon"><svg class="svg-inline-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:28px;height:28px;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></div>
+        <div>
+          <h4>ডিজিটাল রিডার অভিজ্ঞতা</h4>
+          <p>ফন্ট সাইজ পরিবর্তন, ডার্ক মোড, সেপিয়া পেপার মোড এবং জেন ফুলস্ক্রিন রিডিং সুবিধা।</p>
+        </div>
+      </div>
+      <div class="feature-item">
+        <div class="feature-icon"><svg class="svg-inline-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:28px;height:28px;"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg></div>
+        <div>
+          <h4>ইন্টারেক্টিভ সূচিপত্র</h4>
+          <p>প্রতিটি অধ্যায় দ্রুত ব্রাউজ করা এবং আপনার শেষ পাঠের স্থান স্বয়ংক্রিয় সংরক্ষণ (Auto-resume)।</p>
+        </div>
+      </div>
+      <div class="feature-item">
+        <div class="feature-icon"><svg class="svg-inline-icon" viewBox="0 0 24 24" fill="currentColor" style="width:28px;height:28px;"><path d="M12 2C10.9 2 10 2.9 10 4V8H9C7.9 8 7 8.9 7 10V12H6C4.9 12 4 12.9 4 14V17C4 19.8 6.2 22 9 22H15C17.8 22 20 19.8 20 17V12C20 10.9 19.1 10 18 10V6C18 4.9 17.1 4 16 4H15V4C15 2.9 14.1 2 13 2H12ZM12 4H13V8H12V4ZM15 6H16V10H15V6ZM10 6V8H9V6H10ZM6 14H7V17H6V14ZM9 10H10V17H9V10ZM12 10H13V17H12V10ZM15 12H16V17H15V12ZM18 12H18.5V17C18.5 18.9 17 20.5 15 20.5H9C7 20.5 5.5 18.9 5.5 17V15.5H7V17C7 17.6 7.4 18 8 18C8.6 18 9 17.6 9 17V15.5H10V17C10 17.6 10.4 18 11 18C11.6 18 12 17.6 12 17V15.5H13V17C13 17.6 13.4 18 14 18C14.6 18 15 17.6 15 17V15.5H16V17C16 17.6 16.4 18 17 18C17.6 18 18 17.6 18 17V12Z"/></svg></div>
+        <div>
+          <h4>১০০% মুক্ত ভাবাদর্শ</h4>
+          <p>বিশ্বের যে কোনো প্রান্ত থেকে যে কোনো ডিভাইসে নিখরচায় উচ্চমানের প্রামাণ্য অনুবাদ পাঠ।</p>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Footer Mount -->
+  <footer id="theway-footer-mount" class="theway-footer"></footer>
+
+  <!-- Scripts -->
+  <script src="assets/js/books-data.js"></script>
+  <script src="assets/js/supabase-config.js"></script>
+  <script src="assets/js/components.js"></script>
+  <script>
+    function initBooksLibrary() {
+      const books = (window.THE_WAY_BOOKS && typeof window.THE_WAY_BOOKS.getAllBooks === 'function') 
+        ? window.THE_WAY_BOOKS.getAllBooks() 
+        : [];
+        
+      const grid = document.getElementById('books-grid-container');
+      const tabsContainer = document.getElementById('category-filter-tabs');
+      const categories = (window.THE_WAY_BOOKS && typeof window.THE_WAY_BOOKS.getCategories === 'function')
+        ? window.THE_WAY_BOOKS.getCategories()
+        : [
+            { id: 'all', name_bn: 'সকল ধ্রুপদী বই', name_en: 'All Classics' },
+            { id: 'literature', name_bn: 'বিপ্লবী সাহিত্য ও উপন্যাস', name_en: 'Literature & Novels' },
+            { id: 'economy', name_bn: 'পুঁজি ও রাজনৈতিক অর্থনীতি', name_en: 'Das Kapital & Economy' },
+            { id: 'manifesto', name_bn: 'ঐতিহাসিক ইশতেহার', name_en: 'Manifestos' },
+            { id: 'state', name_bn: 'রাষ্ট্র ও সমাজ বিপ্লব', name_en: 'State & Revolution' },
+            { id: 'philosophy', name_bn: 'দ্বান্দ্বিক বস্তুবাদ ও দর্শন', name_en: 'Dialectics & Philosophy' },
+            { id: 'imperialism', name_bn: 'সাম্রাজ্যবাদ ও বিশ্বরাজনীতি', name_en: 'Imperialism' }
+          ];
+
+      if (tabsContainer) {
+        tabsContainer.innerHTML = categories.map(cat => {
+          const count = cat.id === 'all' 
+            ? books.length 
+            : books.filter(b => b.category === cat.id).length;
+          return `<button class="filter-btn ${cat.id === 'all' ? 'active' : ''}" data-cat="${cat.id}">${cat.name_bn} (${count})</button>`;
+        }).join('');
+      }
+
+      const filterBtns = document.querySelectorAll('.filter-btn');
+      const searchInput = document.getElementById('book-search-input');
+      let currentCategory = 'all';
+      let searchQuery = '';
+
+      function renderBooks() {
+        if (!grid) return;
+        const filtered = books.filter(b => {
+          const matchCat = currentCategory === 'all' || b.category === currentCategory;
+          const matchSearch = !searchQuery || 
+            b.title_bn.toLowerCase().includes(searchQuery) ||
+            b.title_en.toLowerCase().includes(searchQuery) ||
+            b.authors.some(a => a.name.toLowerCase().includes(searchQuery)) ||
+            b.summary_bn.toLowerCase().includes(searchQuery);
+          return matchCat && matchSearch;
+        });
+
+        if (filtered.length === 0) {
+          grid.innerHTML = `
+            <div style="grid-column:1/-1; text-align:center; padding:3rem; background:var(--bg-card); border-radius:var(--radius-lg); border:1px solid var(--border-color);">
+              <div style="font-size:3rem; margin-bottom:1rem;">📚</div>
+              <h3 style="font-family:var(--font-bengali-serif); font-size:1.4rem; margin-bottom:0.5rem;">কোনো বই পাওয়া যায়নি</h3>
+              <p style="color:var(--text-muted); font-size:0.95rem;">অনুগ্রহ করে অন্য শব্দ বা ক্যাটাগরি দিয়ে চেষ্টা করুন।</p>
+            </div>
+          `;
+          return;
+        }
+
+        grid.innerHTML = filtered.map(book => {
+          const authorsText = book.authors.map(a => a.name).join(' ও ');
+          return `
+            <article class="book-card">
+              <div class="book-header-visual" style="background:${book.cover_color};">
+                <span class="book-tag">${book.category_name_bn} • ${book.year}</span>
+                <div class="book-icon-badge"><svg class="svg-inline-icon" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:24px;height:24px;"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></div>
+              </div>
+              <div class="book-body">
+                <h2 class="book-title">${book.title_bn}</h2>
+                <div class="book-authors">লেখক: ${authorsText}</div>
+                <p class="book-summary">${book.summary_bn}</p>
+                <div class="book-meta-bar">
+                  <span><svg class="svg-inline-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> ${book.reading_time_mins} মিনিট পাঠ</span>
+                  <span><svg class="svg-inline-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg> ${book.chapters.length}টি অধ্যায়</span>
+                  <span><svg class="svg-inline-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg> ${book.pages_count} পৃষ্ঠা</span>
+                </div>
+                <div class="book-action-row">
+                  <a href="book-reader.html?book=${book.slug}" class="btn-read-book">
+                    <svg class="svg-inline-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg> অনলাইনে পড়ুন
+                  </a>
+                  <a href="book-reader.html?book=${book.slug}&view=toc" class="btn-view-toc" title="সূচিপত্র দেখুন">
+                    <svg class="svg-inline-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg> সূচিপত্র
+                  </a>
+                </div>
+              </div>
+            </article>
+          `;
+        }).join('');
+      }
+
+      // Initial Render
+      renderBooks();
+
+      // Category Filter Event
+      filterBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+          filterBtns.forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          currentCategory = btn.getAttribute('data-cat');
+          renderBooks();
+        });
+      });
+
+      // Search Event
+      if (searchInput) {
+        searchInput.addEventListener('input', (e) => {
+          searchQuery = e.target.value.trim().toLowerCase();
+          renderBooks();
+        });
+      }
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initBooksLibrary);
+    } else {
+      initBooksLibrary();
+    }
+  </script>
+</body>
+</html>

@@ -51,13 +51,13 @@ module.exports = async function handler(req, res) {
           enabled: true
         }
       ],
-      exploreTitle: 'Explore the Privatian',
+      exploreTitle: 'Explore The Way (দ্য ওয়ে)',
       explore: [
-        { id: 'exp-1', label: 'Events', href: '/events', target: '_self', enabled: true },
-        { id: 'exp-2', label: 'Article archive', href: '/', target: '_self', enabled: true },
-        { id: 'exp-3', label: 'About us', href: '/', target: '_self', enabled: true },
-        { id: 'exp-4', label: 'News+', href: '/', target: '_self', enabled: true },
-        { id: 'exp-5', label: 'Podcast', href: '/', target: '_self', enabled: true }
+        { id: 'exp-1', label: 'Solidarity Events', href: '/events.html', target: '_self', enabled: true },
+        { id: 'exp-2', label: 'Revolutionary Library', href: '/books.html', target: '_self', enabled: true },
+        { id: 'exp-3', label: 'Submit Essay', href: '/submit-article.html', target: '_self', enabled: true },
+        { id: 'exp-4', label: 'Manifestos & Archives', href: '/section.html?sec=manifestos-archives', target: '_self', enabled: true },
+        { id: 'exp-5', label: 'Editorial HQ', href: '/admin-login.html', target: '_self', enabled: true }
       ],
       latestTitle: 'Read the latest',
       latestMode: 'curated',
@@ -264,7 +264,7 @@ module.exports = async function handler(req, res) {
       hero: {
         main: {
           articleId: null,
-          title: 'The art of private wisdom: how Privatian families shape culture and legacy.',
+          title: 'Karl Marx and Historical Materialism: Understanding Class Struggle in Modern Capitalism.',
           subtitle: 'An exclusive exploration of family heritage, intellectual tradition, and the enduring power of private knowledge.',
           imageUrl: 'img1.png',
           href: '/section/findings',
@@ -274,8 +274,8 @@ module.exports = async function handler(req, res) {
           {
             id: 'h-side-1',
             articleId: null,
-            title: 'Part legacy, part field study: the Privatian story across generations',
-            description: 'From a family archive, the Privatian tradition sees pathways forged through private endeavors',
+            title: 'Lenin and the Theory of Imperialism: How Finance Capital Dominates Global Trade',
+            description: 'From the Paris Commune to October 1917: Lessons of working-class governance and power',
             imageUrl: 'img5.png',
             tag: 'Heritage Archive',
             href: '/section/community-heritage',
@@ -284,7 +284,7 @@ module.exports = async function handler(req, res) {
           {
             id: 'h-side-2',
             articleId: null,
-            title: 'How the Privatian legacy helped define an era of private excellence',
+            title: 'Stalin’s Problems of Leninism: Preserving the Dictatorship of the Proletariat',
             description: "The family's influence on culture, art, and intellectual discourse runs deeper than most realize",
             imageUrl: 'img6.png',
             tag: '',
@@ -297,7 +297,7 @@ module.exports = async function handler(req, res) {
         {
           id: 'sm-1',
           articleId: null,
-          title: 'When Privatians meet: the quiet power of community',
+          title: 'Mao Zedong and the Cultural Revolution: Ideological Struggle Under Socialism',
           imageUrl: 'img2.png',
           href: '/section/community-heritage',
           enabled: true
@@ -313,7 +313,7 @@ module.exports = async function handler(req, res) {
         {
           id: 'sm-3',
           articleId: null,
-          title: 'Liberal tradition in the modern age: how the Privatian family stays ahead',
+          title: 'Engels on the Origin of the Family, Private Property, and the State',
           imageUrl: 'img4.png',
           href: '/section/privacy-values',
           enabled: true
@@ -328,15 +328,15 @@ module.exports = async function handler(req, res) {
             id: 'ev-1',
             date: 'Sep. 22, 2026',
             title: 'Debate, Debrief, and Dissect: The Role of Privacy in the Modern Family and American Life',
-            meta: '4 p.m. Thursday ■ Privatian Forum, Main Hall, Private Campus; via livestream',
+            meta: '4 p.m. Thursday ■ International Anti-Imperialist Forum, Geneva & Livestream',
             href: '/events',
             enabled: true
           },
           {
             id: 'ev-2',
             date: 'Oct. 16, 2026',
-            title: 'America at 250 and Beyond: A Well-Informed Privatian Citizenry',
-            meta: '4 p.m. Friday ■ Privatian Institute, 79 Heritage Ave., Cambridge',
+            title: 'Global Labor Strike and Multipolar Economic Solidarity',
+            meta: '4 p.m. Friday ■ Socialist Research Institute, Global Hub',
             href: '/events',
             enabled: true
           },
@@ -351,7 +351,7 @@ module.exports = async function handler(req, res) {
           {
             id: 'ev-4',
             date: 'Dec. 04, 2026',
-            title: 'Annual Privatian Literary Honors and Endowed Fellowship Awards',
+            title: 'International Socialist Revolutionary Literature & Dialectics Awards',
             meta: '6 p.m. Friday ■ Grand Ballroom, The Way Society',
             href: '/events',
             enabled: true
@@ -360,7 +360,7 @@ module.exports = async function handler(req, res) {
         featured: {
           articleId: null,
           title: "Rubies decoded: 'Heritage is just one piece of the puzzle'",
-          description: 'Rare family gems shine in new Privatian retrospective',
+          description: 'Rare archival manifestos shine in new Socialist retrospective',
           imageUrl: 'img5.png',
           href: '/section/community-heritage',
           enabled: true
@@ -375,7 +375,7 @@ module.exports = async function handler(req, res) {
             sectionSlug: 'community-heritage',
             lead: {
               articleId: null,
-              title: "Don't hold back, the Privatian elders told scholars. It worked.",
+              title: "Karl Marx and Friedrich Engels on Scientific Socialism vs Utopianism",
               imageUrl: 'img2.png',
               href: '/section/community-heritage',
               enabled: true
@@ -384,7 +384,7 @@ module.exports = async function handler(req, res) {
               { id: 'sub-1-1', title: 'Elena Voss named curator of The Way Foundation for Letters', href: '/section/community-heritage', enabled: true },
               { id: 'sub-1-2', title: 'Family council opposes changes to federal heritage-protection programs', href: '/section/community-heritage', enabled: true },
               { id: 'sub-1-3', title: "Henry's remarkable legacy of giving: what it means to the family today", href: '/section/community-heritage', enabled: true },
-              { id: 'sub-1-4', title: 'Letters to the archive: understanding the Privatian correspondence collection', href: '/section/community-heritage', enabled: true }
+              { id: 'sub-1-4', title: 'Lenin and Stalin: Documents from the Bolshevik Central Committee Archive', href: '/section/community-heritage', enabled: true }
             ]
           },
           {
@@ -393,15 +393,15 @@ module.exports = async function handler(req, res) {
             sectionSlug: 'culture',
             lead: {
               articleId: null,
-              title: "For Privatian women in arts, 'not all cultural diets are equal'",
+              title: "Mao Zedong on Culture, Art, and the Proletarian Revolutionary Struggle",
               imageUrl: 'img1.png',
               href: '/section/culture',
               enabled: true
             },
             subArticles: [
-              { id: 'sub-2-1', title: 'AI use surging for creative writing among young Privatian members', href: '/section/culture', enabled: true },
-              { id: 'sub-2-2', title: 'Pen refill? Go for it, says the Privatian Calligraphy Society', href: '/section/culture', enabled: true },
-              { id: 'sub-2-3', title: 'Music residency, says Privatian Arts & Culture Society, is about connection', href: '/section/culture', enabled: true }
+              { id: 'sub-2-1', title: 'Digital labor and socialist alternatives in the age of artificial intelligence', href: '/section/culture', enabled: true },
+              { id: 'sub-2-2', title: 'Revolutionary working-class poetry and international anti-war art', href: '/section/culture', enabled: true },
+              { id: 'sub-2-3', title: 'Songs of liberation and solidarity: The global heritage of socialist music', href: '/section/culture', enabled: true }
             ]
           },
           {
@@ -417,8 +417,8 @@ module.exports = async function handler(req, res) {
             },
             subArticles: [
               { id: 'sub-3-1', title: 'Families alone, yes. But watching the community is another thing.', href: '/section/privacy-values', enabled: true },
-              { id: 'sub-3-2', title: 'Is that family member a Privatian or not — and who decides the rules?', href: '/section/privacy-values', enabled: true },
-              { id: 'sub-3-3', title: 'Bowling alone, yes. But the Privatian family still gathers.', href: '/section/privacy-values', enabled: true }
+              { id: 'sub-3-2', title: 'The class nature of the bourgeois state apparatus: Lenin’s State and Revolution', href: '/section/privacy-values', enabled: true },
+              { id: 'sub-3-3', title: 'Organizing the unorganized: The rise of new militant trade unions globally', href: '/section/privacy-values', enabled: true }
             ]
           },
           {
@@ -427,14 +427,14 @@ module.exports = async function handler(req, res) {
             sectionSlug: 'nation-world',
             lead: {
               articleId: null,
-              title: 'How the Privatian diaspora is keeping tradition alive in a globalized world',
+              title: 'The Palestinian struggle and the international anti-imperialist solidarity movement',
               imageUrl: 'img6.png',
               href: '/section/nation-world',
               enabled: true
             },
             subArticles: [
-              { id: 'sub-4-1', title: 'Bearing down on global secrecy: what the Privatian model teaches us', href: '/section/nation-world', enabled: true },
-              { id: 'sub-4-2', title: 'Currency of trust: how the Privatian family built international networks', href: '/section/nation-world', enabled: true }
+              { id: 'sub-4-1', title: 'Exposing neo-colonial finance capital: IMF, World Bank, and Global South resistance', href: '/section/nation-world', enabled: true },
+              { id: 'sub-4-2', title: 'De-dollarization and multipolar socialist cooperation in the Global South', href: '/section/nation-world', enabled: true }
             ]
           },
           {
@@ -449,7 +449,7 @@ module.exports = async function handler(req, res) {
               enabled: true
             },
             subArticles: [
-              { id: 'sub-5-1', title: 'Rowing, dance: yes. But the Privatian pen holds a special place of honor.', href: '/section/arts-legacy', enabled: true },
+              { id: 'sub-5-1', title: 'Gramsci’s Prison Notebooks: Cultural hegemony and the battle of ideas', href: '/section/arts-legacy', enabled: true },
               { id: 'sub-5-2', title: 'Novelist argues the world needs more well-written letters, not fewer', href: '/section/arts-legacy', enabled: true },
               { id: 'sub-5-3', title: 'Turnover at The Way Society demands that cultural legacy must be paid.', href: '/section/arts-legacy', enabled: true }
             ]
@@ -460,15 +460,15 @@ module.exports = async function handler(req, res) {
             sectionSlug: 'work-economy',
             lead: {
               articleId: null,
-              title: 'Go-to Privatian professionals redefine private practices in modern economy',
+              title: 'The labor theory of value: Why workers create all societal wealth',
               imageUrl: 'img5.png',
               href: '/section/work-economy',
               enabled: true
             },
             subArticles: [
-              { id: 'sub-6-1', title: "Rural flower power: the Privatian family's investment in private land", href: '/section/work-economy', enabled: true },
+              { id: 'sub-6-1', title: "Agrarian reform and peasant movements: Lessons from the Chinese Revolution", href: '/section/work-economy', enabled: true },
               { id: 'sub-6-2', title: 'The Way economy advisor talks to the state of family wealth', href: '/section/work-economy', enabled: true },
-              { id: 'sub-6-3', title: 'Letters of the law: the Privatian legal scholars improve upon family statutes', href: '/section/work-economy', enabled: true }
+              { id: 'sub-6-3', title: 'Critique of the Gotha Programme: From each according to ability, to each according to need', href: '/section/work-economy', enabled: true }
             ]
           }
         ]
@@ -557,7 +557,7 @@ module.exports = async function handler(req, res) {
     const DEFAULT_FOOTER_CONFIG = {
       sectionsTitle: 'Sections',
       enabledSections: null,
-      exploreTitle: 'Explore the Privatian',
+      exploreTitle: 'Explore The Way (দ্য ওয়ে)',
       explore: [
         { id: 'f-exp-1', label: 'Events', href: '/events', target: '_self', enabled: true },
         { id: 'f-exp-2', label: 'Article archive', href: '/', target: '_self', enabled: true },
@@ -578,7 +578,7 @@ module.exports = async function handler(req, res) {
           id: 'f-ser-2',
           title: 'Life | Heritage',
           href: '/section/community-heritage',
-          description: 'A series focused on the personal side of Privatian family research and tradition.',
+          description: 'A theoretical series exploring the core principles of Marxist-Leninist thought.',
           enabled: true
         }
       ],
@@ -589,7 +589,7 @@ module.exports = async function handler(req, res) {
         { id: 'f-soc-3', platform: 'tiktok', label: 'TikTok', href: 'https://tiktok.com', enabled: true },
         { id: 'f-soc-4', platform: 'facebook', label: 'Facebook', href: 'https://facebook.com', enabled: true },
         { id: 'f-soc-5', platform: 'youtube', label: 'YouTube', href: 'https://youtube.com', enabled: true },
-        { id: 'f-soc-6', platform: 'email', label: 'Email', href: 'mailto:contact@privatian.org', enabled: true }
+        { id: 'f-soc-6', platform: 'email', label: 'Email', href: 'mailto:contact@theway-socialism.org', enabled: true }
       ],
       logoSvg: '',
       logoHeight: 80,

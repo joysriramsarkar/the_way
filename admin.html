@@ -3,29 +3,28 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" type="image/svg+xml" href="assets/images/favicon.svg" />
+  <link rel="alternate icon" type="image/svg+xml" href="favicon.svg" />
   <title>Admin — The Way (দ্য ওয়ে)</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@300;400;600;700&family=Libre+Baskerville:wght@400;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="admin.css" />
+  <link rel="stylesheet" href="assets/css/admin.css" />
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="supabase-config.js"></script>
+  <script src="assets/js/supabase-config.js"></script>
 </head>
 <body>
-  <script src="admin-auth.js"></script>
+  <script src="assets/js/admin-auth.js"></script>
 
   <!-- â•â• SIDEBAR â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
   <aside class="sidebar" id="sidebar">
 
     <div class="sidebar-logo">
       <a href="index.html" class="sidebar-logo-link" title="View main website">
-        <svg viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg" class="sidebar-logo-icon">
-          <rect width="36" height="36" rx="6" fill="#0a528e"/>
-          <text x="9" y="26" font-family="Georgia,serif" font-size="22" font-weight="700" fill="#ffffff">P</text>
-        </svg>
+        <img src="assets/images/logo-icon.svg" alt="The Way" style="width:36px;height:36px;object-fit:contain;flex-shrink:0;border-radius:8px;" onerror="this.src='assets/images/favicon.svg'" />
         <div class="sidebar-logo-text">
           <span class="sidebar-logo-title">The Way</span>
-          <span class="sidebar-logo-sub">Admin Panel</span>
+          <span class="sidebar-logo-sub">Editorial HQ</span>
         </div>
       </a>
       <!-- GLOBAL DATABASE SYNC BADGE -->
@@ -102,6 +101,17 @@
           </a>
         </li>
         <li>
+          <a href="#" class="sidebar-nav-item" data-page="submissions" id="nav-submissions">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+              <polyline points="14 2 14 8 20 8"/>
+              <line x1="12" y1="18" x2="12" y2="12"/>
+              <line x1="9" y1="15" x2="15" y2="15"/>
+            </svg>
+            <span>Submissions & Revisions</span>
+          </a>
+        </li>
+        <li>
           <a href="#" class="sidebar-nav-item" data-page="settings" id="nav-settings">
             <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
               <circle cx="12" cy="12" r="3"/>
@@ -118,6 +128,15 @@
               <path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
             </svg>
             <span>Manage Access</span>
+          </a>
+        </li>
+        <li>
+          <a href="#" class="sidebar-nav-item" data-page="movement" id="nav-movement">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
+              <path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+            </svg>
+            <span>Solidarity Network</span>
           </a>
         </li>
         <li>
@@ -163,7 +182,124 @@
       </div>
     </header>
 
-    <!-- PAGE: SECTIONS -->
+    
+    <!-- PAGE: REVOLUTIONARY BOOKS LIBRARY -->
+    <section class="page" id="page-books">
+      <div class="menu-mgr-header" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;flex-wrap:wrap;gap:12px;">
+        <div class="menu-mgr-title-wrap">
+          <h1 class="page-title" style="font-size:22px;font-weight:700;color:var(--text-primary);margin:0 0 4px;">Books &amp; Literature Library</h1>
+          <p class="page-subtitle" style="font-size:13px;color:var(--text-muted);margin:0;">Manage unabridged revolutionary books, scraped wikisource chapters, and paginated web readers</p>
+        </div>
+        <div class="menu-mgr-actions" style="display:flex;align-items:center;gap:10px;">
+          <a href="books.html" target="_blank" class="btn btn--secondary" style="font-size:13px;padding:8px 14px;display:inline-flex;align-items:center;gap:6px;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            View Public Library
+          </a>
+          <button class="btn btn--primary" type="button" onclick="loadAdminBooks()" style="font-size:13px;padding:8px 16px;display:inline-flex;align-items:center;gap:6px;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+            Sync Database
+          </button>
+        </div>
+      </div>
+
+      <!-- Books Overview Stats -->
+      <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(200px, 1fr));gap:16px;margin-bottom:24px;">
+        <div class="card" style="padding:16px 20px;border-left:4px solid #c2182b;">
+          <div style="font-size:12px;font-weight:700;color:var(--text-muted);text-transform:uppercase;">Active Web Books</div>
+          <div id="books-stat-count" style="font-size:24px;font-weight:800;color:var(--text-primary);margin-top:4px;">6</div>
+        </div>
+        <div class="card" style="padding:16px 20px;border-left:4px solid #059669;">
+          <div style="font-size:12px;font-weight:700;color:var(--text-muted);text-transform:uppercase;">Database Stored Chapters</div>
+          <div id="books-stat-chapters" style="font-size:24px;font-weight:800;color:#059669;margin-top:4px;">36</div>
+        </div>
+        <div class="card" style="padding:16px 20px;border-left:4px solid #d97706;">
+          <div style="font-size:12px;font-weight:700;color:var(--text-muted);text-transform:uppercase;">Storage Engine</div>
+          <div style="font-size:15px;font-weight:700;color:var(--text-primary);margin-top:8px;">Supabase + Local Cache</div>
+        </div>
+      </div>
+
+      <!-- Books Grid & Table -->
+      <div class="card" style="padding:0;overflow:hidden;">
+        <div style="padding:16px 20px;border-bottom:1px solid #e2e8f0;display:flex;justify-content:space-between;align-items:center;background:#f8fafc;">
+          <h3 style="margin:0;font-size:15px;font-weight:700;color:var(--text-primary);">Books Collection</h3>
+          <input type="text" id="books-admin-search" placeholder="Search books by title, author..." oninput="filterAdminBooks(this.value)"
+            style="padding:6px 12px;border:1px solid #cbd5e1;border-radius:6px;font-size:13px;width:240px;" />
+        </div>
+        <table class="data-table" id="admin-books-table">
+          <thead>
+            <tr>
+              <th>Book Title &amp; Details</th>
+              <th>Author &amp; Translator</th>
+              <th>Category</th>
+              <th>Year</th>
+              <th>Chapters / Pages</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="admin-books-tbody">
+            <tr>
+              <td colspan="6" style="text-align:center;padding:30px;color:var(--text-muted);">Loading books from database...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+
+    <!-- PAGE: MOVEMENT & SOLIDARITY SIGNUPS -->
+    <section class="page" id="page-movement">
+      <div class="menu-mgr-header" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;flex-wrap:wrap;gap:12px;">
+        <div class="menu-mgr-title-wrap">
+          <h1 class="page-title" style="font-size:22px;font-weight:700;color:var(--text-primary);margin:0 0 4px;">Solidarity &amp; Movement Network</h1>
+          <p class="page-subtitle" style="font-size:13px;color:var(--text-muted);margin:0;">Members and activists who joined via the public "সংগঠিত হোন" solidarity portal</p>
+        </div>
+        <div class="menu-mgr-actions" style="display:flex;align-items:center;gap:10px;">
+          <button class="btn btn--primary" type="button" onclick="loadAdminMovementSignups()" style="font-size:13px;padding:8px 16px;display:inline-flex;align-items:center;gap:6px;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+            Refresh Members
+          </button>
+        </div>
+      </div>
+
+      <!-- Filter Tabs -->
+      <div class="tab-bar">
+        <button class="tab-btn active" onclick="filterMovementTab('all', this)">
+          All Members <span class="tab-count" id="mov-count-all">0</span>
+        </button>
+        <button class="tab-btn" onclick="filterMovementTab('new', this)">
+          New / Uncontacted <span class="tab-count" id="mov-count-new">0</span>
+        </button>
+        <button class="tab-btn" onclick="filterMovementTab('contacted', this)">
+          Contacted <span class="tab-count" id="mov-count-contacted">0</span>
+        </button>
+        <button class="tab-btn" onclick="filterMovementTab('active', this)">
+          Active Organizers <span class="tab-count" id="mov-count-active">0</span>
+        </button>
+      </div>
+
+      <!-- Members Table -->
+      <div class="card" style="padding:0;overflow:hidden;">
+        <table class="data-table" id="admin-movement-table">
+          <thead>
+            <tr>
+              <th>Member Name &amp; Email</th>
+              <th>Area of Engagement / Interest</th>
+              <th>Location</th>
+              <th>Signup Date</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="admin-movement-tbody">
+            <tr>
+              <td colspan="6" style="text-align:center;padding:30px;color:var(--text-muted);">Loading movement signups...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+<!-- PAGE: SECTIONS -->
     <section class="page active" id="page-sections">
 
       <!-- Sections Header & Status -->
@@ -469,7 +605,7 @@
         </button>
         <button class="tab-btn" id="tab-menu-explore" onclick="switchMenuTab('explore')">
           <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>
-          <span>Explore the Privatian</span>
+          <span>Explore The Way (দ্য ওয়ে)</span>
           <span class="tab-count" id="count-menu-explore">0</span>
         </button>
         <button class="tab-btn" id="tab-menu-latest" onclick="switchMenuTab('latest')">
@@ -505,12 +641,12 @@
         </div>
       </div>
 
-      <!-- Tab Panel: Explore the Privatian -->
+      <!-- Tab Panel: Explore The Way (দ্য ওয়ে) -->
       <div class="menu-tab-panel" id="panel-menu-explore" style="display:none;">
         <div class="card" style="padding:22px;margin-bottom:20px;">
           <div class="form-group" style="margin-bottom:18px;">
             <label class="form-label" for="menu-explore-title-input">Explore Section Title</label>
-            <input type="text" id="menu-explore-title-input" class="form-input" placeholder="Explore the Privatian" value="Explore the Privatian" maxlength="50" oninput="onMenuTitleInput('exploreTitle', this.value)" />
+            <input type="text" id="menu-explore-title-input" class="form-input" placeholder="Explore The Way (দ্য ওয়ে)" value="Explore The Way (দ্য ওয়ে)" maxlength="50" oninput="onMenuTitleInput('exploreTitle', this.value)" />
           </div>
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
             <h3 style="font-size:14px;font-weight:700;color:var(--text-primary);margin:0;">Explore Links</h3>
@@ -645,7 +781,7 @@
         <div class="card" style="padding:24px;margin-bottom:20px;border-radius:12px;">
           <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:14px;margin-bottom:20px;">
             <label class="form-label" for="ft-explore-title-input" style="font-weight:700;color:#0f172a;margin-bottom:6px;">Explore Column Header Title</label>
-            <input type="text" id="ft-explore-title-input" class="form-input" placeholder="Explore the Privatian" value="Explore the Privatian" maxlength="60" oninput="onFooterTitleInput('exploreTitle', this.value)" style="background:#fff;" />
+            <input type="text" id="ft-explore-title-input" class="form-input" placeholder="Explore The Way (দ্য ওয়ে)" value="Explore The Way (দ্য ওয়ে)" maxlength="60" oninput="onFooterTitleInput('exploreTitle', this.value)" style="background:#fff;" />
           </div>
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
             <div>
@@ -1251,7 +1387,7 @@
 
           <div class="form-group" style="margin-bottom:20px;">
             <label class="form-label" for="studio-desc-input" style="font-weight:700;">Section Subtitle &amp; SEO Description (Header Bar &amp; Social Meta)</label>
-            <textarea id="studio-desc-input" class="form-input" rows="3" placeholder="e.g. Exploring insightful reporting, cultural roots, and narratives across the Privatian community…"></textarea>
+            <textarea id="studio-desc-input" class="form-input" rows="3" placeholder="e.g. Exploring insightful reporting, cultural roots, and narratives across the TheWay community…"></textarea>
             <p style="font-size:11.5px;color:var(--text-muted);margin-top:4px;">This description appears directly below the section title on the website header bar and in Google / social search cards.</p>
           </div>
 
@@ -1424,13 +1560,44 @@
   </div>
 
   <!-- â•â• TOAST CONTAINER â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
-  <!-- == PAGE: MANAGE ACCESS == -->
+  <!-- == PAGE: SUBMISSIONS & REVISIONS == -->
+  <section class="page" id="page-submissions">
+    <div class="menu-mgr-header" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;flex-wrap:wrap;gap:12px;">
+      <div class="menu-mgr-title-wrap">
+        <h1 class="page-title" style="font-size:22px;font-weight:700;color:var(--text-primary);margin:0 0 4px;">Submissions & Revisions Review Studio</h1>
+        <p class="page-subtitle" style="font-size:13px;color:var(--text-muted);margin:0;">Review, approve, and publish new article drafts or edit revision proposals submitted by writers & readers.</p>
+      </div>
+      <div class="menu-mgr-actions" style="display:flex;align-items:center;gap:10px;">
+        <button class="btn btn--secondary" onclick="loadAdminSubmissions()" style="height:36px;font-size:13px;display:flex;align-items:center;gap:6px;">
+          🔄 Refresh
+        </button>
+      </div>
+    </div>
+
+    <!-- Filter Buttons -->
+    <div style="display:flex; gap:8px; margin-bottom:16px; flex-wrap:wrap;">
+      <button class="btn sub-filter-btn active" data-filter="all" onclick="filterAdminSubmissions('all', this)" style="padding:6px 14px;font-size:12.5px;">All</button>
+      <button class="btn sub-filter-btn" data-filter="pending" onclick="filterAdminSubmissions('pending', this)" style="padding:6px 14px;font-size:12.5px;color:#d97706;border-color:#d97706;">⏳ Pending</button>
+      <button class="btn sub-filter-btn" data-filter="approved" onclick="filterAdminSubmissions('approved', this)" style="padding:6px 14px;font-size:12.5px;color:#059669;border-color:#059669;">✓ Approved</button>
+      <button class="btn sub-filter-btn" data-filter="rejected" onclick="filterAdminSubmissions('rejected', this)" style="padding:6px 14px;font-size:12.5px;color:#dc2626;border-color:#dc2626;">✕ Rejected</button>
+    </div>
+
+    <!-- Submissions Table Card -->
+    <div class="card" style="border-radius:12px;border:1px solid #e5e7eb;overflow:hidden;">
+      <div style="padding:16px 20px;background:#f9fafb;border-bottom:1px solid #e5e7eb;font-weight:600;font-size:14px;">Incoming Submissions & Revisions</div>
+      <div id="admin-submissions-container">
+        <div style="text-align:center;padding:40px;color:#9ca3af;">Loading submissions...</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- == PAGE: MANAGE ACCESS & USERS == -->
   <section class="page" id="page-access">
     <!-- Manage Access Header & Status -->
     <div class="menu-mgr-header" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;flex-wrap:wrap;gap:12px;">
       <div class="menu-mgr-title-wrap">
-        <h1 class="page-title" style="font-size:22px;font-weight:700;color:var(--text-primary);margin:0 0 4px;">Manage Access</h1>
-        <p class="page-subtitle" style="font-size:13px;color:var(--text-muted);margin:0;">Manage who can access the Admin Panel. Only authorized admins can manage permissions.</p>
+        <h1 class="page-title" style="font-size:22px;font-weight:700;color:var(--text-primary);margin:0 0 4px;">User & Admin Accounts Management</h1>
+        <p class="page-subtitle" style="font-size:13px;color:var(--text-muted);margin:0;">Create, assign roles, and manage permissions for Admins, Editors, Moderators, and Contributors.</p>
       </div>
       <div class="menu-mgr-actions" style="display:flex;align-items:center;gap:10px;">
         <div id="access-save-status-wrap" class="ft-header-badge synced" title="Access whitelist database status">
@@ -1439,27 +1606,43 @@
         </div>
       </div>
     </div>
+
+    <!-- Add New User Form -->
     <div class="card" style="margin-bottom:24px;border-radius:12px;border:1px solid #e5e7eb;overflow:hidden;">
-      <div style="padding:16px 20px;background:#f9fafb;border-bottom:1px solid #e5e7eb;font-weight:600;font-size:14px;">Add Whitelisted Email</div>
-      <div style="padding:20px;display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap;">
+      <div style="padding:16px 20px;background:#f9fafb;border-bottom:1px solid #e5e7eb;font-weight:600;font-size:14px;">Add New User / Admin Account</div>
+      <div style="padding:20px;display:flex;gap:14px;align-items:flex-end;flex-wrap:wrap;">
+        <div style="flex:1;min-width:180px;">
+          <label style="display:block;font-size:11px;font-weight:700;margin-bottom:6px;color:#6b7280;text-transform:uppercase;letter-spacing:.06em;">Full Name</label>
+          <input type="text" id="access-name-input" placeholder="e.g. ড. সৌমিক রায়হান"
+            style="width:100%;padding:9px 13px;border:1px solid #d1d5db;border-radius:8px;font-size:14px;outline:none;font-family:inherit;" />
+        </div>
         <div style="flex:1;min-width:200px;">
-          <label style="display:block;font-size:11px;font-weight:700;margin-bottom:6px;color:#6b7280;text-transform:uppercase;letter-spacing:.06em;">Email Address</label>
-          <input type="email" id="access-email-input" placeholder="user@example.com"
+          <label style="display:block;font-size:11px;font-weight:700;margin-bottom:6px;color:#6b7280;text-transform:uppercase;letter-spacing:.06em;">Email Address *</label>
+          <input type="email" id="access-email-input" placeholder="user@example.com" required
+            style="width:100%;padding:9px 13px;border:1px solid #d1d5db;border-radius:8px;font-size:14px;outline:none;font-family:inherit;" />
+        </div>
+        <div style="flex:1;min-width:160px;">
+          <label style="display:block;font-size:11px;font-weight:700;margin-bottom:6px;color:#6b7280;text-transform:uppercase;letter-spacing:.06em;">Password</label>
+          <input type="password" id="access-pwd-input" placeholder="Default: theway@admin2026"
             style="width:100%;padding:9px 13px;border:1px solid #d1d5db;border-radius:8px;font-size:14px;outline:none;font-family:inherit;" />
         </div>
         <div style="min-width:150px;">
-          <label style="display:block;font-size:11px;font-weight:700;margin-bottom:6px;color:#6b7280;text-transform:uppercase;letter-spacing:.06em;">Role</label>
+          <label style="display:block;font-size:11px;font-weight:700;margin-bottom:6px;color:#6b7280;text-transform:uppercase;letter-spacing:.06em;">Role *</label>
           <select id="access-role-select"
             style="width:100%;padding:9px 13px;border:1px solid #d1d5db;border-radius:8px;font-size:14px;outline:none;background:#fff;font-family:inherit;">
-            <option value="Moderator">Moderator</option>
-            <option value="Admin">Admin</option>
+            <option value="Contributor" selected>Contributor (লেখক/পাঠক)</option>
+            <option value="Editor">Editor (সম্পাদক)</option>
+            <option value="Moderator">Moderator (মডারেটর)</option>
+            <option value="Admin">Admin (অ্যাডমিন)</option>
           </select>
         </div>
-        <button class="btn btn--primary" id="access-add-btn" style="height:40px;padding:0 20px;white-space:nowrap;">Add to Whitelist</button>
+        <button class="btn btn--primary" id="access-add-btn" style="height:40px;padding:0 20px;white-space:nowrap;">Create / Whitelist Account</button>
       </div>
     </div>
+
+    <!-- Accounts List Card -->
     <div class="card" style="border-radius:12px;border:1px solid #e5e7eb;overflow:hidden;">
-      <div style="padding:16px 20px;background:#f9fafb;border-bottom:1px solid #e5e7eb;font-weight:600;font-size:14px;">Current Whitelist</div>
+      <div style="padding:16px 20px;background:#f9fafb;border-bottom:1px solid #e5e7eb;font-weight:600;font-size:14px;">Registered Users & Whitelist</div>
       <div id="access-list"><div style="text-align:center;padding:40px;color:#9ca3af;">Loading...</div></div>
     </div>
   </section>
@@ -1686,7 +1869,7 @@
         </div>
         <div class="form-group" style="margin-top:12px;">
           <label class="form-label" for="hp-event-meta-input">Time &amp; Venue / Details</label>
-          <input type="text" id="hp-event-meta-input" class="form-input" placeholder="e.g. 4 p.m. Thursday ■ Privatian Forum" maxlength="150" />
+          <input type="text" id="hp-event-meta-input" class="form-input" placeholder="e.g. 4 p.m. Thursday ■ TheWay Forum" maxlength="150" />
         </div>
         <div class="form-group" style="margin-top:12px;">
           <label class="form-label" for="hp-event-link-input">Event Link URL</label>
@@ -1890,7 +2073,7 @@
 
   <div class="toast-container" id="toast-container" aria-live="polite"></div>
 
-  <script src="admin.js"></script>
+  <script src="assets/js/admin.js"></script>
 </body>
 </html>
 

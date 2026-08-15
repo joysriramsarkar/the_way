@@ -1,13 +1,14 @@
 /**
  * THE WAY (দ্য ওয়ে) — Supabase Configuration & Resilient Fallback Engine
  * International Socialist Editorial & Movement Portal
+ * Curated Articles & Foundational Texts: Marx, Engels, Lenin, Stalin, Mao Zedong, Gramsci
  */
 
 (function(window) {
   'use strict';
 
-  const DEFAULT_SUPABASE_URL = 'https://aenhajqjsgskimfzvlfr.supabase.co';
-  const DEFAULT_SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFlbmhhanFqc2dza2ltZnp2bGZyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY2MDc1MDUsImV4cCI6MjEwMjE4MzUwNX0.q0wmF77hpsb8M7CQOYMq8GrDuQJ32vn1NcWFXTc5UAY';
+  const DEFAULT_SUPABASE_URL = 'https://gyhkpjjwwiakhpdqatuh.supabase.co';
+  const DEFAULT_SUPABASE_ANON_KEY = 'sb_publishable_I0VMIhMDmPpuLH0MpEvaKA_c_vDrRSV';
 
   const SUPABASE_URL = window.SUPABASE_URL || DEFAULT_SUPABASE_URL;
   const SUPABASE_ANON_KEY = window.SUPABASE_ANON_KEY || DEFAULT_SUPABASE_ANON_KEY;
@@ -29,12 +30,12 @@
   // Pre-loaded revolutionary socialist sections
   const DEFAULT_SECTIONS = [
     { name: 'সমস্ত লেখা', name_en: 'All Articles', slug: 'all', admin_id: 'all', display_order: 0, is_active: true, locked: true, subtitle: 'আন্তর্জাতিক সমাজতান্ত্রিক চিন্তন ও গণআন্দোলনের সামগ্রিক মহাফেজখানা' },
-    { name: 'তত্ত্ব ও দর্শন', name_en: 'Theory & Philosophy', slug: 'theory-philosophy', admin_id: 'theory-philosophy', display_order: 1, is_active: true, locked: false, subtitle: 'মার্ক্সীয় দ্বন্দ্ববাদ, ঐতিহাসিক বস্তুবাদ, উত্তর-ঔপনিবেশিক পাঠ ও মুক্তিচিন্তা' },
+    { name: 'তত্ত্ব ও দর্শন', name_en: 'Theory & Philosophy', slug: 'theory-philosophy', admin_id: 'theory-philosophy', display_order: 1, is_active: true, locked: false, subtitle: 'মার্ক্সীয় দ্বন্দ্ববাদ, ঐতিহাসিক বস্তুবাদ, লেনিনবাদ ও মুক্তিদর্শন' },
     { name: 'সাম্রাজ্যবাদ ও বিশ্ব-রাজনীতি', name_en: 'Imperialism & Geopolitics', slug: 'imperialism-geopolitics', admin_id: 'imperialism-geopolitics', display_order: 2, is_active: true, locked: false, subtitle: 'নব্য-সাম্রাজ্যবাদী আগ্রাসন, গ্লোবাল সাউথ প্রতিরোধ ও প্যালেস্টাইন সংহতি' },
     { name: 'শ্রম ও গণসংগ্রাম', name_en: 'Labor & Peasant Movements', slug: 'labor-peasant', admin_id: 'labor-peasant', display_order: 3, is_active: true, locked: false, subtitle: 'শ্রমিক ধর্মঘট, কৃষক জাগরণ, গিগ-শ্রমিক প্রতিরোধ ও ট্রেড ইউনিয়ন আন্দোলন' },
-    { name: 'রাজনৈতিক অর্থনীতি', name_en: 'Political Economy', slug: 'political-economy', admin_id: 'political-economy', display_order: 4, is_active: true, locked: false, subtitle: 'নব্য-উদারবাদের সংকট, সম্পদ পুঞ্জীভবন ও সমাজতান্ত্রিক অর্থনীতির বিকল্প' },
-    { name: 'সংস্কৃতি ও বিপ্লব', name_en: 'Culture & Revolution', slug: 'culture-revolution', admin_id: 'culture-revolution', display_order: 5, is_active: true, locked: false, subtitle: 'বিপ্লবী সাহিত্য, গণসঙ্গীত, সিনেমা, গণসংস্কৃতি ও সাংস্কৃতিক হেজেমনি' },
-    { name: 'ইশতেহার ও দলিল', name_en: 'Manifestos & Archives', slug: 'manifestos-archives', admin_id: 'manifestos-archives', display_order: 6, is_active: true, locked: false, subtitle: 'ঐতিহাসিক সমাজতান্ত্রিক ঘোষণাপত্র, শ্রমিক আন্দোলনের চার্টার ও রণনীতি' }
+    { name: 'রাজনৈতিক অর্থনীতি', name_en: 'Political Economy', slug: 'political-economy', admin_id: 'political-economy', display_order: 4, is_active: true, locked: false, subtitle: 'নব্য-উদারবাদের সংকট, উদ্বৃত্ত মূল্য ও সমাজতান্ত্রিক অর্থনীতির বিকল্প' },
+    { name: 'সংস্কৃতি ও বিপ্লব', name_en: 'Culture & Revolution', slug: 'culture-revolution', admin_id: 'culture-revolution', display_order: 5, is_active: true, locked: false, subtitle: 'মহান সর্বহারা সাংস্কৃতিক বিপ্লব, বিপ্লবী শিল্প-সাহিত্য ও প্রতি-আধিপত্য' },
+    { name: 'ইশতেহার ও দলিল', name_en: 'Manifestos & Archives', slug: 'manifestos-archives', admin_id: 'manifestos-archives', display_order: 6, is_active: true, locked: false, subtitle: 'ঐতিহাসিক কমিউনিস্ট ঘোষণাপত্র, পার্টি দলিল ও বৈপ্লবিক রণনীতি' }
   ];
 
   // Pre-loaded inaugural socialist essays & analyses
@@ -64,255 +65,165 @@
         <p class="lead-paragraph">একবিংশ শতাব্দীর তৃতীয় দশকে এসে বিশ্ব পুঁজিবাদী ব্যবস্থা তার ইতিহাসে সবচেয়ে গভীর ও তীব্র বহুমাত্রিক সংকটের মুখোমুখি। একদিকে চরম সম্পদ পুঞ্জীভবন, যেখানে বিশ্বের শীর্ষ ১ শতাংশ ধনী বৈশ্বিক সম্পদের অর্ধেকের বেশি নিয়ন্ত্রণ করছে; অন্যদিকে কোটি কোটি মেহনতি মানুষ শিকার হচ্ছে সীমাহীন মুদ্রাস্ফীতি, বেকারত্ব ও জলবায়ু বিপর্যয়ের। এই প্রেক্ষাপটে 'দ্য ওয়ে' হাজির হয়েছে এক সুস্পষ্ট ঐতিহাসিক ঘোষণাপত্র নিয়ে—সমাজতন্ত্র কোনো অতীত স্মৃতি নয়, বরং মানবজাতির মুক্তির একমাত্র জীবন্ত ভবিষ্যৎ।</p>
         
         <h2>১. নব্য-উদারবাদের পতন ও যুদ্ধের উন্মাদনা</h2>
-        <p>নব্য-উদারবাদী বিশ্বায়নের যে মোহময় মিথ্যা গত চার দশক ধরে বাজার অর্থনীতি প্রচার করেছিল, তা আজ ধসে পড়েছে। ওয়াশিংটন কনসেনসাস ও সাম্রাজ্যবাদী আর্থিক প্রতিষ্ঠানগুলো (আইএমএফ, বিশ্বব্যাংক) গ্লোবাল সাউথের দেশগুলোকে ঋণের ফাঁদে ফেলে তাদের সার্বভৌমত্ব কেড়ে নিয়েছে। যখনই কোনো জাতি নিজস্ব প্রাকৃতিক সম্পদের ওপর জনগণের অধিকার প্রতিষ্ঠা করতে চেয়েছে, তখনই নেমে এসেছে নিষেধাজ্ঞা, সামরিক ক্যু অথবা সরাসরি যুদ্ধ।</p>
+        <p>নব্য-উদারবাদী বিশ্বায়নের যে মোহময় মিথ্যা গত চার দশক ধরে বাজার অর্থনীতি প্রচার করেছিল, তা আজ ধসে পড়েছে। ওয়াশিংটন কনসেনসাস ও সাম্রাজ্যবাদী আর্থিক প্রতিষ্ঠানগুলো গ্লোবাল সাউথের দেশগুলোকে ঋণের ফাঁদে ফেলে তাদের সার্বভৌমত্ব কেড়ে নিয়েছে।</p>
 
         <blockquote class="featured-quote">
           <p>“সাম্রাজ্যবাদ কেবল ভৌগোলিক দখলদারিত্ব নয়; এটি হলো পুঁজির বিশ্বজনীন একচেটিয়া শোষণ কাঠামো, যা মানুষের শ্রম ও প্রকৃতির রক্ত শুষে নিয়ে গুটিকয়েক করপোরেট সাম্রাজ্য গড়ে তোলে।”</p>
           <cite>— দ্য ওয়ে ইশতেহার, ২০২৬</cite>
         </blockquote>
 
-        <h2>২. গ্লোবাল সাউথের জেগে ওঠা ও বহুমেরুকেন্দ্রিক বিশ্ব</h2>
-        <p>পশ্চিমের একমেরুকেন্দ্রিক আধিপত্য ও ডলারের একচেটিয়া সাম্রাজ্য আজ চ্যালেঞ্জের মুখে। লাতিন আমেরিকা থেকে আফ্রিকা, মধ্যপ্রাচ্য থেকে এশিয়া—সর্বত্র জনগণের মাঝে জন্ম নিচ্ছে নতুন সাম্রাজ্যবাদবিরোধী চেতনা। ফিলিস্তিনের মুক্তিকামী জনতার দীর্ঘস্থায়ী লড়াই গোটা বিশ্বের বিবেককে নাড়া দিয়েছে এবং পশ্চিমা সাম্রাজ্যবাদের মুখোশ উন্মোচন করে দিয়েছে।</p>
-
-        <div class="callout callout-red">
-          <h4>বৈপ্লবিক সংহতির মূল স্তম্ভসমূহ:</h4>
-          <ul>
-            <li><strong>শ্রমের সামাজিকীকরণ:</strong> উৎপাদনের প্রধান উপায়গুলোর ওপর মুনাফালোভী করপোরেট মালিকানার অবসান ও গণতান্ত্রিক গণমালিকানা প্রতিষ্ঠা।</li>
-            <li><strong>আন্তর্জাতিক শ্রমিক সংহতি:</strong> জাতীয় ও আঞ্চলিক বিভাজন ভেঙে বিশ্বজুড়ে শ্রমিক শ্রেণির ঐক্যবদ্ধ আন্দোলন।</li>
-            <li><strong>পরিবেশগত সমাজতন্ত্র (Eco-Socialism):</strong> মুনাফার জন্য প্রকৃতি ধ্বংস নয়, বরং পরিবেশের সুরক্ষায় পরিকল্পিত অর্থনীতি।</li>
-          </ul>
-        </div>
-
-        <h2>৩. আমাদের অঙ্গীকার ও পথচলা</h2>
-        <p>‘দ্য ওয়ে’ কেবল একটি নিবন্ধ পাঠের পোর্টাল নয়; এটি হলো বিপ্লবীদের চিন্তার যুদ্ধক্ষেত্র ও আন্তর্জাতিক নেটওয়ার্ক। আমরা মেহনতি মানুষের প্রতিশব্দ হতে চাই, কারখানার মজুর থেকে মাঠের কৃষক, ক্যাম্পাসের বিদ্রোহী শিক্ষার্থী থেকে বুদ্ধিজীবী—সবার চিন্তার মশাল প্রজ্বলিত রাখা আমাদের অঙ্গীকার।</p>
+        <h2>২. মার্ক্স, লেনিন ও সমাজতান্ত্রিক বিপ্লবের উত্তরাধিকার</h2>
+        <p>কার্ল মার্ক্স ও ফ্রিডরিখ এঙ্গেলসের বৈজ্ঞানিক সমাজতন্ত্র, লেনিনের সাম্রাজ্যবাদ ও রাষ্ট্রতত্ত্ব, স্ট্যালিনের সমাজতান্ত্রিক নির্মাণ ও পার্টি কাঠামোর বিকাশ, এবং মাও সেতুং-এর সাংস্কৃতিক বিপ্লব ও গণলাইন—এই সমস্ত ঐতিহাসিক অভিজ্ঞতাকে ধারণ করেই আমাদের একবিংশ শতাব্দীর নতুন সমাজতান্ত্রিক বিকল্পের রূপরেখা নির্মাণ করতে হবে।</p>
       `
     },
     {
-      id: 'art-gramsci-hegemony',
-      slug: 'gramsci-hegemony-and-counter-hegemonic-struggle',
-      title: 'গ্রামশি, হেজেমনি ও সাংস্কৃতিক প্রতিরোধের আধুনিক রণকৌশল',
-      title_en: 'Gramsci, Hegemony and Modern Strategies of Counter-Hegemony',
-      deck: 'শাসক শ্রেণি কেবল বন্দুক দিয়ে নয়, চিন্তা ও সংস্কৃতির প্রভুত্ব দিয়ে রাজত্ব করে। কেন সাংস্কৃতিক প্রতিরোধ বিপ্লবের অবিচ্ছেদ্য অংশ?',
+      id: 'art-stalin-problems-leninism',
+      slug: 'stalin-problems-of-leninism-contemporary-relevance',
+      title: 'স্ট্যালিনের ‘Problems of Leninism’ ও সমাজতান্ত্রিক নির্মাণের ঐতিহাসিক প্রাসঙ্গিকতা',
+      title_en: 'Stalin’s Problems of Leninism & The Construction of Socialist Society',
+      deck: 'সাম্রাজ্যবাদী ঘেরাওয়ের মুখে প্রলেতারীয় একনায়কত্ব রক্ষা, পার্টি শৃঙ্খলা এবং কৃষক-শ্রমিক মৈত্রীর দ্বান্দ্বিক পাঠ।',
       section: 'theory-philosophy',
       section_name: 'তত্ত্ব ও দর্শন',
-      author: 'ড. সৌমিক রায়হান',
-      author_role: 'রাজনৈতিক তাত্ত্বিক ও লেখক',
-      author_bio: 'ড. সৌমিক রায়হান মার্ক্সীয় তত্ত্ব, সংস্কৃতি ও ফ্রাঙ্কফুর্ট স্কুল নিয়ে গবেষণা করেন।',
+      author: 'প্রফেসর অমিত দাশগুপ্ত',
+      author_role: 'সোভিয়েত ইতিহাস ও মার্ক্সীয় দর্শন গবেষক',
+      author_bio: 'সমাজতান্ত্রিক রূপান্তর ও বিশ শতকের বলশেভিক ইতিহাস বিশেষজ্ঞ।',
       author_photo_url: 'assets/images/img2.png',
       hero_img_url: 'assets/images/img2.png',
-      hero_img_alt: 'অ্যান্তোনিও গ্রামশির দার্শনিক প্রতিকৃতি',
-      hero_caption: 'কারাগারে বসে গ্রামশি যে নোটবুক রচনা করেছিলেন, তা আধুনিক বিপ্লবের পথনির্দেশক।',
-      hero_credit: 'দ্য ওয়ে থিওরি কালেকশন',
+      hero_img_alt: 'লেনিন ও স্ট্যালিনের তাত্ত্বিক দলিল',
+      hero_caption: 'লেনিনবাদের সমস্যাবলি: সাম্রাজ্যবাদের যুগে সর্বহারা বিপ্লবের বিজ্ঞান।',
+      hero_credit: 'দ্য ওয়ে ইতিহাস আর্কাইভ',
       lang: 'bn',
-      tags: 'গ্রামশি, হেজেমনি, মার্ক্সবাদ, দর্শন, সংস্কৃতি',
+      tags: 'স্ট্যালিন, লেনিনবাদ, সমাজতন্ত্র, পার্টি, প্রলেতারিয়েত',
       status: 'published',
-      published_at: '2026-08-14T14:30:00.000Z',
-      created_at: '2026-08-14T14:30:00.000Z',
+      published_at: '2026-08-15T08:00:00.000Z',
+      created_at: '2026-08-15T08:00:00.000Z',
       content_html: `
-        <p class="lead-paragraph">ইতালীয় মার্ক্সবাদী চিন্তাবিদ আন্তোনিও গ্রামশি যখন মুসোলিনির ফ্যাসিস্ট কারাগারে বন্দি ছিলেন, তখন তিনি লিখেছিলেন: <em>“পুরনো বিশ্ব মরছে, এবং নতুন বিশ্ব জন্ম নিতে লড়াই করছে: এই সংকটকালে নানা রকম দানবের জন্ম হয়।”</em> আজ একবিংশ শতকে যখন নব্য-ফ্যাসিবাদ ও দক্ষিণপন্থী পপুলিজম বিশ্বজুড়ে মাথাচাড়া দিচ্ছে, তখন গ্রামশির ‘সাংস্কৃতিক হেজেমনি’ (Cultural Hegemony) তত্ত্ব বোঝা আগের চেয়ে অনেক বেশি জরুরি হয়ে পড়েছে।</p>
+        <p class="lead-paragraph">১৯২৬ সালে জোসেফ স্ট্যালিন রচিত <em>‘Problems of Leninism’ (লেনিনবাদের সমস্যাবলি)</em> সমাজতান্ত্রিক ইতিহাসের এক অন্যতম প্রভাবশালী তাত্ত্বিক দলিল। লেনিন মৃত্যুর পর যখন আন্তর্জাতিক বলশেভিক আন্দোলনের সামনে পথনির্দেশনার প্রশ্ন দেখা দিয়েছিল, তখন স্ট্যালিন অত্যন্ত প্রাঞ্জল ও সুশৃঙ্খলভাবে লেনিনবাদের সারবত্তাকে সংজ্ঞায়িত করেছিলেন।</p>
         
-        <h2>আধিপত্য বনাম সম্মতি: শাসক শ্রেণির অস্ত্র</h2>
-        <p>গ্রামশি দেখিয়েছেন, বুর্জোয়া শ্রেণি তাদের শাসন টিকিয়ে রাখে দুটি উপায়ে: একটি হলো বলপ্রয়োগ (রাষ্ট্রযন্ত্র, পুলিশ, সেনাবাহিনী) এবং অন্যটি হলো ‘সম্মতি উৎপাদন’ (স্কুল, গণমাধ্যম, ধর্ম, শিল্প ও জনপ্রিয় সংস্কৃতি)। পুঁজিবাদ মানুষের মনে এই বিশ্বাস তৈরি করে যে তাদের শোষণমূলক ব্যবস্থাপনাই হলো ‘স্বাভাবিক’ ও ‘একমাত্র বিকল্প’।</p>
-
-        <blockquote class="pull-quote">
-          “বিপ্লব কেবল রাষ্ট্রীয় ক্ষমতা দখলের যুদ্ধ নয়; এটি হলো মানুষের মননে বুর্জোয়া ভাবাদর্শের বিরুদ্ধে বিকল্প সমাজতান্ত্রিক সংস্কৃতির স্থায়ী জয়।”
-        </blockquote>
-
-        <h2>কাউন্টার-হেজেমনি গড়ে তোলার পথ</h2>
-        <p>একটি কার্যকর বিপ্লবের জন্য ‘ওয়ার অব পজিশন’ (War of Position) পরিচালনা করতে হবে। সমাজতান্ত্রিক বুদ্ধিজীবীদের ভূমিকা হলো মেহনতি শ্রেণির সাথে অঙ্গাঙ্গীভাবে যুক্ত হয়ে ‘জৈব বুদ্ধিজীবী’ (Organic Intellectuals) হিসেবে গড়ে ওঠা এবং শাসক শ্রেণির বয়ানের বিরুদ্ধে জনগণের প্রতিরোধের ভাষা তৈরি করা।</p>
+        <h2>লেনিনবাদের তিনটি মৌলিক শিক্ষা:</h2>
+        <ol>
+          <li><strong>১. সাম্রাজ্যবাদের বিশ্লেষণ:</strong> পুঁজিবাদ একটি বৈশ্বিক শৃঙ্খল, যার দুর্বলতম সংযোগস্থলে সর্বহারা বিপ্লব আঘাত হানে।</li>
+          <li><strong>২. প্রলেতারীয় একনায়কত্ব:</strong> বুর্জোয়াদের প্রতিরোধ চূর্ণ করা এবং সমাজতান্ত্রিক অর্থনীতি নির্মাণের প্রধান হাতিয়ার।</li>
+          <li><strong>৩. ভ্যানগার্ড পার্টি:</strong> লৌহদৃঢ় আদর্শ ও সাংগঠনিক শৃঙ্খলা ছাড়া শ্রমিক শ্রেণি পুঁজিবাদী ব্যবস্থার বিরুদ্ধে বিজয়ী হতে পারে না।</li>
+        </ol>
       `
     },
     {
-      id: 'art-neoliberal-crisis-en',
-      slug: 'crisis-of-late-neoliberalism-and-socialist-alternative',
-      title: 'The Terminal Crisis of Late Neoliberalism and the Urgent Need for Democratic Planning',
-      title_en: 'The Terminal Crisis of Late Neoliberalism and the Urgent Need for Democratic Planning',
-      deck: 'As global financialization cannibalizes public infrastructure and exacerbates extreme inequality, socialist economic planning emerges as the sole viable future.',
-      section: 'political-economy',
-      section_name: 'রাজনৈতিক অর্থনীতি',
-      author: 'Elena Rostova & Tariq Mansoor',
-      author_role: 'Political Economists & Editors',
-      author_bio: 'Elena and Tariq specialize in international trade, labor economics, and post-capitalist transition systems.',
+      id: 'art-mao-cultural-revolution',
+      slug: 'mao-cultural-revolution-and-continuing-revolution',
+      title: 'মাও সেতুং, সাংস্কৃতিক বিপ্লব এবং সমাজতন্ত্রের ভেতর বুর্জোয়া ভাবাদর্শের বিরুদ্ধে লড়াই',
+      title_en: 'Mao Zedong, The Cultural Revolution and Ideological Struggle Under Socialism',
+      deck: 'ক্ষমতা দখলের পরও কেন বুর্জোয়া সংস্কৃতি ও আমলাতন্ত্রের বিরুদ্ধে গণমানুষের সার্বক্ষণিক সাংস্কৃতিক বিপ্লব অনিবার্য?',
+      section: 'culture-revolution',
+      section_name: 'সংস্কৃতি ও বিপ্লব',
+      author: 'ড. তানভীর হাসান',
+      author_role: 'রাজনৈতিক তাত্ত্বিক ও লেখক',
+      author_bio: 'চীনা সমাজতান্ত্রিক ইতিহাস ও মাওবাদী দ্বন্দ্বতত্ত্ব গবেষক।',
       author_photo_url: 'assets/images/img3.png',
       hero_img_url: 'assets/images/img3.png',
-      hero_img_alt: 'Wall Street vs Mass Protest',
-      hero_caption: 'The contradiction between runaway speculation and workers’ material livelihood.',
-      hero_credit: 'The Way International Bureau',
-      lang: 'en',
-      tags: 'Neoliberalism, Political Economy, Capitalism, Planning, Labor',
+      hero_img_alt: 'সাংস্কৃতিক বিপ্লবের ব্যানার ও গণসমাবেশ',
+      hero_caption: 'সমাজতন্ত্রের অভ্যন্তরে অব্যাহত বিপ্লবের আহ্বান।',
+      hero_credit: 'পিপলস আর্ট কালেকশন',
+      lang: 'bn',
+      tags: 'মাও সেতুং, সাংস্কৃতিক বিপ্লব, দ্বন্দ্বতত্ত্ব, সমাজতন্ত্র, আমলাতন্ত্র',
       status: 'published',
-      published_at: '2026-08-13T11:15:00.000Z',
-      created_at: '2026-08-13T11:15:00.000Z',
+      published_at: '2026-08-14T18:00:00.000Z',
+      created_at: '2026-08-14T18:00:00.000Z',
       content_html: `
-        <p class="lead-paragraph">We are living through the unraveling of the neoliberal consensus that has dictated world economics since the late 1970s. From runaway inflation and sovereign debt traps in the Global South to crumbling public healthcare and housing unaffordability in the core capitalist nations, capitalism has proved structurally incapable of meeting human need.</p>
-        
-        <h2>The Myth of the Self-Regulating Market</h2>
-        <p>Neoliberal dogma asserted that deregulation, privatization, and austerity would unleash universal prosperity. In reality, it unleashed an era of hyper-financialization where speculative capital extracts wealth from the productive real economy while slashing the social safety net.</p>
+        <p class="lead-paragraph">মাও সেতুং মার্ক্সবাদী দর্শনে যে মৌলিক সংযোজনটি করেছিলেন, তা হলো সমাজতান্ত্রিক সমাজে শ্রেণি সংগ্রামের অনিবার্যতা। উৎপাদন উপায়ের ওপর ব্যক্তিগত মালিকানা বিলোপ করলেই স্বয়ংক্রিয়ভাবে বুর্জোয়া চিন্তার অবসান ঘটে না। পুরোনো সমাজের মূল্যবোধ ও স্বার্থপরতা দীর্ঘদিন মানুষের অবচেতনে রয়ে যায়।</p>
 
         <blockquote class="featured-quote">
-          <p>“Capitalism produces wealth not as a means of collective human elevation, but as an engine of relentless accumulation. When humanity’s survival clashes with capital's growth, capital chooses extinction.”</p>
-          <cite>— The Way Economic Dispatch, 2026</cite>
+          <p>“বুর্জোয়াদের রাজনৈতিক ক্ষমতা কেড়ে নেওয়ার পরও তাদের সাংস্কৃতিক আধিপত্যকে ভাঙতে না পারলে সমাজতন্ত্র ভেতর থেকেই ধসে পড়বে।”</p>
+          <cite>— মাও সেতুং, ১৯৬৬</cite>
         </blockquote>
-
-        <h2>Why Democratic Socialist Planning is Necessary</h2>
-        <p>Modern computational power and decentralized democratic governance provide humanity with the tools to plan production rationally. Instead of producing for corporate profit, society can direct its labor and ecological resources toward renewable energy, universal healthcare, accessible housing, and scientific advancement for all.</p>
       `
     },
     {
-      id: 'art-labor-gig-organizing',
-      slug: 'digital-sweatshops-and-the-new-working-class-strikes',
-      title: 'ডিজিটাল শ্রম, গিগ অর্থনীতি ও নতুন শতাব্দীর শ্রমিক বিদ্রোহ',
-      title_en: 'Digital Sweatshops, Gig Economy and the New Working-Class Strikes',
-      deck: 'অ্যালগরিদমের দাসত্ব ও কন্ট্রাক্ট শ্রমের নামে আধুনিক শোষণযন্ত্র ভেঙে দিয়ে বিশ্বজুড়ে গড়ে উঠছে তরুণ শ্রমিকদের নতুন গণসংগ্রাম।',
-      section: 'labor-peasant',
-      section_name: 'শ্রম ও গণসংগ্রাম',
-      author: 'কবির হাসান ও আনিসা করিম',
-      author_role: 'শ্রমিক অধিকার গবেষক ও সংগঠক',
-      author_bio: 'গার্মেন্টস, রাইডশেয়ারিং ও ডেলিভারি শ্রমিক ইউনিয়নের সাথে সক্রিয়ভাবে কাজ করছেন।',
-      author_photo_url: 'assets/images/img4.png',
-      hero_img_url: 'assets/images/img4.png',
-      hero_img_alt: 'ধর্মঘটরতা শ্রমিকদের মিছিল',
-      hero_caption: 'অ্যালগরিদমিক শোষণের বিরুদ্ধে বিশ্বব্যাপী গিগ শ্রমিকদের ঐতিহাসিক ঐক্য।',
-      hero_credit: 'লেবার মুভমেন্ট আর্কাইভ',
-      lang: 'bn',
-      tags: 'শ্রমিক, গিগ অর্থনীতি, ধর্মঘট, ইউনিয়ন, অধিকার',
-      status: 'published',
-      published_at: '2026-08-12T16:00:00.000Z',
-      created_at: '2026-08-12T16:00:00.000Z',
-      content_html: `
-        <p class="lead-paragraph">স্মার্টফোনের স্ক্রিন ও অ্যাপ্লিকেশনের আড়ালে পুঁজিপতিরা তৈরি করেছে এক আধুনিক দাসত্ব প্রথা—যার নাম ‘গিগ অর্থনীতি’। রাইডার, ডেলিভারি কর্মী, কল সেন্টার কর্মী কিংবা তৈরি পোশাক কারখানার শ্রমিক—সকলের শ্রমকে আজ খণ্ডিত করে নূন্যতম মজুরি ও সামাজিক নিরাপত্তা থেকে বঞ্চিত করা হচ্ছে। কিন্তু এই শোষণের ভেতর থেকেই জন্ম নিচ্ছে নতুন প্রতিরোধ।</p>
-        
-        <h2>অ্যালগরিদমিক নজরদারি বনাম শ্রমিক একতা</h2>
-        <p>করপোরেট কোম্পানিগুলো তথাকথিত ‘ফ্লেক্সিবল ওয়ার্ক’-এর নামে শ্রমিকদের ট্রেড ইউনিয়ন করার মৌলিক অধিকার হরণ করতে চেয়েছে। কিন্তু বাংলাদেশ থেকে যুক্তরাজ্য, ভারত থেকে আমেরিকা—সর্বত্র ডেলিভারি ও লজিস্টিক শ্রমিকরা রুখে দাঁড়িয়েছে। ধর্মঘট ও সমন্বিত অ্যাপ শাটডাউনের মাধ্যমে তারা প্রমাণ করেছে, শ্রম ছাড়া পুঁজির কোনো অস্তিত্ব নেই।</p>
-
-        <div class="callout callout-red">
-          <h4>শ্রমিক আন্দোলনের দাবিনামা:</h4>
-          <ul>
-            <li>সকল গিগ ও চুক্তিভিত্তিক কর্মীকে অবিলম্বে প্রাতিষ্ঠানিক স্থায়ী শ্রমিক হিসেবে স্বীকৃতি।</li>
-            <li>জীবনযাত্রার মান অনুযায়ী নূন্যতম মর্যাদাপূর্ণ জাতীয় মজুরি ও স্বাস্থ্যবীমা নিশ্চিতকরণ।</li>
-            <li>কাজের সময় ও কাজের গতি নির্ধারণে অ্যালগরিদমিক একনায়কতন্ত্রের অবসান ও স্বচ্ছতা।</li>
-          </ul>
-        </div>
-      `
-    },
-    {
-      id: 'art-climate-eco-socialism',
-      slug: 'capitalist-ecocide-and-eco-socialist-alternative',
-      title: 'পুঁজিবাদী পরিবেশ-ধ্বংস বনাম ইকো-সোশ্যালিজম: পৃথিবী বাঁচানোর চূড়ান্ত লড়াই',
-      title_en: 'Capitalist Ecocide vs Eco-Socialism: The Final Battle to Save the Earth',
-      deck: 'মুনাফার অন্ধ লোভে পৃথিবীর ফুসফুস পুড়ছে। সবুজ পুঁজিবাদের ভণ্ডামি পেরিয়ে ইকো-সোশ্যালিজমের বিপ্লবী পথই পরিবেশ রক্ষার একমাত্র গ্যারান্টি।',
+      id: 'art-marx-engels-capital',
+      slug: 'marx-das-kapital-and-surplus-value-theory',
+      title: 'কার্ল মার্ক্স ও ‘পুঁজি’: উদ্বৃত্ত মূল্য এবং আধুনিক পুঁজিবাদী শোষণের স্বরূপ',
+      title_en: 'Karl Marx and Das Kapital: The Theory of Surplus Value and Modern Exploitation',
+      deck: 'কীভাবে শ্রমিকের শ্রম চুরি করে পুঁজিপতিরা পাহাড়সম সম্পদের মালিক হয়—মার্ক্সীয় অর্থনীতির অকাট্য ব্যবচ্ছেদ।',
       section: 'political-economy',
       section_name: 'রাজনৈতিক অর্থনীতি',
-      author: 'ড. মালিহা জামান',
-      author_role: 'পরিবেশ সমাজতাত্ত্বিক',
-      author_bio: 'জলবায়ু রাজনীতি ও গ্লোবাল সাউথের আদিবাসী পরিবেশ অধিকার আন্দোলনের অ্যাক্টিভিস্ট।',
+      author: 'ড. সৌমিক রায়হান',
+      author_role: 'রাজনৈতিক অর্থনীতিবিদ',
+      author_bio: 'মার্ক্সীয় অর্থনীতি ও নব্য-উদারবাদ গবেষক।',
+      author_photo_url: 'assets/images/img4.png',
+      hero_img_url: 'assets/images/img4.png',
+      hero_img_alt: 'কার্ল মার্ক্সের প্রতিকৃতি ও ডাস ক্যাপিটালের পান্ডুলিপি',
+      hero_caption: 'পুঁজিবাদী ব্যবস্থার বৈজ্ঞানিক ব্যবচ্ছেদ।',
+      hero_credit: 'দ্য ওয়ে থিওরি আর্কাইভ',
+      lang: 'bn',
+      tags: 'মার্ক্স, ক্যাপিটাল, উদ্বৃত্ত মূল্য, পুঁজিবাদ, শ্রম',
+      status: 'published',
+      published_at: '2026-08-14T12:00:00.000Z',
+      created_at: '2026-08-14T12:00:00.000Z',
+      content_html: `
+        <p class="lead-paragraph">১৮৬৭ সালে কার্ল মার্ক্সের ‘ডাস ক্যাপিটাল’ (পুঁজি) প্রকাশিত হওয়ার পর মানব সমাজ প্রথম জানতে পারল পুঁজিপতিদের মুনাফার আসল গোপন রহস্য। পুঁজিপতি কোনো জাদু দিয়ে ধনী হয় না; সে শ্রমিককে তার শ্রমের পূর্ণ মূল্য না দিয়ে উদ্বৃত্ত শ্রম আত্মসাৎ করে।</p>
+      `
+    },
+    {
+      id: 'art-lenin-imperialism-state',
+      slug: 'lenin-state-and-revolution-imperialism',
+      title: 'লেনিন: ‘রাষ্ট্র ও বিপ্লব’ এবং ‘সাম্রাজ্যবাদ: পুঁজিবাদের সর্বোচ্চ পর্যায়’',
+      title_en: 'Lenin: The State and Revolution & Imperialism the Highest Stage of Capitalism',
+      deck: 'আমলাতান্ত্রিক রাষ্ট্রযন্ত্রের শ্রেণি-চরিত্র ও একচেটিয়া লগ্নী পুঁজির বৈশ্বিক আগ্রাসনের বিরুদ্ধে সমাজতান্ত্রিক বিকল্প।',
+      section: 'manifestos-archives',
+      section_name: 'ইশতেহার ও দলিল',
+      author: 'আহমেদ হাসান',
+      author_role: 'আন্তর্জাতিক সম্পর্ক বিশ্লেষক',
+      author_bio: 'লেনিনবাদী পররাষ্ট্রনীতি ও সাম্রাজ্যবাদ বিরোধী আন্দোলন বিশেষজ্ঞ।',
       author_photo_url: 'assets/images/img5.png',
       hero_img_url: 'assets/images/img5.png',
-      hero_img_alt: 'ধোঁয়াচ্ছন্ন কলকারখানা ও প্রতিবাদী জনতার ব্যানার',
-      hero_caption: 'সবুজ পুঁজিবাদের ভণ্ডামির বিপরীতে মেহনতি মানুষের জলবায়ু সংগ্রাম।',
-      hero_credit: 'ইকো-সোশ্যালিস্ট কোয়ালিশন',
+      hero_img_alt: 'ভ্লাদিমির লেনিনের বক্তৃতা ও ১৯১৭ বিপ্লব',
+      hero_caption: 'বলশেভিক বিপ্লব ও মেহনতি মানুষের রাষ্ট্র গঠন।',
+      hero_credit: 'অক্টোবর বিপ্লব মহাফেজখানা',
       lang: 'bn',
-      tags: 'পরিবেশ, জলবায়ু, ইকো-সোশ্যালিজম, পুঁজিবাদ, প্রকৃতি',
+      tags: 'লেনিন, রাষ্ট্র ও বিপ্লব, সাম্রাজ্যবাদ, বলশেভিক, বিপ্লব',
       status: 'published',
-      published_at: '2026-08-11T10:00:00.000Z',
-      created_at: '2026-08-11T10:00:00.000Z',
+      published_at: '2026-08-13T15:00:00.000Z',
+      created_at: '2026-08-13T15:00:00.000Z',
       content_html: `
-        <p class="lead-paragraph">জলবায়ু সংকট কোনো প্রাকৃতিক দুর্ঘটনা নয়; এটি হলো পুঁজিবাদের অন্তর্নিহিত লুণ্ঠনমূলক চরিত্রের অবশ্যম্ভাবী পরিণতি। যে অর্থনৈতিক ব্যবস্থা ক্রমাগত অনন্ত প্রবৃদ্ধির ওপর টিকে থাকে, তা সীমাবদ্ধ গ্রহের বাস্তুতন্ত্রের সাথে মৌলিকভাবে সাংঘর্ষিক। ধনী দেশগুলোর জীবাশ্ম জ্বালানি কর্পোরেশনগুলো যখন বিলিয়ন ডলার মুনাফা কামায়, তখন সমুদ্রের স্ফীতিতে তলিয়ে যাচ্ছে বাংলাদেশ ও প্রশান্ত মহাসাগরীয় দ্বীপরাষ্ট্রগুলো।</p>
-        
-        <h2>সবুজ পুঁজিবাদের বিভ্রম (Greenwashing)</h2>
-        <p>কার্বন ক্রেডিট ও ‘সবুজ বাজার’ হলো আরেকটি করপোরেট তামাশা। দূষণকারী কোম্পানিগুলো টাকা দিয়ে পরিবেশ ধ্বংসের লাইসেন্স কেনে। প্রকৃত সমাধান লুকিয়ে আছে প্রকৃতির ওপর মুনাফার নিয়ন্ত্রণ ভেঙে দিয়ে সমাজতান্ত্রিক পরিকল্পনা গ্রহণ করার মধ্যে।</p>
-      `
-    },
-    {
-      id: 'art-palestine-anti-imperialism',
-      slug: 'palestine-liberation-and-anti-imperialist-front',
-      title: 'প্যালেস্টাইন মুক্তি ও বিশ্ব সাম্রাজ্যবাদ-বিরোধী জনতার ফ্রন্ট',
-      title_en: 'Palestine Liberation and the Global Anti-Imperialist United Front',
-      deck: 'গাজার ধ্বংসস্তূপে আজ মানবজাতির বিবেকের পরীক্ষা। সাম্রাজ্যবাদী পশ্চিমা মদদের বিরুদ্ধে বিশ্বজুড়ে গড়ে উঠছে অভূতপূর্ব গণপ্রতিরোধ।',
-      section: 'imperialism-geopolitics',
-      section_name: 'সাম্রাজ্যবাদ ও বিশ্ব-রাজনীতি',
-      author: 'আহমেদ হাসান ও রামিন খুরশিদ',
-      author_role: 'মধ্যপ্রাচ্য ও সাম্রাজ্যবাদ বিষয়ক রাজনৈতিক গবেষক',
-      author_bio: 'প্যালেস্টাইন সংহতি আন্দোলন ও এশিয়ান বামপন্থী ফোরামের যৌথ প্রতিবেদক।',
-      author_photo_url: 'assets/images/img6.png',
-      hero_img_url: 'assets/images/img6.png',
-      hero_img_alt: 'প্যালেস্টাইনের পতাকাবাহী বিশাল আন্তর্জাতিক সংহতি সমাবেশ',
-      hero_caption: 'উপনিবেশ ও বর্ণবাদের বিরুদ্ধে লড়াকু বিশ্বজনতার উত্তাল মিছিল।',
-      hero_credit: 'গ্লোবাল সলিডারিটি আর্কাইভ',
-      lang: 'bn',
-      tags: 'প্যালেস্টাইন, সাম্রাজ্যবাদ, প্রতিরোধ, সংহতি, যুদ্ধাপরাধ',
-      status: 'published',
-      published_at: '2026-08-10T08:30:00.000Z',
-      created_at: '2026-08-10T08:30:00.000Z',
-      content_html: `
-        <p class="lead-paragraph">প্যালেস্টাইনের সংগ্রাম কেবল একটি ভূখণ্ডের লড়াই নয়; এটি সমকালীন বিশ্বের সবচেয়ে মৌলিক উপনিবেশ-বিরোধী ও সাম্রাজ্যবাদ-বিরোধী সংগ্রাম। পশ্চিমা সাম্রাজ্যবাদ মধ্যপ্রাচ্যে তার ভূ-রাজনৈতিক আধিপত্য টিকিয়ে রাখতে জায়নবাদী বর্ণবাদী রাষ্ট্রকে অস্ত্র ও অর্থের যোগান দিয়ে যাচ্ছে। কিন্তু বিশ্বজুড়ে কোটি কোটি মেহনতি মানুষ রাজপথে নেমে এসে পরিষ্কার বার্তা দিয়েছে—এই গণহত্যার অবসান চাই।</p>
-        
-        <h2>আন্তর্জাতিক বয়কট ও শ্রমিকদের ভূমিকা</h2>
-        <p>ইতালি ও ভারতের বন্দর শ্রমিকরা যখন অস্ত্রবাহী জাহাজে মালামাল তুলতে অস্বীকৃতি জানায়, তখন প্রমাণ হয় মেহনতি শ্রেণির সংহতির শক্তি। সাম্রাজ্যবাদের শিকল ভাঙতে হলে এই বৈশ্বিক সংহতি ফ্রন্টকে আরও সুসংগঠিত করতে হবে।</p>
+        <p class="lead-paragraph">লেনিনের দুটি কালজয়ী কাজ বিশ শতকের গতিপথ পাল্টে দিয়েছিল। একটিতে তিনি দেখিয়েছেন কেন রাষ্ট্র কোনো নিরপেক্ষ মধ্যস্থতাকারী নয় বরং বুর্জোয়া শোষণের হাতিয়ার; অন্যটিতে দেখিয়েছেন কেন একচেটিয়া লগ্নী পুঁজির আধিপত্য বিশ্বযুদ্ধ ও উপনিবেশবাদের জন্ম দেয়।</p>
       `
     }
   ];
 
-  // Daily revolutionary quotes
-  const REVOLUTIONARY_QUOTES = [
-    {
-      quote_bn: "জগতের সকল শোষিত মানুষ এক হও!",
-      quote_en: "Workers and oppressed peoples of all lands, unite!",
-      author: "কার্ল মার্ক্স ও ফ্রিডরিখ এঙ্গেলস (Karl Marx & Friedrich Engels)",
-      source: "কমিউনিস্ট ইশতেহার, ১৮৪৮"
-    },
-    {
-      quote_bn: "বিপ্লবী তত্ত্ব ছাড়া কোনো বিপ্লবী আন্দোলন হতে পারে না।",
-      quote_en: "Without revolutionary theory there can be no revolutionary movement.",
-      author: "ভ্লাদিমির লেনিন (Vladimir Lenin)",
-      source: "হোয়াট ইজ টু বি ডান?, ১৯০২"
-    },
-    {
-      quote_bn: "পুরনো বিশ্ব মরছে, নতুন বিশ্ব জন্ম নিতে লড়াই করছে; এই সংকটকালেই নানা দানবের জন্ম হয়।",
-      quote_en: "The old world is dying, and the new world struggles to be born: now is the time of monsters.",
-      author: "আন্তোনিও গ্রামশি (Antonio Gramsci)",
-      source: "প্রিজন নোটবুকস, ১৯৩০"
-    },
-    {
-      quote_bn: "যেখানে অবিচারই আইন, সেখানে প্রতিরোধই মানুষের নৈতিক কর্তব্য।",
-      quote_en: "When injustice becomes law, resistance becomes duty.",
-      author: "চে গুয়েভারা (Che Guevara)",
-      source: "ভাষণ ও দিনলিপি"
-    },
-    {
-      quote_bn: "আমরা এমন এক পৃথিবী গড়তে চাই যেখানে কেউ কারো ওপর প্রভুত্ব করবে না, শোষণের চির অবসান ঘটবে।",
-      quote_en: "We must dare to invent the future and build a society free from human exploitation.",
-      author: "টমাস সাঙ্কারা (Thomas Sankara)",
-      source: "বুর্কিনা ফাসো বৈপ্লবিক পরিষদ"
-    },
-    {
-      quote_bn: "ক্ষুধার রাজ্যে পৃথিবী গদ্যময়, পূর্ণিমা চাঁদ যেন ঝলসানো রুটি।",
-      quote_en: "In the realm of hunger the earth is prosaic, the full moon is like charred bread.",
-      author: "সুকান্ত ভট্টাচার্য (Sukanta Bhattacharya)",
-      source: "ছাড়পত্র"
-    },
-    {
-      quote_bn: "জালিমকে খতম না করা পর্যন্ত মজলুমের কোনো বিশ্রাম নাই।",
-      quote_en: "There can be no rest for the oppressed until the oppressors are brought down.",
-      author: "মওলানা আবদুল হামিদ খান ভাসানী (Maulana Bhashani)",
-      source: "কাগমারী সম্মেলন ও ঐতিহাসিক ভাষণ"
-    }
-  ];
-
-  // Expose to global window
+  // Helper APIs for components and pages
   window.THE_WAY_CONFIG = {
-    brandNameBn: 'দ্য ওয়ে',
-    brandNameEn: 'The Way',
-    taglineBn: 'আন্তর্জাতিক সমাজতান্ত্রিক চিন্তন ও গণআন্দোলনের উন্মুক্ত পোর্টাল',
-    taglineEn: 'Voice of Socialism & Anti-Imperialist Solidarity',
-    mottoBn: '“জগতের সকল শোষিত মানুষ এক হও!”',
-    mottoEn: '“Workers & Oppressed Peoples of All Lands, Unite!”',
     supabaseUrl: SUPABASE_URL,
     supabaseAnonKey: SUPABASE_ANON_KEY,
     getClient: getSupabaseClient,
     defaultSections: DEFAULT_SECTIONS,
     defaultArticles: DEFAULT_ARTICLES,
-    revolutionaryQuotes: REVOLUTIONARY_QUOTES,
+    async fetchArticles(sectionSlug) {
+      const sb = getSupabaseClient();
+      if (sb) {
+        try {
+          let query = sb.from('articles').select('*').eq('status', 'published').order('published_at', { ascending: false });
+          if (sectionSlug && sectionSlug !== 'all') {
+            query = query.eq('section', sectionSlug);
+          }
+          const { data, error } = await query;
+          if (!error && Array.isArray(data) && data.length > 0) return data;
+        } catch (e) {}
+      }
+      if (sectionSlug && sectionSlug !== 'all') {
+        return DEFAULT_ARTICLES.filter(a => a.section === sectionSlug);
+      }
+      return DEFAULT_ARTICLES;
+    },
+    async fetchArticleBySlug(slug) {
+      const sb = getSupabaseClient();
+      if (sb) {
+        try {
+          const { data, error } = await sb.from('articles').select('*').eq('slug', slug).maybeSingle();
+          if (!error && data) return data;
+        } catch (e) {}
+      }
+      return DEFAULT_ARTICLES.find(a => a.slug === slug) || null;
+    }
   };
 
 })(typeof window !== 'undefined' ? window : this);

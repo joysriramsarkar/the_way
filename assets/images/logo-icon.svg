@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <defs>
+    <linearGradient id="emblemCrimson" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ff2a3e"/>
+      <stop offset="50%" stop-color="#c2182b"/>
+      <stop offset="100%" stop-color="#7a0b17"/>
+    </linearGradient>
+    <linearGradient id="emblemGold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fbbf24"/>
+      <stop offset="100%" stop-color="#d97706"/>
+    </linearGradient>
+    <filter id="emblemGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="1.5" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+  </defs>
+
+  <!-- Background Diamond Shield -->
+  <rect width="64" height="64" rx="14" fill="#0d0406"/>
+  <polygon points="32,4 60,32 32,60 4,32" fill="#1b080b" stroke="url(#emblemCrimson)" stroke-width="2.5"/>
+  <polygon points="32,9 55,32 32,55 9,32" fill="#290c10" stroke="url(#emblemGold)" stroke-width="1" opacity="0.6"/>
+
+  <!-- Revolutionary Torch / Flame -->
+  <path d="M32 14 C36 20, 41 23, 38 30 C36 34, 31 35, 29 40 C28 42, 28 45, 32 48 C25 46, 22 40, 23 35 C24 29, 30 26, 29 20 C30 18, 31 16, 32 14 Z" fill="url(#emblemCrimson)" filter="url(#emblemGlow)"/>
+  <path d="M32 22 C34 26, 36 28, 34 32 C33 34, 31 36, 31 40 C30 37, 29 34, 30 31 C31 27, 32 25, 32 22 Z" fill="url(#emblemGold)"/>
+
+  <!-- 5-Point Socialist Star -->
+  <polygon points="32,41 33.8,45.5 38.5,45.5 34.7,48.2 36.1,52.7 32,49.9 27.9,52.7 29.3,48.2 25.5,45.5 30.2,45.5" fill="url(#emblemGold)"/>
+</svg>

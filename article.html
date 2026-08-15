@@ -3,8 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/svg+xml" href="assets/images/favicon.svg" />
+  <link rel="alternate icon" type="image/svg+xml" href="favicon.svg" />
   <title>প্রবন্ধ পাঠ — দ্য ওয়ে (The Way)</title>
-  <link rel="icon" type="image/svg+xml" href="assets/images/logo.svg">
+  
   
   <link rel="stylesheet" href="assets/css/style.css">
   <link rel="stylesheet" href="assets/css/article.css">
@@ -101,6 +103,17 @@
           ‘দ্য ওয়ে’ সম্পাদকীয় পর্ষদ বিশ্বের মেহনতি মানুষের মুক্তিকামী চেতনা ও সাম্রাজ্যবাদ-বিরোধী বিশ্লেষণের পক্ষে আন্তর্জাতিক গবেষকদের উন্মুক্ত যৌথ প্রয়াস।
         </p>
       </div>
+    </div>
+
+    <!-- Revision Request Action Bar -->
+    <div style="margin: 24px 0 32px; padding: 18px 22px; background: rgba(255,255,255,0.03); border: 1px dashed rgba(255,255,255,0.12); border-radius: 12px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 14px;">
+      <div style="font-size: 13.5px; color: var(--text-muted);">
+        <strong style="color:#fff;">💡 লেখায় কোনো অসঙ্গতি বা তথ্যের সংশোধন প্রয়োজন?</strong>
+        <div>সাধারণ পাঠক ও গবেষক হিসেবে আপনিও এই লেখার পরিমার্জন বা পরিবর্ধনের প্রস্তাব পাঠাতে পারেন।</div>
+      </div>
+      <a id="btn-request-revision" href="/submit-article.html?revision=true" style="display: inline-flex; align-items: center; gap: 6px; background: #c2182b; color: #fff; text-decoration: none; padding: 9px 18px; border-radius: 8px; font-weight: 700; font-size: 13.5px; transition: opacity 0.2s;">
+        📝 সংশোধনের আবেদন করুন
+      </a>
     </div>
 
     <!-- Related Theory & Articles -->
@@ -218,6 +231,12 @@
         document.getElementById('author-bio-role').textContent = art.author_role || '';
         document.getElementById('author-bio-desc').textContent = art.author_bio || 'মেহনতি মানুষের মুক্তিকামী চিন্তা ও সমাজতান্ত্রিক বিশ্লেষণের পক্ষে লেখক।';
         if (art.author_photo_url) document.getElementById('author-bio-avatar').src = art.author_photo_url;
+
+        // Revision Link
+        const revBtn = document.getElementById('btn-request-revision');
+        if (revBtn && art.slug) {
+          revBtn.href = '/submit-article.html?revision=true&slug=' + encodeURIComponent(art.slug);
+        }
       }
 
       function loadRelated(allArts, currentArt) {

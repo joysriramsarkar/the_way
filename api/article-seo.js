@@ -23,7 +23,7 @@ module.exports = async function handler(req, res) {
   const id   = req.query.id || '';
 
   const sb = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
-  const host = req.headers['x-forwarded-host'] || req.headers.host || 'theprivatianfamily.vercel.app';
+  const host = req.headers['x-forwarded-host'] || req.headers.host || 'thewaysocialist.vercel.app';
   const proto = req.headers['x-forwarded-proto'] || 'https';
   const baseUrl = `${proto}://${host}`;
 

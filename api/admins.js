@@ -72,9 +72,10 @@ module.exports = async function handler(req, res) {
     const session = await requireAdmin(req, res);
     if (!session) return;
 
-    const { email, role } = req.body || {};
+    const { email, role, name, password, bio } = req.body || {};
     if (!email || !role) return res.status(400).json({ error: 'email and role are required' });
-    if (!['Admin', 'Moderator'].includes(role)) return res.status(400).json({ error: 'role must be Admin or Moderator' });
+    const allowedRoles = ['Admin', 'Moderator', 'Editor', 'Contributor', 'User'];
+    if (!allowedRoles.includes(role)) return res.status(400).json({ error: `role must be one of: ${allowedRoles.join(', ')}` });
 
     const emailNorm = email.toLowerCase().trim();
     const { data: existing } = await client.from('allowed_admins').select('status').ilike('email', emailNorm).maybeSingle();
@@ -84,9 +85,20 @@ module.exports = async function handler(req, res) {
       if (existing.status === 'deleted')   return res.status(400).json({ error: 'already_in_recycle', message: 'This email is in the Recycle bin. Go to the Recycle tab and restore them instead.' });
     }
 
+    const { hashPassword } = require('./_lib/auth');
+    const pwdHash = password ? hashPassword(password) : hashPassword('theway@admin2026');
+
     const { data, error } = await client
       .from('allowed_admins')
-      .insert({ email: emailNorm, role, added_by: session.email, status: 'active' })
+      .insert({
+        email: emailNorm,
+        name: name ? name.trim() : emailNorm.split('@')[0],
+        password_hash: pwdHash,
+        role,
+        bio: bio || '',
+        added_by: session.email,
+        status: 'active'
+      })
       .select().single();
     if (error) return res.status(500).json({ error: error.message });
 
@@ -94,7 +106,7 @@ module.exports = async function handler(req, res) {
       actor: session,
       action: 'admin.add',
       category: 'admins',
-      summary: `${session.name || session.email} added "${emailNorm}" to whitelist as ${role}`,
+      summary: `${session.name || session.email} added account "${emailNorm}" (${role})`,
       target_id: data.id,
       target_name: emailNorm,
       details: { role, target_email: emailNorm },
@@ -113,7 +125,7 @@ module.exports = async function handler(req, res) {
     const { status, role } = req.body || {};
     const updates = {};
     if (status && ['active', 'suspended', 'deleted'].includes(status)) updates.status = status;
-    if (role   && ['Admin', 'Moderator'].includes(role))               updates.role   = role;
+    if (role   && ['Admin', 'Moderator', 'Editor', 'Contributor', 'User'].includes(role)) updates.role = role;
     if (!Object.keys(updates).length) return res.status(400).json({ error: 'No valid updates' });
 
     const { data: target } = await client.from('allowed_admins').select('*').eq('id', id).single();

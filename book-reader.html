@@ -1,0 +1,847 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/svg+xml" href="assets/images/favicon.svg" />
+  <link rel="alternate icon" type="image/svg+xml" href="favicon.svg" />
+  <title>ওয়েব বই রিডার — দ্য ওয়ে (The Way)</title>
+  
+  <link rel="stylesheet" href="assets/css/style.css">
+  <style>
+    /* ==========================================================================
+       THE WAY — Interactive Web Book Reader Styles
+       ========================================================================== */
+
+    :root {
+      --reader-max-width: 820px;
+      --reader-font-size: 1.18rem;
+      --reader-line-height: 1.85;
+      --reader-font-family: 'Noto Serif Bengali', 'Newsreader', Georgia, serif;
+    }
+
+    /* Reading Themes */
+    body.theme-light {
+      --bg-reader-body: #f8f6f0;
+      --bg-reader-content: #ffffff;
+      --text-reader-primary: #1a1a1a;
+      --text-reader-secondary: #4a4a4a;
+      --border-reader: #e5e0d8;
+    }
+
+    body.theme-sepia {
+      --bg-reader-body: #f4ecd8;
+      --bg-reader-content: #fcf6e8;
+      --text-reader-primary: #3b2a1a;
+      --text-reader-secondary: #5c4530;
+      --border-reader: #e3d2b8;
+    }
+
+    body.theme-dark {
+      --bg-reader-body: #0d1117;
+      --bg-reader-content: #161b22;
+      --text-reader-primary: #e6edf3;
+      --text-reader-secondary: #8b949e;
+      --border-reader: #30363d;
+    }
+
+    body.theme-crimson {
+      --bg-reader-body: #140507;
+      --bg-reader-content: #1f0b0e;
+      --text-reader-primary: #fce7e9;
+      --text-reader-secondary: #f0a3aa;
+      --border-reader: #4a151b;
+    }
+
+    body.reader-active {
+      background-color: var(--bg-reader-body);
+      color: var(--text-reader-primary);
+      transition: background-color var(--transition-normal), color var(--transition-normal);
+    }
+
+    /* Sticky Reader Navigation Bar */
+    .reader-navbar {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: var(--bg-reader-content);
+      border-bottom: 1px solid var(--border-reader);
+      box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+    }
+    .reader-navbar-inner {
+      max-width: var(--container-width);
+      margin: 0 auto;
+      padding: 0.65rem 1.2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+    }
+    .reader-nav-left {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      min-width: 0;
+    }
+    .btn-back-library {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--text-reader-secondary);
+      text-decoration: none;
+      font-size: 0.88rem;
+      font-weight: 600;
+      padding: 6px 12px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border-reader);
+      transition: all var(--transition-fast);
+      white-space: nowrap;
+    }
+    .btn-back-library:hover {
+      color: var(--crimson-primary);
+      border-color: var(--crimson-primary);
+    }
+    .reader-book-heading {
+      font-family: var(--font-bengali-serif);
+      font-size: 1.05rem;
+      font-weight: 700;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .reader-book-heading span {
+      font-weight: 400;
+      font-size: 0.85rem;
+      opacity: 0.75;
+      margin-left: 6px;
+    }
+
+    /* Controls Toolbar */
+    .reader-toolbar {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .reader-btn-tool {
+      background: transparent;
+      border: 1px solid var(--border-reader);
+      color: var(--text-reader-primary);
+      padding: 6px 10px;
+      border-radius: var(--radius-sm);
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      transition: all var(--transition-fast);
+    }
+    .reader-btn-tool:hover {
+      border-color: var(--crimson-primary);
+      color: var(--crimson-primary);
+    }
+    .theme-selector {
+      display: flex;
+      border: 1px solid var(--border-reader);
+      border-radius: var(--radius-sm);
+      overflow: hidden;
+    }
+    .theme-btn-opt {
+      background: transparent;
+      border: none;
+      padding: 6px 9px;
+      font-size: 0.82rem;
+      cursor: pointer;
+      transition: background var(--transition-fast);
+    }
+    .theme-btn-opt.active {
+      background: var(--crimson-primary);
+      color: #fff;
+    }
+
+    /* Progress Indicator */
+    .reader-progress-bar {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      height: 3px;
+      background: var(--crimson-primary);
+      width: 0%;
+      transition: width 0.1s ease;
+    }
+
+    /* Reader Main Layout */
+    .reader-container {
+      max-width: var(--reader-max-width);
+      margin: 2rem auto 5rem;
+      padding: 0 1.5rem;
+    }
+    .reader-card {
+      background: var(--bg-reader-content);
+      border: 1px solid var(--border-reader);
+      border-radius: var(--radius-lg);
+      padding: 3.5rem 3rem;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.04);
+      position: relative;
+    }
+
+    /* Book Hero Inside Reader */
+    .book-cover-banner {
+      border-radius: var(--radius-md);
+      padding: 2.5rem 2rem;
+      color: #fff;
+      margin-bottom: 3rem;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.25);
+      position: relative;
+      overflow: hidden;
+    }
+    .book-cover-banner .book-meta-tag {
+      background: rgba(0,0,0,0.4);
+      border: 1px solid rgba(255,255,255,0.3);
+      padding: 4px 12px;
+      border-radius: var(--radius-full);
+      font-size: 0.78rem;
+      font-weight: 700;
+      display: inline-block;
+      margin-bottom: 1rem;
+    }
+    .book-cover-banner h1 {
+      font-family: var(--font-bengali-serif);
+      font-size: 2.3rem;
+      font-weight: 800;
+      line-height: 1.25;
+      margin-bottom: 0.5rem;
+    }
+    .book-cover-banner h2 {
+      font-size: 1.1rem;
+      font-weight: 400;
+      opacity: 0.9;
+      line-height: 1.5;
+      margin-bottom: 1.2rem;
+    }
+    .book-author-strip {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1.5rem;
+      font-size: 0.88rem;
+      padding-top: 1rem;
+      border-top: 1px solid rgba(255,255,255,0.2);
+    }
+
+    /* Quote Banner */
+    .book-famous-quote {
+      background: rgba(194, 24, 43, 0.06);
+      border-left: 4px solid var(--crimson-primary);
+      padding: 1.5rem 1.8rem;
+      border-radius: 0 var(--radius-md) var(--radius-md) 0;
+      margin-bottom: 3rem;
+      font-family: var(--font-bengali-serif);
+      font-size: 1.2rem;
+      font-style: italic;
+      line-height: 1.7;
+      position: relative;
+    }
+    .quote-action-btn {
+      position: absolute;
+      right: 15px;
+      bottom: 12px;
+      font-style: normal;
+      font-family: var(--font-bengali-sans);
+      font-size: 0.78rem;
+      background: var(--bg-reader-content);
+      border: 1px solid var(--border-reader);
+      color: var(--crimson-primary);
+      padding: 4px 10px;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: all var(--transition-fast);
+    }
+    .quote-action-btn:hover {
+      background: var(--crimson-primary);
+      color: #fff;
+    }
+
+    /* Chapter Header */
+    .chapter-section {
+      margin-bottom: 4rem;
+      padding-top: 2rem;
+      border-top: 1px solid var(--border-reader);
+    }
+    .chapter-badge {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--crimson-primary);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 0.5rem;
+    }
+    .chapter-title {
+      font-family: var(--font-bengali-serif);
+      font-size: 1.85rem;
+      font-weight: 800;
+      color: var(--text-reader-primary);
+      line-height: 1.35;
+      margin-bottom: 2rem;
+    }
+
+    /* Chapter Content Typography */
+    .chapter-body {
+      font-family: var(--reader-font-family);
+      font-size: var(--reader-font-size);
+      line-height: var(--reader-line-height);
+      color: var(--text-reader-primary);
+    }
+    .chapter-body p {
+      margin-bottom: 1.5rem;
+      text-align: justify;
+      text-justify: inter-word;
+    }
+    .chapter-body .lead-text {
+      font-size: 1.15em;
+      font-weight: 600;
+      color: var(--text-reader-primary);
+      line-height: 1.7;
+    }
+    .chapter-body h3 {
+      font-family: var(--font-bengali-serif);
+      font-size: 1.4em;
+      font-weight: 700;
+      margin: 2.5rem 0 1rem;
+      color: var(--text-reader-primary);
+    }
+    .reader-quote {
+      border-left: 3px solid var(--crimson-primary);
+      padding: 1.2rem 1.5rem;
+      margin: 2rem 0;
+      background: rgba(194, 24, 43, 0.04);
+      font-style: italic;
+      border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+    }
+    .reader-quote p {
+      margin-bottom: 0.5rem;
+      font-size: 1.05em;
+    }
+    .reader-quote cite {
+      font-size: 0.85em;
+      color: var(--crimson-primary);
+      font-style: normal;
+      font-weight: 600;
+      display: block;
+    }
+    .reader-callout {
+      padding: 1.5rem;
+      border-radius: var(--radius-md);
+      margin: 2rem 0;
+      background: var(--bg-reader-body);
+    }
+    .reader-callout.crimson-border {
+      border: 1px solid var(--border-crimson);
+      border-left: 5px solid var(--crimson-primary);
+    }
+    .reader-callout.gold-border {
+      border: 1px solid rgba(217, 119, 6, 0.4);
+      border-left: 5px solid var(--gold-accent);
+    }
+    .reader-callout h4 {
+      font-family: var(--font-bengali-serif);
+      font-size: 1.1em;
+      font-weight: 700;
+      margin-bottom: 0.8rem;
+    }
+    .reader-callout ol, .reader-callout ul, .chapter-body ol, .chapter-body ul {
+      padding-left: 1.5rem;
+      margin-bottom: 1.2rem;
+    }
+    .reader-callout li, .chapter-body li {
+      margin-bottom: 0.6rem;
+      line-height: 1.6;
+    }
+    .manifesto-finale-box {
+      background: linear-gradient(135deg, #8b0e1b 0%, #c2182b 100%);
+      color: #fff;
+      padding: 2.5rem 2rem;
+      border-radius: var(--radius-md);
+      margin: 3rem 0;
+      text-align: center;
+      box-shadow: 0 8px 24px var(--crimson-glow);
+    }
+    .finale-text {
+      font-size: 1.15em;
+      line-height: 1.7;
+      margin-bottom: 1.5rem;
+      color: #fff !important;
+      text-align: center !important;
+    }
+    .finale-slogan {
+      font-family: var(--font-bengali-serif);
+      font-size: 1.8rem;
+      font-weight: 800;
+      color: #ffd700;
+      line-height: 1.3;
+    }
+    .finale-slogan span {
+      display: block;
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: #fff;
+      opacity: 0.9;
+      margin-top: 0.3rem;
+    }
+
+    /* Chapter Navigation Pagination */
+    .chapter-nav-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 1rem;
+      margin-top: 4rem;
+      padding-top: 2rem;
+      border-top: 1px solid var(--border-reader);
+    }
+    .btn-ch-nav {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--bg-reader-body);
+      border: 1px solid var(--border-reader);
+      color: var(--text-reader-primary);
+      text-decoration: none;
+      padding: 10px 18px;
+      border-radius: var(--radius-md);
+      font-weight: 600;
+      font-size: 0.92rem;
+      transition: all var(--transition-fast);
+    }
+    .btn-ch-nav:hover {
+      border-color: var(--crimson-primary);
+      color: var(--crimson-primary);
+      transform: translateY(-2px);
+    }
+
+    /* Off-canvas Table of Contents Drawer */
+    .toc-drawer-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.6);
+      backdrop-filter: blur(4px);
+      z-index: 200;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity var(--transition-normal);
+    }
+    .toc-drawer-overlay.open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .toc-drawer {
+      position: fixed;
+      top: 0; left: 0; bottom: 0;
+      width: 380px;
+      max-width: 85vw;
+      background: var(--bg-reader-content);
+      border-right: 1px solid var(--border-reader);
+      z-index: 201;
+      transform: translateX(-100%);
+      transition: transform var(--transition-normal);
+      display: flex;
+      flex-direction: column;
+      box-shadow: 10px 0 30px rgba(0,0,0,0.25);
+    }
+    .toc-drawer-overlay.open .toc-drawer {
+      transform: translateX(0);
+    }
+    .toc-header {
+      padding: 1.5rem;
+      border-bottom: 1px solid var(--border-reader);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .toc-header h3 {
+      font-family: var(--font-bengali-serif);
+      font-size: 1.2rem;
+      font-weight: 700;
+    }
+    .btn-close-toc {
+      background: transparent;
+      border: none;
+      font-size: 1.4rem;
+      color: var(--text-reader-secondary);
+      cursor: pointer;
+      padding: 4px 8px;
+    }
+    .toc-body {
+      padding: 1.5rem;
+      overflow-y: auto;
+      flex: 1;
+    }
+    .toc-item {
+      display: block;
+      padding: 12px 14px;
+      border-radius: var(--radius-md);
+      color: var(--text-reader-primary);
+      text-decoration: none;
+      margin-bottom: 0.5rem;
+      border: 1px solid transparent;
+      transition: all var(--transition-fast);
+    }
+    .toc-item:hover {
+      background: var(--bg-reader-body);
+      border-color: var(--border-reader);
+      color: var(--crimson-primary);
+    }
+    .toc-item.active {
+      background: rgba(194, 24, 43, 0.08);
+      border-color: var(--border-crimson);
+      color: var(--crimson-primary);
+      font-weight: 700;
+    }
+    .toc-item-number {
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: var(--crimson-primary);
+      margin-bottom: 2px;
+      display: block;
+    }
+
+    @media (max-width: 768px) {
+      .reader-card {
+        padding: 2rem 1.2rem;
+      }
+      .book-cover-banner {
+        padding: 1.8rem 1.2rem;
+      }
+      .book-cover-banner h1 {
+        font-size: 1.8rem;
+      }
+      .chapter-title {
+        font-size: 1.45rem;
+      }
+      .reader-book-heading span {
+        display: none;
+      }
+    }
+
+    /* Floating Toast Notification */
+    .theway-toast {
+      position: fixed;
+      bottom: 2.5rem;
+      left: 50%;
+      transform: translateX(-50%) translateY(40px);
+      background: rgba(17, 24, 39, 0.95);
+      color: #ffffff;
+      padding: 10px 22px;
+      border-radius: var(--radius-full);
+      font-family: var(--font-bengali-sans);
+      font-size: 0.92rem;
+      font-weight: 700;
+      border: 1px solid rgba(194, 24, 43, 0.6);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+      backdrop-filter: blur(8px);
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+      z-index: 99999;
+    }
+    .theway-toast.show {
+      opacity: 1;
+      visibility: visible;
+      transform: translateX(-50%) translateY(0);
+    }
+  </style>
+</head>
+<body class="reader-active theme-light" id="reader-body">
+
+  <!-- Sticky Reader Navigation Bar -->
+  <nav class="reader-navbar">
+    <div class="reader-navbar-inner">
+      <div class="reader-nav-left">
+        <a href="books.html" class="btn-back-library" title="উন্মুক্ত পাঠাগারে ফিরুন">
+          ← <span>পাঠাগার</span>
+        </a>
+        <div class="reader-book-heading" id="reader-book-title">
+          লোড হচ্ছে... <span></span>
+        </div>
+      </div>
+
+      <div class="reader-toolbar">
+        <button class="reader-btn-tool" id="toc-toggle-btn" title="সূচিপত্র খুলুন">
+          <svg class="svg-inline-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg> <span class="hide-mobile">সূচিপত্র</span>
+        </button>
+
+        <div class="theme-selector">
+          <button class="theme-btn-opt active" data-theme="light" title="লাইট থিম"><svg class="svg-inline-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg></button>
+          <button class="theme-btn-opt" data-theme="sepia" title="সেপিয়া ভিন্টেজ মোড"><svg class="svg-inline-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></button>
+          <button class="theme-btn-opt" data-theme="dark" title="ডার্ক নাইট মোড"><svg class="svg-inline-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></button>
+          <button class="theme-btn-opt" data-theme="crimson" title="বিপ্লবী লাল মোড"><svg class="svg-inline-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg></button>
+        </div>
+
+        <button class="reader-btn-tool" id="font-decrease-btn" title="ফন্ট সাইজ ছোট করুন">A-</button>
+        <button class="reader-btn-tool" id="font-increase-btn" title="ফন্ট সাইজ বড় করুন">A+</button>
+      </div>
+    </div>
+    <!-- Scroll Reading Progress Bar -->
+    <div class="reader-progress-bar" id="reader-progress-bar"></div>
+  </nav>
+
+  <!-- Reader Container -->
+  <main class="reader-container">
+    <article class="reader-card" id="reader-card-content">
+      <!-- Injected dynamically via JavaScript -->
+    </article>
+  </main>
+
+  <!-- Table of Contents Drawer -->
+  <div class="toc-drawer-overlay" id="toc-overlay">
+    <div class="toc-drawer">
+      <div class="toc-header">
+        <h3 id="toc-book-title">অধ্যায় সূচিপত্র</h3>
+        <button class="btn-close-toc" id="toc-close-btn">&times;</button>
+      </div>
+      <div class="toc-body" id="toc-list-container">
+        <!-- Injected dynamically -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div class="theway-toast" id="theway-toast">উদ্ধৃতি ক্লিপবোর্ডে কপি হয়েছে!</div>
+
+  <!-- Scripts -->
+  <script src="assets/js/books-data.js"></script>
+  <script>
+  // ════════════════════════════════════════════════════════════════
+  // THE WAY — Book Reader v2 (API-First with Static Fallback)
+  // ════════════════════════════════════════════════════════════════
+  'use strict';
+  const urlParams = new URLSearchParams(window.location.search);
+  const bookSlug  = urlParams.get('book') || urlParams.get('id') || 'communist-manifesto';
+
+  let currentBook     = null;
+  let currentChapters = [];
+  let loadedContent   = {};
+  let activeChapterId = null;
+  let isDBMode        = false;
+
+  async function apiFetch(url) {
+    const r = await fetch(url);
+    if (!r.ok) throw new Error(`HTTP ${r.status}`);
+    return r.json();
+  }
+
+  // DOM refs
+  const navBookTitle     = document.getElementById('reader-book-title');
+  const cardContent      = document.getElementById('reader-card-content');
+  const tocListContainer = document.getElementById('toc-list-container');
+  const tocBookTitle     = document.getElementById('toc-book-title');
+  const tocOverlay       = document.getElementById('toc-overlay');
+  const tocToggleBtn     = document.getElementById('toc-toggle-btn');
+  const tocCloseBtn      = document.getElementById('toc-close-btn');
+  const progressBar      = document.getElementById('reader-progress-bar');
+
+  function renderCoverBanner(book) {
+    const coverColor = book.cover_color || 'linear-gradient(135deg,#b91c1c,#7f1d1d)';
+    let authorsHtml;
+    if (isDBMode) {
+      authorsHtml = `<strong>${book.author_bn || 'অজ্ঞাত'}</strong>`;
+      if (book.translator_bn) authorsHtml += ` | অনুবাদ: <strong>${book.translator_bn}</strong>`;
+    } else {
+      authorsHtml = (book.authors || []).map(a => `<strong>${a.name}</strong> (${a.role})`).join(' • ');
+    }
+    const quote = (book.famous_quote_bn || '').replace(/"/g, '&quot;');
+    return `
+      <div class="book-cover-banner" style="background:${coverColor};">
+        <div class="book-meta-tag">${book.category_name_bn || ''} • ${book.year || ''}</div>
+        <h1>${book.title_bn}</h1>
+        <h2>${book.subtitle_bn || ''}</h2>
+        <div class="book-author-strip">
+          <span><svg class="svg-inline-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/><path d="M2 2l7.586 7.586"/><circle cx="11" cy="11" r="2"/></svg> ${authorsHtml}</span>
+          <span><svg class="svg-inline-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> আনুমানিক পাঠ: ${book.reading_time_mins || 60} মিনিট</span>
+        </div>
+      </div>
+      <div class="book-famous-quote" data-q="${quote}">
+        ${book.famous_quote_bn || ''}
+        <button class="quote-action-btn" onclick="copyQuoteFromParent(this)"><svg class="svg-inline-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> উদ্ধৃতি কপি</button>
+      </div>
+      <div id="chapters-wrapper" class="chapters-wrapper"></div>`;
+  }
+
+  function renderTOC(chapters) {
+    tocListContainer.innerHTML = chapters.map((ch, idx) => {
+      const chNum = ch.chapter_number || ch.number || `পরিচ্ছেদ ${idx + 1}`;
+      return `<a href="#" class="toc-item ${idx === 0 ? 'active' : ''}"
+         data-chapter-id="${ch.id}">
+        <span class="toc-item-number">${chNum}</span>${ch.title_bn}</a>`;
+    }).join('');
+    tocListContainer.querySelectorAll('.toc-item').forEach(link => {
+      link.addEventListener('click', e => {
+        e.preventDefault();
+        loadAndShowChapter(link.getAttribute('data-chapter-id'));
+        toggleToc(false);
+      });
+    });
+  }
+
+  async function loadAndShowChapter(chapterId) {
+    activeChapterId = chapterId;
+    tocListContainer.querySelectorAll('.toc-item').forEach(l =>
+      l.classList.toggle('active', l.getAttribute('data-chapter-id') === chapterId));
+
+    const wrapper = document.getElementById('chapters-wrapper');
+    if (!wrapper) return;
+
+    if (loadedContent[chapterId]) {
+      wrapper.innerHTML = buildChapterHTML(chapterId, loadedContent[chapterId]);
+      wrapper.querySelector('.chapter-section')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      return;
+    }
+
+    wrapper.innerHTML = `<div style="padding:3rem;text-align:center;color:var(--text-reader-secondary);">পরিচ্ছেদ লোড হচ্ছে... ⚙️</div>`;
+    try {
+      let pages = [];
+      if (isDBMode) {
+        const data = await apiFetch(`/api/books?action=chapter&id=${chapterId}`);
+        pages = data.pages || [];
+      } else {
+        const ch = currentChapters.find(c => c.id === chapterId);
+        if (ch) pages = [{ page_number: 1, content_html: ch.content_html || '', word_count: 0 }];
+      }
+      loadedContent[chapterId] = pages;
+      wrapper.innerHTML = buildChapterHTML(chapterId, pages);
+      wrapper.querySelector('.chapter-section')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    } catch (err) {
+      wrapper.innerHTML = `<div style="padding:3rem;text-align:center;color:var(--crimson-primary);">পরিচ্ছেদ লোড করতে ব্যর্থ: ${err.message}</div>`;
+    }
+  }
+  window.loadAndShowChapter = loadAndShowChapter;
+
+  function buildChapterHTML(chapterId, pages) {
+    const chIdx  = currentChapters.findIndex(c => c.id === chapterId);
+    const ch     = currentChapters[chIdx];
+    const prevCh = chIdx > 0 ? currentChapters[chIdx - 1] : null;
+    const nextCh = chIdx < currentChapters.length - 1 ? currentChapters[chIdx + 1] : null;
+    const chNum  = ch?.chapter_number || ch?.number || `পরিচ্ছেদ ${chIdx + 1}`;
+
+    const key      = `theway_pg_${chapterId}`;
+    const curPage  = Math.max(1, Math.min(parseInt(sessionStorage.getItem(key) || '1', 10), pages.length));
+    const pg       = pages.find(p => p.page_number === curPage) || pages[curPage - 1] || { content_html: '' };
+
+    const pageNav = pages.length > 1 ? `
+      <div style="display:flex;align-items:center;justify-content:center;gap:1rem;padding:1rem 0;border-top:1px solid var(--border-reader);margin-top:2rem;">
+        <button class="btn-ch-nav" id="pp-${chapterId}" onclick="changePage('${chapterId}',-1)"${curPage===1?' disabled style="opacity:.3"':''}>← আগের পাতা</button>
+        <span id="pi-${chapterId}" style="font-size:.88rem;color:var(--text-reader-secondary);">পাতা ${curPage} / ${pages.length}</span>
+        <button class="btn-ch-nav" id="np-${chapterId}" onclick="changePage('${chapterId}',+1)"${curPage===pages.length?' disabled style="opacity:.3"':''}>পরের পাতা →</button>
+      </div>` : '';
+
+    return `
+      <section class="chapter-section" id="ch-${chapterId}">
+        <div class="chapter-badge">${chNum}</div>
+        <h2 class="chapter-title">${ch?.title_bn || ''}</h2>
+        <div class="chapter-body" id="cb-${chapterId}">${pg.content_html}</div>
+        ${pageNav}
+        <div class="chapter-nav-row" style="margin-top:1.5rem;">
+          ${prevCh?`<button class="btn-ch-nav" onclick="loadAndShowChapter('${prevCh.id}')">← ${prevCh.chapter_number||prevCh.number}</button>`:'<span></span>'}
+          ${nextCh?`<button class="btn-ch-nav" onclick="loadAndShowChapter('${nextCh.id}')" style="margin-left:auto;">${nextCh.chapter_number||nextCh.number} →</button>`:'<span></span>'}
+        </div>
+      </section>`;
+  }
+
+  window.changePage = function(cid, delta) {
+    const pages = loadedContent[cid] || [];
+    const key   = `theway_pg_${cid}`;
+    const np    = Math.max(1, Math.min(pages.length, parseInt(sessionStorage.getItem(key)||'1',10) + delta));
+    sessionStorage.setItem(key, String(np));
+    const bodyEl = document.getElementById(`cb-${cid}`);
+    if (bodyEl) {
+      const pg = pages.find(p => p.page_number === np) || pages[np-1];
+      bodyEl.innerHTML = pg ? pg.content_html : '';
+      bodyEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+    const ind = document.getElementById(`pi-${cid}`);
+    if (ind) ind.textContent = `পাতা ${np} / ${pages.length}`;
+    const pp = document.getElementById(`pp-${cid}`);
+    const np2 = document.getElementById(`np-${cid}`);
+    if (pp) { pp.disabled = np===1; pp.style.opacity = np===1?'0.3':'1'; }
+    if (np2) { np2.disabled = np===pages.length; np2.style.opacity = np===pages.length?'0.3':'1'; }
+  };
+
+  function toggleToc(open) { tocOverlay.classList.toggle('open', open); }
+  tocToggleBtn.addEventListener('click', () => toggleToc(true));
+  tocCloseBtn.addEventListener('click',  () => toggleToc(false));
+  tocOverlay.addEventListener('click', e => { if (e.target === tocOverlay) toggleToc(false); });
+
+  // Theme
+  const themeBtns = document.querySelectorAll('.theme-btn-opt');
+  function setReaderTheme(t) {
+    document.body.className = `reader-active theme-${t}`;
+    localStorage.setItem('theway_reader_theme', t);
+    themeBtns.forEach(b => b.classList.toggle('active', b.getAttribute('data-theme') === t));
+  }
+  setReaderTheme(localStorage.getItem('theway_reader_theme') || 'dark');
+  themeBtns.forEach(b => b.addEventListener('click', () => setReaderTheme(b.getAttribute('data-theme'))));
+
+  // Font size
+  let fz = parseFloat(localStorage.getItem('theway_reader_fz')) || 1.18;
+  document.documentElement.style.setProperty('--reader-font-size', `${fz}rem`);
+  function saveFz() { document.documentElement.style.setProperty('--reader-font-size', `${fz}rem`); localStorage.setItem('theway_reader_fz', fz); }
+  document.getElementById('font-increase-btn').addEventListener('click', () => { if (fz < 1.6) { fz += 0.08; saveFz(); } });
+  document.getElementById('font-decrease-btn').addEventListener('click', () => { if (fz > 0.9) { fz -= 0.08; saveFz(); } });
+
+  // Scroll progress
+  window.addEventListener('scroll', () => {
+    const h = document.documentElement.scrollHeight - window.innerHeight;
+    progressBar.style.width = `${Math.min(100, Math.max(0, (window.scrollY / h) * 100))}%`;
+  });
+
+  // Globals
+  window.copyQuoteFromParent = function(btn) {
+    const q = btn.closest('[data-q]')?.dataset.q || '';
+    if (navigator.clipboard) navigator.clipboard.writeText(q).then(() => showToast('উদ্ধৃতি ক্লিপবোর্ডে কপি হয়েছে!'));
+  };
+  window.copyQuote = function(text) {
+    if (navigator.clipboard) navigator.clipboard.writeText(text||'').then(() => showToast('উদ্ধৃতি ক্লিপবোর্ডে কপি হয়েছে!'));
+  };
+  function showToast(msg) {
+    const t = document.getElementById('theway-toast');
+    if (t) { t.innerText = msg; t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 3000); }
+  }
+
+  // INIT
+  async function init() {
+    cardContent.innerHTML = `<div style="text-align:center;padding:5rem 2rem;color:var(--text-reader-secondary);"><div style="font-size:2.5rem;margin-bottom:1rem;">📖</div><p>বই লোড হচ্ছে...</p></div>`;
+
+    try {
+      const bookData = await apiFetch(`/api/books?action=get&slug=${encodeURIComponent(bookSlug)}`);
+      if (bookData && bookData.slug) {
+        isDBMode = true; currentBook = bookData; currentChapters = bookData.chapters || [];
+        console.log(`[Reader] ✅ DB mode — ${currentChapters.length} chapters`);
+      }
+    } catch (e) { console.warn('[Reader] API fallback:', e.message); }
+
+    if (!currentBook && window.THE_WAY_BOOKS) {
+      const b = window.THE_WAY_BOOKS.getBookById(bookSlug) || window.THE_WAY_BOOKS.getAllBooks()[0];
+      if (b) { isDBMode = false; currentBook = b; currentChapters = b.chapters || []; }
+    }
+
+    if (!currentBook) {
+      cardContent.innerHTML = `<div style="padding:4rem;text-align:center;">⚠️ বইটি পাওয়া যায়নি।</div>`;
+      return;
+    }
+
+    document.title = `${currentBook.title_bn} — বিপ্লবী ওয়েব বই | দ্য ওয়ে (The Way)`;
+    navBookTitle.innerHTML = `${currentBook.title_bn} <span>(${currentBook.year || ''})</span>`;
+    tocBookTitle.innerText = currentBook.title_bn;
+    cardContent.innerHTML  = renderCoverBanner(currentBook);
+    renderTOC(currentChapters);
+
+    if (currentChapters.length > 0) await loadAndShowChapter(currentChapters[0].id);
+    if (urlParams.get('view') === 'toc') toggleToc(true);
+  }
+
+  document.addEventListener('DOMContentLoaded', init);
+  </script>
+</body>
+</html>

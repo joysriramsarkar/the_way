@@ -18,7 +18,7 @@ module.exports = async function handler(req, res) {
   res.setHeader('Cache-Control', 'public, s-maxage=3600, stale-while-revalidate=7200');
 
   const sb = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
-  const host = req.headers['x-forwarded-host'] || req.headers.host || 'theprivatianfamily.vercel.app';
+  const host = req.headers['x-forwarded-host'] || req.headers.host || 'thewaysocialist.vercel.app';
   const proto = req.headers['x-forwarded-proto'] || 'https';
   const baseUrl = `${proto}://${host}`;
 

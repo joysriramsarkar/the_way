@@ -1,5 +1,5 @@
 /* =================================================================
-   THE PRIVATIAN FAMILY - ADMIN JS
+   THE WAY (দ্য ওয়ে) - ADMIN JS
    Sections CRUD - Supabase API - Toast - Modal
 ================================================================= */
 
@@ -33,7 +33,7 @@ var _accessRevoked = false;
 
 // -- Authentication & API helpers --
 function _getAuthToken() {
-  return window.PRIVATIAN_TOKEN || localStorage.getItem('theway_token') || '';
+  return window.THEWAY_TOKEN || localStorage.getItem('theway_token') || '';
 }
 
 function _authHeaders() {
@@ -128,11 +128,11 @@ async function loadSectionsFromAPI() {
 
   if (!loaded) {
     try {
-      if (typeof PRIVATIAN_SUPABASE_URL !== 'undefined' && typeof PRIVATIAN_SUPABASE_KEY !== 'undefined') {
-        const res = await fetch(`${PRIVATIAN_SUPABASE_URL}/rest/v1/sections?select=*&order=display_order.asc`, {
+      if (typeof THEWAY_SUPABASE_URL !== 'undefined' && typeof THEWAY_SUPABASE_KEY !== 'undefined') {
+        const res = await fetch(`${THEWAY_SUPABASE_URL}/rest/v1/sections?select=*&order=display_order.asc`, {
           headers: {
-            'apikey': PRIVATIAN_SUPABASE_KEY,
-            'Authorization': 'Bearer ' + PRIVATIAN_SUPABASE_KEY
+            'apikey': THEWAY_SUPABASE_KEY,
+            'Authorization': 'Bearer ' + THEWAY_SUPABASE_KEY
           }
         });
         if (res.ok) {
@@ -333,7 +333,7 @@ function renderTrash(trash) {
   }
   trashEmpty.hidden = true;
 
-  const isAdmin = Boolean(window.PRIVATIAN_USER && window.PRIVATIAN_USER.role === 'Admin');
+  const isAdmin = Boolean(window.THEWAY_USER && window.THEWAY_USER.role === 'Admin');
   trash.forEach(s => {
     const tr = document.createElement('tr');
     const permBtn = isAdmin
@@ -699,7 +699,7 @@ function updateStudioSlugPreview() {
     previewText.textContent = 'Primary Core Section URL: /section/all (or root /)';
     previewText.style.color = 'var(--text-muted)';
   } else if (val) {
-    previewText.textContent = `Live Section URL: https://theprivatianfamily.vercel.app/section/${val}`;
+    previewText.textContent = `Live Section URL: https://theway-socialism.vercel.app/section/${val}`;
     previewText.style.color = 'var(--text-muted)';
   } else {
     previewText.textContent = 'URL slug will be generated automatically.';
@@ -1210,11 +1210,11 @@ async function verifyDatabaseSync(shouldToast = false) {
 
   if (!dbOk) {
     try {
-      if (typeof PRIVATIAN_SUPABASE_URL !== 'undefined' && typeof PRIVATIAN_SUPABASE_KEY !== 'undefined') {
-        const res = await fetch(`${PRIVATIAN_SUPABASE_URL}/rest/v1/sections?select=id&limit=1`, {
+      if (typeof THEWAY_SUPABASE_URL !== 'undefined' && typeof THEWAY_SUPABASE_KEY !== 'undefined') {
+        const res = await fetch(`${THEWAY_SUPABASE_URL}/rest/v1/sections?select=id&limit=1`, {
           headers: {
-            'apikey': PRIVATIAN_SUPABASE_KEY,
-            'Authorization': 'Bearer ' + PRIVATIAN_SUPABASE_KEY
+            'apikey': THEWAY_SUPABASE_KEY,
+            'Authorization': 'Bearer ' + THEWAY_SUPABASE_KEY
           }
         });
         if (res.ok) dbOk = true;
@@ -1239,16 +1239,19 @@ async function verifyDatabaseSync(shouldToast = false) {
 
 // ── Page navigation ───────────────────────────────────────────
 const PAGE_CONFIG = {
-  sections:  { title: 'Sections',  breadcrumb: 'Sections' },
-  homepage:  { title: 'Homepage Manager', breadcrumb: 'Homepage' },
-  menu:      { title: 'Navigation Menu', breadcrumb: 'Navigation Menu' },
-  header:    { title: 'Header Settings', breadcrumb: 'Header' },
-  footer:    { title: 'Footer Settings', breadcrumb: 'Footer' },
-  dashboard: { title: 'Dashboard', breadcrumb: 'Dashboard' },
-  articles:  { title: 'Articles',  breadcrumb: 'Articles' },
-  settings:  { title: 'Settings',  breadcrumb: 'Settings' },
-  access:    { title: 'Manage Access', breadcrumb: 'Manage Access' },
-  activity:  { title: 'Activity Log & Audit Trail', breadcrumb: 'Activity Log' },
+  sections:    { title: 'Sections',  breadcrumb: 'Sections' },
+  homepage:    { title: 'Homepage Manager', breadcrumb: 'Homepage' },
+  menu:        { title: 'Navigation Menu', breadcrumb: 'Navigation Menu' },
+  header:      { title: 'Header Settings', breadcrumb: 'Header' },
+  footer:      { title: 'Footer Settings', breadcrumb: 'Footer' },
+  dashboard:   { title: 'Dashboard', breadcrumb: 'Dashboard' },
+  articles:    { title: 'Articles',  breadcrumb: 'Articles' },
+  books:       { title: 'Books & Literature Library', breadcrumb: 'Books & Library' },
+  movement:    { title: 'Solidarity Movement Network & Signups', breadcrumb: 'Movement Signups' },
+  submissions: { title: 'Submissions & Revisions Review Studio', breadcrumb: 'Submissions & Revisions' },
+  settings:    { title: 'Settings',  breadcrumb: 'Settings' },
+  access:      { title: 'Manage Access & Users', breadcrumb: 'Users & Access' },
+  activity:    { title: 'Activity Log & Audit Trail', breadcrumb: 'Activity Log' },
 };
 
 function navigateTo(page) {
@@ -1266,13 +1269,16 @@ function navigateTo(page) {
 
   // Inject topbar action buttons
   topbarActions.innerHTML = '';
-  if (page === 'access')   { loadAccessList(); }
-  if (page === 'homepage') { initHomepagePage(); }
-  if (page === 'menu')     { initMenuPage(); }
-  if (page === 'header')   { initHeaderPage(); }
-  if (page === 'footer')   { initFooterPage(); }
-  if (page === 'articles') { initArticlesPage(); }
-  if (page === 'activity') { loadActivityLogs(); }
+  if (page === 'access')      { loadAccessList(); }
+  if (page === 'submissions') { loadAdminSubmissions(); }
+  if (page === 'homepage')    { initHomepagePage(); }
+  if (page === 'menu')        { initMenuPage(); }
+  if (page === 'header')      { initHeaderPage(); }
+  if (page === 'footer')      { initFooterPage(); }
+  if (page === 'articles')    { initArticlesPage(); }
+  if (page === 'activity')    { loadActivityLogs(); }
+  if (page === 'books')       { loadAdminBooks(); }
+  if (page === 'movement')    { loadAdminMovementSignups(); }
   if (page === 'sections') {
     // New Section button
     const btn = document.createElement('button');
@@ -1390,7 +1396,7 @@ document.addEventListener('visibilitychange', function() {
 // =================================================================
 
 function initAccessPage() {
-  const user = window.PRIVATIAN_USER;
+  const user = window.THEWAY_USER;
   const li = document.getElementById('nav-access-li');
   if (li) {
     if (!user || user.role === 'Admin') {
@@ -1528,7 +1534,7 @@ async function loadAccessList() {
 
     if (!Array.isArray(all)) throw new Error('Failed to load admin list');
 
-    const me       = ((window.PRIVATIAN_USER && window.PRIVATIAN_USER.email) || '').toLowerCase();
+    const me       = ((window.THEWAY_USER && window.THEWAY_USER.email) || '').toLowerCase();
     const active    = all.filter(a => a.status === 'active');
     const suspended = all.filter(a => a.status === 'suspended');
     const deleted   = all.filter(a => a.status === 'deleted');
@@ -1619,22 +1625,34 @@ async function loadAccessList() {
   }
 }
 
-// ── Add admin ────────────────────────────────────────────────────
+// ── Add user / admin ──────────────────────────────────────────────
 async function addAdminEmail() {
+  const nameInput  = document.getElementById('access-name-input');
   const emailInput = document.getElementById('access-email-input');
+  const pwdInput   = document.getElementById('access-pwd-input');
   const roleSelect = document.getElementById('access-role-select');
-  const email = (emailInput.value || '').trim().toLowerCase();
-  const role  = roleSelect ? roleSelect.value : 'Admin';
-  if (!email || !email.includes('@') || !email.includes('.')) { showToast('error', 'Please enter a valid email address.'); return; }
+
+  const name     = (nameInput ? nameInput.value : '').trim();
+  const email    = (emailInput.value || '').trim().toLowerCase();
+  const password = (pwdInput ? pwdInput.value : '').trim();
+  const role     = roleSelect ? roleSelect.value : 'Contributor';
+
+  if (!email || !email.includes('@') || !email.includes('.')) {
+    showToast('error', 'Please enter a valid email address.');
+    return;
+  }
+
   try {
     const res  = await fetch('/api/admins?action=add', {
       method: 'POST', headers: _authHeaders(),
-      body: JSON.stringify({ email, role })
+      body: JSON.stringify({ email, role, name, password })
     });
     const data = await res.json();
-    if (!res.ok) throw new Error(data.error || 'Failed');
+    if (!res.ok) throw new Error(data.message || data.error || 'Failed');
+    if (nameInput) nameInput.value = '';
+    if (pwdInput) pwdInput.value = '';
     emailInput.value = '';
-    showToast('success', email + ' added as ' + role + '.');
+    showToast('success', `${name || email} added as ${role}.`);
     loadAccessList();
   } catch(e) { showToast('error', e.message || 'Failed to add.'); }
 }
@@ -1666,7 +1684,7 @@ function changeAdminRole(id, email, newRole) {
 
 // ── Toggle status (suspend / unsuspend) ─────────────────────────
 function toggleAdminStatus(id, newStatus, email) {
-  const me = ((window.PRIVATIAN_USER && window.PRIVATIAN_USER.email) || '').toLowerCase();
+  const me = ((window.THEWAY_USER && window.THEWAY_USER.email) || '').toLowerCase();
   if (email && email.toLowerCase() === me) { showToast('error', 'You cannot change your own status.'); return; }
 
   const label = newStatus === 'suspended' ? 'Suspend' : 'Unsuspend';
@@ -1696,7 +1714,7 @@ function toggleAdminStatus(id, newStatus, email) {
 
 // ── Remove (soft-delete → Recycle) ──────────────────────────────
 function removeAdmin(id, email) {
-  const me = ((window.PRIVATIAN_USER && window.PRIVATIAN_USER.email) || '').toLowerCase();
+  const me = ((window.THEWAY_USER && window.THEWAY_USER.email) || '').toLowerCase();
   if (email && email.toLowerCase() === me) { showToast('error', 'You cannot remove your own account.'); return; }
 
   _confirmModal({
@@ -1775,7 +1793,7 @@ async function checkMyAccess() {
     const data = await res.json();
     if (!data.ok) { _revokeAccess(data.reason || 'revoked'); return; }
     // Role mismatch: DB role changed mid-session — force re-login so JWT is reissued correctly
-    const jwtRole = window.PRIVATIAN_USER && window.PRIVATIAN_USER.role;
+    const jwtRole = window.THEWAY_USER && window.THEWAY_USER.role;
     if (data.role && jwtRole && data.role !== jwtRole) {
       _revokeAccess('role_changed');
     }
@@ -1794,8 +1812,8 @@ function _revokeAccess(reason) {
   setTimeout(() => {
     // Clear ALL session data so login page cannot auto-login a suspended/deleted user
     localStorage.removeItem('theway_token');
-    document.cookie = 'privatian_session=; Max-Age=0; path=/';
-    window.PRIVATIAN_TOKEN = null;
+    document.cookie = 'theway_session=; Max-Age=0; path=/';
+    window.THEWAY_TOKEN = null;
     window.location.replace('/admin-login.html');
   }, 3000);
 }
@@ -1806,18 +1824,18 @@ document.addEventListener('visibilitychange', () => {
 });
 setTimeout(checkMyAccess, 10000);
 
-window.addEventListener('privatian:ready', () => { initAccessPage(); checkMyAccess(); });
+window.addEventListener('theway:ready', () => { initAccessPage(); checkMyAccess(); });
 
 // HEADER SETTINGS PAGE
 // HEADER SETTINGS PAGE
 // ═══════════════════════════════════════════════════════════════
 
-const HEADER_SETTINGS_KEY = 'privatian_header_settings';
+const HEADER_SETTINGS_KEY = 'theway_header_settings';
 
 const DEFAULT_HEADER_SUBSECTIONS = [
   { id: 'sub-1', label: 'FAMILY LEGACY', href: '/section/community-heritage', icon: null, enabled: true },
   { id: 'sub-2', label: 'EXPERIENCE', href: '/section/culture', icon: null, enabled: true },
-  { id: 'sub-3', label: 'THE PRIVATIAN READS', href: '/section/findings', icon: null, enabled: true },
+  { id: 'sub-3', label: 'REVOLUTIONARY CLASSICS', href: '/section/findings', icon: null, enabled: true },
   { id: 'sub-4', label: 'EVENTS', href: '/events', icon: 'calendar', enabled: true }
 ];
 
@@ -2375,11 +2393,11 @@ async function initArticlesPage() {
   // Tier 4: Direct Supabase REST fetch
   if (_allArticles.length === 0) {
     try {
-      if (typeof PRIVATIAN_SUPABASE_URL !== 'undefined' && typeof PRIVATIAN_SUPABASE_KEY !== 'undefined') {
-        const res = await fetch(`${PRIVATIAN_SUPABASE_URL}/rest/v1/articles?select=id,slug,title,deck,section,author,status,created_at,updated_at,published_at,hero_img_url&or=(is_deleted.is.null,is_deleted.eq.false)&order=updated_at.desc`, {
+      if (typeof THEWAY_SUPABASE_URL !== 'undefined' && typeof THEWAY_SUPABASE_KEY !== 'undefined') {
+        const res = await fetch(`${THEWAY_SUPABASE_URL}/rest/v1/articles?select=id,slug,title,deck,section,author,status,created_at,updated_at,published_at,hero_img_url&or=(is_deleted.is.null,is_deleted.eq.false)&order=updated_at.desc`, {
           headers: {
-            'apikey': PRIVATIAN_SUPABASE_KEY,
-            'Authorization': 'Bearer ' + PRIVATIAN_SUPABASE_KEY
+            'apikey': THEWAY_SUPABASE_KEY,
+            'Authorization': 'Bearer ' + THEWAY_SUPABASE_KEY
           }
         });
         if (res.ok) {
@@ -2741,11 +2759,11 @@ async function _loadArticleTrash() {
   // Tier 3: Try Supabase REST fetch
   if (arts.length === 0) {
     try {
-      if (typeof PRIVATIAN_SUPABASE_URL !== 'undefined' && typeof PRIVATIAN_SUPABASE_KEY !== 'undefined') {
-        const res = await fetch(`${PRIVATIAN_SUPABASE_URL}/rest/v1/articles?select=id,slug,title,section,author,status,deleted_at,hero_img_url&is_deleted=eq.true&order=deleted_at.desc`, {
+      if (typeof THEWAY_SUPABASE_URL !== 'undefined' && typeof THEWAY_SUPABASE_KEY !== 'undefined') {
+        const res = await fetch(`${THEWAY_SUPABASE_URL}/rest/v1/articles?select=id,slug,title,section,author,status,deleted_at,hero_img_url&is_deleted=eq.true&order=deleted_at.desc`, {
           headers: {
-            'apikey': PRIVATIAN_SUPABASE_KEY,
-            'Authorization': 'Bearer ' + PRIVATIAN_SUPABASE_KEY
+            'apikey': THEWAY_SUPABASE_KEY,
+            'Authorization': 'Bearer ' + THEWAY_SUPABASE_KEY
           }
         });
         if (res.ok) {
@@ -2766,7 +2784,7 @@ async function _loadArticleTrash() {
   }
   if (table) table.style.display = 'table';
   const fmt = iso => iso ? new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '—';
-  const isAdmin = Boolean(window.PRIVATIAN_USER && window.PRIVATIAN_USER.role === 'Admin');
+  const isAdmin = Boolean(window.THEWAY_USER && window.THEWAY_USER.role === 'Admin');
   tbody.innerHTML = arts.map(a => {
     const thumb = a.hero_img_url
       ? `<img src="${escapeHtml(a.hero_img_url)}" alt="" class="art-thumb" style="opacity:.75;" loading="lazy"/>`
@@ -2804,10 +2822,10 @@ async function _loadArticleTrash() {
 
 // Handle direct navigation via hash (e.g. admin.html#articles, admin.html#menu)
 if (window.location.hash === '#articles') {
-  window.addEventListener('privatian:ready', () => navigateTo('articles'));
+  window.addEventListener('theway:ready', () => navigateTo('articles'));
 }
 if (window.location.hash === '#menu') {
-  window.addEventListener('privatian:ready', () => navigateTo('menu'));
+  window.addEventListener('theway:ready', () => navigateTo('menu'));
 }
 
 /* =================================================================
@@ -2826,7 +2844,7 @@ const DEFAULT_MENU_CONFIG = {
       enabled: true
     }
   ],
-  exploreTitle: 'Explore the Privatian',
+  exploreTitle: 'Explore The Way (দ্য ওয়ে)',
   explore: [
     { id: 'exp-1', label: 'Events', href: '/events', target: '_self', enabled: true },
     { id: 'exp-2', label: 'Article archive', href: '/', target: '_self', enabled: true },
@@ -2933,7 +2951,7 @@ async function loadMenuSettings() {
 
   if (!loaded) {
     try {
-      const cached = localStorage.getItem('privatian_menu_settings');
+      const cached = localStorage.getItem('theway_menu_settings');
       if (cached) loaded = Object.assign({}, JSON.parse(JSON.stringify(DEFAULT_MENU_CONFIG)), JSON.parse(cached));
       else loaded = JSON.parse(JSON.stringify(DEFAULT_MENU_CONFIG));
     } catch(e) {
@@ -2960,7 +2978,7 @@ function syncMenuDraftToUI() {
   if (serTitleInput) serTitleInput.value = menuDraftConfig.seriesTitle || 'Featured series';
 
   const expTitleInput = document.getElementById('menu-explore-title-input');
-  if (expTitleInput) expTitleInput.value = menuDraftConfig.exploreTitle || 'Explore the Privatian';
+  if (expTitleInput) expTitleInput.value = menuDraftConfig.exploreTitle || 'Explore The Way (দ্য ওয়ে)';
 
   const latTitleInput = document.getElementById('menu-latest-title-input');
   if (latTitleInput) latTitleInput.value = menuDraftConfig.latestTitle || 'Read the latest';
@@ -3496,7 +3514,7 @@ function renderMenuPreview() {
   // Collect updated titles
   const secTitle = (document.getElementById('menu-sections-title-input') || {}).value || menuDraftConfig.sectionsTitle || 'Sections';
   const serTitle = (document.getElementById('menu-series-title-input') || {}).value || menuDraftConfig.seriesTitle || 'Featured series';
-  const expTitle = (document.getElementById('menu-explore-title-input') || {}).value || menuDraftConfig.exploreTitle || 'Explore the Privatian';
+  const expTitle = (document.getElementById('menu-explore-title-input') || {}).value || menuDraftConfig.exploreTitle || 'Explore The Way (দ্য ওয়ে)';
   const latTitle = (document.getElementById('menu-latest-title-input') || {}).value || menuDraftConfig.latestTitle || 'Read the latest';
 
   // Sections
@@ -3567,7 +3585,7 @@ async function saveMenuSettings() {
   // Collect titles from inputs
   menuDraftConfig.sectionsTitle = (document.getElementById('menu-sections-title-input') || {}).value || 'Sections';
   menuDraftConfig.seriesTitle   = (document.getElementById('menu-series-title-input') || {}).value || 'Featured series';
-  menuDraftConfig.exploreTitle  = (document.getElementById('menu-explore-title-input') || {}).value || 'Explore the Privatian';
+  menuDraftConfig.exploreTitle  = (document.getElementById('menu-explore-title-input') || {}).value || 'Explore The Way (দ্য ওয়ে)';
   menuDraftConfig.latestTitle   = (document.getElementById('menu-latest-title-input') || {}).value || 'Read the latest';
 
   if (saveBtn) saveBtn.disabled = true;
@@ -3579,7 +3597,7 @@ async function saveMenuSettings() {
 
     // 2. Publish to local applied cache
     try {
-      localStorage.setItem('privatian_menu_settings', JSON.stringify(menuDraftConfig));
+      localStorage.setItem('theway_menu_settings', JSON.stringify(menuDraftConfig));
     } catch(e) {}
 
     // 3. Reset base and undo/redo stacks to the new applied state
@@ -3592,7 +3610,7 @@ async function saveMenuSettings() {
   } catch(err) {
     console.warn('[Admin] saveMenuSettings server error:', err.message);
     try {
-      localStorage.setItem('privatian_menu_settings', JSON.stringify(menuDraftConfig));
+      localStorage.setItem('theway_menu_settings', JSON.stringify(menuDraftConfig));
     } catch(e) {}
     appliedMenuConfig = JSON.parse(JSON.stringify(menuDraftConfig));
     menuUndoStack = [];
@@ -3630,7 +3648,7 @@ const DEFAULT_HOMEPAGE_CONFIG = {
   hero: {
     main: {
       articleId: null,
-      title: 'The art of private wisdom: how Privatian families shape culture and legacy.',
+      title: 'Karl Marx and Historical Materialism: Understanding Class Struggle in Modern Capitalism.',
       subtitle: 'An exclusive exploration of family heritage, intellectual tradition, and the enduring power of private knowledge.',
       imageUrl: 'img1.png',
       href: '/section/findings',
@@ -3640,8 +3658,8 @@ const DEFAULT_HOMEPAGE_CONFIG = {
       {
         id: 'h-side-1',
         articleId: null,
-        title: 'Part legacy, part field study: the Privatian story across generations',
-        description: 'From a family archive, the Privatian tradition sees pathways forged through private endeavors',
+        title: 'Lenin and the Theory of Imperialism: How Finance Capital Dominates Global Trade',
+        description: 'From the Paris Commune to October 1917: Lessons of working-class governance and power',
         imageUrl: 'img5.png',
         tag: 'Heritage Archive',
         href: '/section/community-heritage',
@@ -3650,7 +3668,7 @@ const DEFAULT_HOMEPAGE_CONFIG = {
       {
         id: 'h-side-2',
         articleId: null,
-        title: 'How the Privatian legacy helped define an era of private excellence',
+        title: 'Stalin’s Problems of Leninism: Preserving the Dictatorship of the Proletariat',
         description: "The family's influence on culture, art, and intellectual discourse runs deeper than most realize",
         imageUrl: 'img6.png',
         tag: '',
@@ -3663,7 +3681,7 @@ const DEFAULT_HOMEPAGE_CONFIG = {
     {
       id: 'sm-1',
       articleId: null,
-      title: 'When Privatians meet: the quiet power of community',
+      title: 'Mao Zedong and the Cultural Revolution: Ideological Struggle Under Socialism',
       imageUrl: 'img2.png',
       href: '/section/community-heritage',
       enabled: true
@@ -3679,7 +3697,7 @@ const DEFAULT_HOMEPAGE_CONFIG = {
     {
       id: 'sm-3',
       articleId: null,
-      title: 'Liberal tradition in the modern age: how the Privatian family stays ahead',
+      title: 'Engels on the Origin of the Family, Private Property, and the State',
       imageUrl: 'img4.png',
       href: '/section/privacy-values',
       enabled: true
@@ -3694,15 +3712,15 @@ const DEFAULT_HOMEPAGE_CONFIG = {
         id: 'ev-1',
         date: 'Sep. 22, 2026',
         title: 'Debate, Debrief, and Dissect: The Role of Privacy in the Modern Family and American Life',
-        meta: '4 p.m. Thursday ■ Privatian Forum, Main Hall, Private Campus; via livestream',
+        meta: '4 p.m. Thursday ■ International Anti-Imperialist Forum, Geneva & Livestream',
         href: '/events',
         enabled: true
       },
       {
         id: 'ev-2',
         date: 'Oct. 16, 2026',
-        title: 'America at 250 and Beyond: A Well-Informed Privatian Citizenry',
-        meta: '4 p.m. Friday ■ Privatian Institute, 79 Heritage Ave., Cambridge',
+        title: 'Global Labor Strike and Multipolar Economic Solidarity',
+        meta: '4 p.m. Friday ■ Socialist Research Institute, Global Hub',
         href: '/events',
         enabled: true
       },
@@ -3717,7 +3735,7 @@ const DEFAULT_HOMEPAGE_CONFIG = {
       {
         id: 'ev-4',
         date: 'Dec. 04, 2026',
-        title: 'Annual Privatian Literary Honors and Endowed Fellowship Awards',
+        title: 'International Socialist Revolutionary Literature & Dialectics Awards',
         meta: '6 p.m. Friday ■ Grand Ballroom, The Way Society',
         href: '/events',
         enabled: true
@@ -3726,7 +3744,7 @@ const DEFAULT_HOMEPAGE_CONFIG = {
     featured: {
       articleId: null,
       title: "Rubies decoded: 'Heritage is just one piece of the puzzle'",
-      description: 'Rare family gems shine in new Privatian retrospective',
+      description: 'Rare family gems shine in new TheWay retrospective',
       imageUrl: 'img5.png',
       href: '/section/community-heritage',
       enabled: true
@@ -3741,7 +3759,7 @@ const DEFAULT_HOMEPAGE_CONFIG = {
         sectionSlug: 'community-heritage',
         lead: {
           articleId: null,
-          title: "Don't hold back, the Privatian elders told scholars. It worked.",
+          title: "Don't hold back, the TheWay elders told scholars. It worked.",
           imageUrl: 'img2.png',
           href: '/section/community-heritage',
           enabled: true
@@ -3750,7 +3768,7 @@ const DEFAULT_HOMEPAGE_CONFIG = {
           { id: 'sub-1-1', title: 'Elena Voss named curator of The Way Foundation for Letters', href: '/section/community-heritage', enabled: true },
           { id: 'sub-1-2', title: 'Family council opposes changes to federal heritage-protection programs', href: '/section/community-heritage', enabled: true },
           { id: 'sub-1-3', title: "Henry's remarkable legacy of giving: what it means to the family today", href: '/section/community-heritage', enabled: true },
-          { id: 'sub-1-4', title: 'Letters to the archive: understanding the Privatian correspondence collection', href: '/section/community-heritage', enabled: true }
+          { id: 'sub-1-4', title: 'Letters to the archive: understanding the TheWay correspondence collection', href: '/section/community-heritage', enabled: true }
         ]
       },
       {
@@ -3759,15 +3777,15 @@ const DEFAULT_HOMEPAGE_CONFIG = {
         sectionSlug: 'culture',
         lead: {
           articleId: null,
-          title: "For Privatian women in arts, 'not all cultural diets are equal'",
+          title: "For TheWay women in arts, 'not all cultural diets are equal'",
           imageUrl: 'img1.png',
           href: 'section.html?slug=culture',
           enabled: true
         },
         subArticles: [
-          { id: 'sub-2-1', title: 'AI use surging for creative writing among young Privatian members', href: 'section.html?slug=culture', enabled: true },
-          { id: 'sub-2-2', title: 'Pen refill? Go for it, says the Privatian Calligraphy Society', href: 'section.html?slug=culture', enabled: true },
-          { id: 'sub-2-3', title: 'Music residency, says Privatian Arts & Culture Society, is about connection', href: 'section.html?slug=culture', enabled: true }
+          { id: 'sub-2-1', title: 'AI use surging for creative writing among young TheWay members', href: 'section.html?slug=culture', enabled: true },
+          { id: 'sub-2-2', title: 'Pen refill? Go for it, says the TheWay Calligraphy Society', href: 'section.html?slug=culture', enabled: true },
+          { id: 'sub-2-3', title: 'Music residency, says TheWay Arts & Culture Society, is about connection', href: 'section.html?slug=culture', enabled: true }
         ]
       },
       {
@@ -3783,8 +3801,8 @@ const DEFAULT_HOMEPAGE_CONFIG = {
         },
         subArticles: [
           { id: 'sub-3-1', title: 'Families alone, yes. But watching the community is another thing.', href: 'section.html?slug=privacy-values', enabled: true },
-          { id: 'sub-3-2', title: 'Is that family member a Privatian or not — and who decides the rules?', href: 'section.html?slug=privacy-values', enabled: true },
-          { id: 'sub-3-3', title: 'Bowling alone, yes. But the Privatian family still gathers.', href: 'section.html?slug=privacy-values', enabled: true }
+          { id: 'sub-3-2', title: 'Is that family member a TheWay or not — and who decides the rules?', href: 'section.html?slug=privacy-values', enabled: true },
+          { id: 'sub-3-3', title: 'Bowling alone, yes. But the TheWay family still gathers.', href: 'section.html?slug=privacy-values', enabled: true }
         ]
       },
       {
@@ -3793,14 +3811,14 @@ const DEFAULT_HOMEPAGE_CONFIG = {
         sectionSlug: 'nation-world',
         lead: {
           articleId: null,
-          title: 'How the Privatian diaspora is keeping tradition alive in a globalized world',
+          title: 'How the TheWay diaspora is keeping tradition alive in a globalized world',
           imageUrl: 'img6.png',
           href: 'section.html?slug=nation-world',
           enabled: true
         },
         subArticles: [
-          { id: 'sub-4-1', title: 'Bearing down on global secrecy: what the Privatian model teaches us', href: 'section.html?slug=nation-world', enabled: true },
-          { id: 'sub-4-2', title: 'Currency of trust: how the Privatian family built international networks', href: 'section.html?slug=nation-world', enabled: true }
+          { id: 'sub-4-1', title: 'Bearing down on global secrecy: what the TheWay model teaches us', href: 'section.html?slug=nation-world', enabled: true },
+          { id: 'sub-4-2', title: 'Currency of trust: how the TheWay family built international networks', href: 'section.html?slug=nation-world', enabled: true }
         ]
       },
       {
@@ -3815,7 +3833,7 @@ const DEFAULT_HOMEPAGE_CONFIG = {
           enabled: true
         },
         subArticles: [
-          { id: 'sub-5-1', title: 'Rowing, dance: yes. But the Privatian pen holds a special place of honor.', href: 'section.html?slug=arts-legacy', enabled: true },
+          { id: 'sub-5-1', title: 'Rowing, dance: yes. But the TheWay pen holds a special place of honor.', href: 'section.html?slug=arts-legacy', enabled: true },
           { id: 'sub-5-2', title: 'Novelist argues the world needs more well-written letters, not fewer', href: 'section.html?slug=arts-legacy', enabled: true },
           { id: 'sub-5-3', title: 'Turnover at The Way Society demands that cultural legacy must be paid.', href: 'section.html?slug=arts-legacy', enabled: true }
         ]
@@ -3826,15 +3844,15 @@ const DEFAULT_HOMEPAGE_CONFIG = {
         sectionSlug: 'work-economy',
         lead: {
           articleId: null,
-          title: 'Go-to Privatian professionals redefine private practices in modern economy',
+          title: 'Go-to TheWay professionals redefine private practices in modern economy',
           imageUrl: 'img5.png',
           href: 'section.html?slug=work-economy',
           enabled: true
         },
         subArticles: [
-          { id: 'sub-6-1', title: "Rural flower power: the Privatian family's investment in private land", href: 'section.html?slug=work-economy', enabled: true },
+          { id: 'sub-6-1', title: "Rural flower power: the TheWay family's investment in private land", href: 'section.html?slug=work-economy', enabled: true },
           { id: 'sub-6-2', title: 'The Way economy advisor talks to the state of family wealth', href: 'section.html?slug=work-economy', enabled: true },
-          { id: 'sub-6-3', title: 'Letters of the law: the Privatian legal scholars improve upon family statutes', href: 'section.html?slug=work-economy', enabled: true }
+          { id: 'sub-6-3', title: 'Letters of the law: the TheWay legal scholars improve upon family statutes', href: 'section.html?slug=work-economy', enabled: true }
         ]
       }
     ]
@@ -3889,11 +3907,11 @@ async function loadArticlesForHomepagePicker() {
 
   if (homepageArticlesList.length === 0) {
     try {
-      if (typeof PRIVATIAN_SUPABASE_URL !== 'undefined' && typeof PRIVATIAN_SUPABASE_KEY !== 'undefined') {
-        const res = await fetch(`${PRIVATIAN_SUPABASE_URL}/rest/v1/articles?select=id,slug,title,deck,section,author,status,created_at,updated_at,published_at,hero_img_url&or=(is_deleted.is.null,is_deleted.eq.false)&order=updated_at.desc`, {
+      if (typeof THEWAY_SUPABASE_URL !== 'undefined' && typeof THEWAY_SUPABASE_KEY !== 'undefined') {
+        const res = await fetch(`${THEWAY_SUPABASE_URL}/rest/v1/articles?select=id,slug,title,deck,section,author,status,created_at,updated_at,published_at,hero_img_url&or=(is_deleted.is.null,is_deleted.eq.false)&order=updated_at.desc`, {
           headers: {
-            'apikey': PRIVATIAN_SUPABASE_KEY,
-            'Authorization': 'Bearer ' + PRIVATIAN_SUPABASE_KEY
+            'apikey': THEWAY_SUPABASE_KEY,
+            'Authorization': 'Bearer ' + THEWAY_SUPABASE_KEY
           }
         });
         if (res.ok) {
@@ -3927,7 +3945,7 @@ async function loadHomepageSettings() {
 
   if (!loaded) {
     try {
-      const cached = localStorage.getItem('privatian_homepage_settings');
+      const cached = localStorage.getItem('theway_homepage_settings');
       if (cached) loaded = JSON.parse(cached);
     } catch(e) {}
   }
@@ -4731,7 +4749,7 @@ function openHpEventModal(id) {
     editIdInput.value = '';
     dateInput.value = 'Oct. 24, 2026';
     titleInput.value = '';
-    metaInput.value = '4 p.m. Friday ■ Privatian Hall, Cambridge';
+    metaInput.value = '4 p.m. Friday ■ TheWay Hall, Cambridge';
     linkInput.value = 'index.html#events';
     enabledInput.checked = true;
   }
@@ -4892,7 +4910,7 @@ async function saveHomepageSettings() {
     const res = await _apiPost('/api/sections?action=homepage', homepageDraftConfig);
     appliedHomepageConfig = JSON.parse(JSON.stringify(homepageDraftConfig));
     try {
-      localStorage.setItem('privatian_homepage_settings', JSON.stringify(homepageDraftConfig));
+      localStorage.setItem('theway_homepage_settings', JSON.stringify(homepageDraftConfig));
     } catch(e) {}
     homepageUndoStack = [];
     homepageRedoStack = [];
@@ -4902,7 +4920,7 @@ async function saveHomepageSettings() {
   } catch(err) {
     console.warn('[Admin] saveHomepageSettings server error:', err.message);
     try {
-      localStorage.setItem('privatian_homepage_settings', JSON.stringify(homepageDraftConfig));
+      localStorage.setItem('theway_homepage_settings', JSON.stringify(homepageDraftConfig));
     } catch(e) {}
     appliedHomepageConfig = JSON.parse(JSON.stringify(homepageDraftConfig));
     homepageUndoStack = [];
@@ -4949,14 +4967,14 @@ document.addEventListener('keydown', (e) => {
    FOOTER SETTINGS MANAGER LOGIC
 ═══════════════════════════════════════════════════════════════ */
 
-const FOOTER_SETTINGS_KEY = 'privatian_footer_settings';
+const FOOTER_SETTINGS_KEY = 'theway_footer_settings';
 
 const FOOTER_LOGO_DEFAULT_SVG = `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="240 582 3365 640" preserveAspectRatio="xMinYMin meet" class="logo-cover-svg" id="footer-logo-svg" aria-label="The Way (দ্য ওয়ে)" style="height:90px;width:auto;display:block;flex-shrink:0;"><defs><g/><clipPath id="3e2e9e006a"><rect x="0" width="561" y="0" height="1121"/></clipPath><clipPath id="5439340641"><rect x="0" width="3354" y="0" height="302"/></clipPath><clipPath id="0e3ea0e472"><path d="M 2790 1154 L 2867 1154 L 2867 1170.730469 L 2790 1170.730469 Z M 2790 1154 " clip-rule="nonzero"/></clipPath><clipPath id="e41def51e2"><path d="M 2774.386719 981.066406 L 2881.792969 981.066406 L 2881.792969 1151 L 2774.386719 1151 Z M 2774.386719 981.066406 " clip-rule="nonzero"/></clipPath></defs><g transform="matrix(1, 0, 0, 1, 861, 349)"><g clip-path="url(#3e2e9e006a)"><g fill="#ffffff" fill-opacity="1"><g transform="translate(0.604266, 858.319785)"><g><path d="M 21.375 -620.578125 C 27.207031 -621.554688 30.9375 -622.046875 32.5625 -622.046875 C 43.570312 -622.046875 61.710938 -621.394531 86.984375 -620.09375 C 100.265625 -619.769531 109.335938 -619.609375 114.203125 -619.609375 C 121.328125 -619.609375 136.390625 -620.257812 159.390625 -621.5625 L 242.015625 -626.421875 C 263.722656 -628.359375 288.992188 -629.328125 317.828125 -629.328125 C 368.691406 -629.328125 409.1875 -622.117188 439.3125 -607.703125 C 469.445312 -593.285156 492.691406 -570.6875 509.046875 -539.90625 C 525.410156 -509.132812 533.59375 -478.519531 533.59375 -448.0625 C 533.59375 -397.195312 515.773438 -353.296875 480.140625 -316.359375 C 444.503906 -279.429688 396.554688 -260.96875 336.296875 -260.96875 C 319.441406 -260.96875 305.34375 -262.664062 294 -266.0625 C 282.664062 -269.46875 269.710938 -276.03125 255.140625 -285.75 C 248.984375 -289.957031 245.253906 -294.332031 243.953125 -298.875 C 245.253906 -301.132812 247.035156 -302.753906 249.296875 -303.734375 C 253.835938 -303.734375 258.535156 -302.757812 263.390625 -300.8125 C 274.410156 -296.925781 288.34375 -294.984375 305.1875 -294.984375 C 330.78125 -294.984375 355 -301.300781 377.84375 -313.9375 C 400.6875 -326.570312 417.9375 -344.550781 429.59375 -367.875 C 441.257812 -391.207031 447.09375 -415.832031 447.09375 -441.75 C 447.09375 -467.019531 440.9375 -491.5625 428.625 -515.375 C 416.3125 -539.1875 400.113281 -558.21875 380.03125 -572.46875 C 368.6875 -580.570312 351.269531 -587.375 327.78125 -592.875 C 304.289062 -598.382812 286.066406 -601.140625 273.109375 -601.140625 C 232.941406 -601.140625 209.128906 -598.222656 201.671875 -592.390625 L 201.1875 -585.59375 L 203.140625 -530.671875 L 202.65625 -520.953125 C 202 -512.210938 201.671875 -498.769531 201.671875 -480.625 C 201.671875 -414.53125 202.644531 -373.382812 204.59375 -357.1875 L 204.59375 -329.96875 L 210.90625 -107.890625 C 210.90625 -104.648438 210.5 -98.65625 209.6875 -89.90625 C 208.882812 -81.15625 208.484375 -73.539062 208.484375 -67.0625 C 208.484375 -51.507812 209.78125 -39.6875 212.375 -31.59375 C 220.144531 -29.320312 242.820312 -23.972656 280.40625 -15.546875 C 297.894531 -11.335938 307.453125 -8.910156 309.078125 -8.265625 C 311.671875 -7.285156 313.9375 -5.175781 315.875 -1.9375 C 314.582031 2.914062 312.882812 6.070312 310.78125 7.53125 C 308.675781 8.988281 304.546875 9.71875 298.390625 9.71875 C 294.492188 9.71875 285.421875 8.910156 271.171875 7.296875 C 243.304688 4.378906 221.4375 2.921875 205.5625 2.921875 L 120.03125 6.3125 L 69 4.859375 C 65.757812 4.859375 56.367188 5.179688 40.828125 5.828125 L 40.328125 -6.796875 L 103.515625 -18.953125 C 113.878906 -21.867188 120.195312 -24.785156 122.46875 -27.703125 C 125.707031 -32.234375 127.328125 -41.140625 127.328125 -54.421875 C 127.328125 -57.335938 127.488281 -63.65625 127.8125 -73.375 C 128.132812 -80.1875 128.296875 -89.582031 128.296875 -101.5625 C 128.296875 -139.789062 126.675781 -221.273438 123.4375 -346.015625 C 122.144531 -404.328125 121.5 -463.613281 121.5 -523.875 L 121.5 -532.140625 C 121.5 -555.460938 117.929688 -570.203125 110.796875 -576.359375 C 98.804688 -587.046875 68.835938 -595.796875 20.890625 -602.609375 C 19.273438 -606.171875 18.46875 -609.082031 18.46875 -611.34375 C 18.46875 -613.9375 19.4375 -617.015625 21.375 -620.578125 Z M 21.375 -620.578125 "/></g></g></g></g></g><g transform="matrix(1, 0, 0, 1, 245, 931)"><g clip-path="url(#5439340641)"><g fill="#ffffff" fill-opacity="1"><g transform="translate(0.871153, 235.96386)"><g><path d="M 97.296875 0 L 97.296875 -165.578125 L 166.09375 -165.578125 L 166.09375 -179.6875 L 5.140625 -179.6875 L 5.140625 -165.578125 L 73.9375 -165.578125 L 73.9375 0 Z M 97.296875 0 "/></g></g></g><g fill="#ffffff" fill-opacity="1"><g transform="translate(172.076148, 235.96386)"><g><path d="M 54.171875 -89.328125 L 161.71875 -89.328125 L 161.71875 0 L 185.078125 0 L 185.078125 -179.6875 L 161.71875 -179.6875 L 161.71875 -101.140625 L 54.171875 -101.140625 L 54.171875 -179.6875 L 30.796875 -179.6875 L 30.796875 0 L 54.171875 0 Z M 54.171875 -89.328125 "/></g></g></g><g fill="#ffffff" fill-opacity="1"><g transform="translate(387.94332, 235.96386)"><g><path d="M 30.796875 -179.6875 L 30.796875 0 L 146.828125 0 L 146.828125 -14.125 L 54.171875 -14.125 L 54.171875 -89.328125 L 133.75 -89.328125 L 133.75 -101.140625 L 54.171875 -101.140625 L 54.171875 -165.578125 L 146.828125 -165.578125 L 146.828125 -179.6875 Z M 30.796875 -179.6875 "/></g></g></g><g fill="#ffffff" fill-opacity="1"><g transform="translate(542.485004, 235.96386)"><g/></g></g><g fill="#ffffff" fill-opacity="1"><g transform="translate(632.322705, 235.96386)"><g/></g></g><g fill="#ffffff" fill-opacity="1"><g transform="translate(722.160406, 235.96386)"><g/></g></g><g fill="#ffffff" fill-opacity="1"><g transform="translate(901.844513, 235.96386)"><g><path d="M 30.796875 -179.6875 L 30.796875 0 L 54.171875 0 L 54.171875 -79.328125 L 65.453125 -79.328125 C 70.242188 -79.328125 74.222656 -78.894531 77.390625 -78.03125 C 80.554688 -77.175781 83.421875 -75.722656 85.984375 -73.671875 C 88.554688 -71.617188 90.953125 -68.96875 93.171875 -65.71875 C 95.398438 -62.46875 98.054688 -58.445312 101.140625 -53.65625 L 121.421875 -23.609375 C 123.984375 -19.679688 126.503906 -16.085938 128.984375 -12.828125 C 131.472656 -9.578125 134.171875 -6.796875 137.078125 -4.484375 C 139.984375 -2.179688 143.273438 -0.347656 146.953125 1.015625 C 150.640625 2.390625 155.050781 3.078125 160.1875 3.078125 C 163.945312 3.078125 167.023438 2.90625 169.421875 2.5625 C 171.816406 2.21875 174.210938 1.363281 176.609375 0 L 176.609375 -9.5 C 175.753906 -9.320312 174.898438 -9.191406 174.046875 -9.109375 C 173.191406 -9.023438 172.335938 -8.984375 171.484375 -8.984375 C 167.890625 -8.984375 164.722656 -9.492188 161.984375 -10.515625 C 159.242188 -11.546875 156.675781 -13.046875 154.28125 -15.015625 C 151.882812 -16.984375 149.570312 -19.378906 147.34375 -22.203125 C 145.125 -25.023438 142.816406 -28.234375 140.421875 -31.828125 C 133.234375 -42.265625 127.671875 -50.609375 123.734375 -56.859375 C 119.796875 -63.109375 116.671875 -67.941406 114.359375 -71.359375 C 112.046875 -74.785156 110.160156 -77.269531 108.703125 -78.8125 C 107.253906 -80.351562 105.503906 -81.632812 103.453125 -82.65625 L 100.890625 -83.9375 L 100.890625 -84.96875 C 109.097656 -85.476562 116.15625 -87.273438 122.0625 -90.359375 C 127.96875 -93.441406 132.800781 -97.289062 136.5625 -101.90625 C 140.332031 -106.53125 143.070312 -111.535156 144.78125 -116.921875 C 146.488281 -122.316406 147.34375 -127.582031 147.34375 -132.71875 C 147.34375 -137.332031 146.441406 -142.378906 144.640625 -147.859375 C 142.847656 -153.335938 139.769531 -158.425781 135.40625 -163.125 C 131.039062 -167.832031 125.09375 -171.769531 117.5625 -174.9375 C 110.039062 -178.101562 100.546875 -179.6875 89.078125 -179.6875 Z M 54.171875 -168.390625 L 80.09375 -168.390625 C 86.59375 -168.390625 92.453125 -167.445312 97.671875 -165.5625 C 102.890625 -163.6875 107.378906 -161.078125 111.140625 -157.734375 C 114.910156 -154.398438 117.78125 -150.421875 119.75 -145.796875 C 121.71875 -141.179688 122.703125 -136.132812 122.703125 -130.65625 C 122.703125 -126.039062 121.800781 -121.378906 120 -116.671875 C 118.207031 -111.960938 115.515625 -107.679688 111.921875 -103.828125 C 108.328125 -99.984375 103.921875 -96.863281 98.703125 -94.46875 C 93.484375 -92.070312 87.453125 -90.875 80.609375 -90.875 L 54.171875 -90.875 Z M 54.171875 -168.390625 "/></g></g></g><g fill="#ffffff" fill-opacity="1"><g transform="translate(1086.140135, 235.96386)"><g><path d="M 41.078125 -179.6875 L 41.078125 0 L 64.4375 0 L 64.4375 -179.6875 Z M 41.078125 -179.6875 "/></g></g></g><g fill="#ffffff" fill-opacity="1"><g transform="translate(1191.635268, 235.96386)"><g><path d="M 7.703125 -179.6875 L 82.921875 0 L 98.3125 0 L 171.21875 -179.6875 L 157.875 -179.6875 L 98.0625 -31.828125 L 97.03125 -31.828125 L 35.421875 -179.6875 Z M 7.703125 -179.6875 "/></g></g></g><g fill="#ffffff" fill-opacity="1"><g transform="translate(1370.540616, 235.96386)"><g><path d="M 130.65625 -52.875 L 155.3125 0 L 180.203125 0 L 96.515625 -179.6875 L 83.6875 -179.6875 L 7.703125 0 L 19.515625 0 L 42.09375 -52.875 Z M 125.265625 -64.4375 L 46.984375 -64.4375 L 83.9375 -150.9375 L 84.96875 -150.9375 Z M 125.265625 -64.4375 "/></g></g></g><g fill="#ffffff" fill-opacity="1"><g transform="translate(1558.429803, 235.96386)"><g><path d="M 97.296875 0 L 97.296875 -165.578125 L 166.09375 -165.578125 L 166.09375 -179.6875 L 5.140625 -179.6875 L 5.140625 -165.578125 L 73.9375 -165.578125 L 73.9375 0 Z M 97.296875 0 "/></g></g></g><g fill="#ffffff" fill-opacity="1"><g transform="translate(1729.634757, 235.96386)"><g><path d="M 41.078125 -179.6875 L 41.078125 0 L 64.4375 0 L 64.4375 -179.6875 Z M 41.078125 -179.6875 "/></g></g></g><g fill="#ffffff" fill-opacity="1"><g transform="translate(1835.129932, 235.96386)"><g><path d="M 130.65625 -52.875 L 155.3125 0 L 180.203125 0 L 96.515625 -179.6875 L 83.6875 -179.6875 L 7.703125 0 L 19.515625 0 L 42.09375 -52.875 Z M 125.265625 -64.4375 L 46.984375 -64.4375 L 83.9375 -150.9375 L 84.96875 -150.9375 Z M 125.265625 -64.4375 "/></g></g></g><g fill="#ffffff" fill-opacity="1"><g transform="translate(2023.019035, 235.96386)"><g><path d="M 175.578125 -179.6875 L 175.578125 -42.359375 L 174.5625 -42.359375 L 32.09375 -182.765625 L 30.796875 -182.765625 L 30.796875 0 L 42.609375 0 L 42.609375 -137.34375 L 43.640625 -137.34375 L 186.109375 3.078125 L 187.390625 3.078125 L 187.390625 -179.6875 Z M 175.578125 -179.6875 "/></g></g></g><g fill="#ffffff" fill-opacity="1"><g transform="translate(2241.196307, 235.96386)"><g/></g></g><g fill="#ffffff" fill-opacity="1"><g transform="translate(2331.033987, 235.96386)"><g><path d="M 30.796875 -179.6875 L 30.796875 0 L 54.171875 0 L 54.171875 -89.328125 L 133.75 -89.328125 L 133.75 -101.140625 L 54.171875 -101.140625 L 54.171875 -165.578125 L 146.828125 -165.578125 L 146.828125 -179.6875 Z M 30.796875 -179.6875 "/></g></g></g><g fill="#ffffff" fill-opacity="1"><g transform="translate(2485.557655, 235.96386)"><g/></g></g><g fill="#ffffff" fill-opacity="1"><g transform="translate(2575.395356, 235.96386)"><g/></g></g><g fill="#ffffff" fill-opacity="1"><g transform="translate(2665.237374, 235.96386)"><g><path d="M 48.265625 -179.6875 L 30.796875 -179.6875 L 30.796875 0 L 42.09375 0 L 42.09375 -146.578125 L 43.125 -146.578125 L 122.453125 3.078125 L 127.0625 3.078125 L 208.1875 -145.546875 L 209.21875 -145.546875 L 209.21875 0 L 232.578125 0 L 232.578125 -179.6875 L 214.859375 -179.6875 L 131.6875 -25.40625 L 130.65625 -25.40625 Z M 48.265625 -179.6875 "/></g></g></g><g fill="#ffffff" fill-opacity="1"><g transform="translate(2928.590174, 235.96386)"><g><path d="M 41.078125 -179.6875 L 41.078125 0 L 64.4375 0 L 64.4375 -179.6875 Z M 41.078125 -179.6875 "/></g></g></g><g fill="#ffffff" fill-opacity="1"><g transform="translate(3034.085328, 235.96386)"><g><path d="M 30.796875 0 L 30.796875 -179.6875 L 54.171875 -179.6875 L 54.171875 -14.125 L 146.828125 -14.125 L 146.828125 0 Z M 30.796875 0 "/></g></g></g><g fill="#ffffff" fill-opacity="1"><g transform="translate(3188.606131, 235.96386)"><g><path d="M 7.703125 -179.6875 L 69.828125 -68.03125 L 69.828125 0 L 93.1875 0 L 93.1875 -70.34375 L 156.328125 -179.6875 L 142.46875 -179.6875 L 87.53125 -84.96875 L 86.515625 -84.96875 L 34.140625 -179.6875 Z M 7.703125 -179.6875 "/></g></g></g></g></g><g clip-path="url(#0e3ea0e472)"><path fill="#ffffff" d="M 2793.894531 1154.117188 L 2790.078125 1171.03125 C 2794.308594 1171.03125 2861.871094 1171.03125 2866.101562 1171.03125 L 2862.28125 1154.117188 C 2860.355469 1154.117188 2795.824219 1154.117188 2793.894531 1154.117188 " fill-opacity="1" fill-rule="nonzero"/></g><g clip-path="url(#e41def51e2)"><path fill="#ffffff" d="M 2861.273438 1150.296875 C 2865.835938 1128.109375 2872.757812 1107.109375 2881.792969 1087.175781 C 2856.460938 1069.894531 2842.941406 1031.542969 2831.167969 990.078125 C 2832.453125 989.128906 2833.289062 987.613281 2833.289062 985.894531 C 2833.289062 983.699219 2831.921875 981.832031 2829.992188 981.066406 C 2829.992188 989.628906 2829.992188 1092.195312 2829.992188 1096.921875 C 2834.589844 1097.808594 2838.042969 1101.847656 2838.042969 1106.695312 C 2838.042969 1112.1875 2833.59375 1116.652344 2828.089844 1116.652344 C 2822.597656 1116.652344 2818.132812 1112.1875 2818.132812 1106.695312 C 2818.132812 1101.847656 2821.601562 1097.808594 2826.183594 1096.921875 C 2826.183594 1092.195312 2826.183594 989.628906 2826.183594 981.066406 C 2824.257812 981.832031 2822.886719 983.699219 2822.886719 985.894531 C 2822.886719 987.613281 2823.722656 989.128906 2825.007812 990.078125 C 2813.234375 1031.542969 2799.714844 1069.894531 2774.386719 1087.175781 C 2783.417969 1107.109375 2790.34375 1128.109375 2794.902344 1150.296875 C 2796.769531 1150.296875 2859.40625 1150.296875 2861.273438 1150.296875 " fill-opacity="1" fill-rule="nonzero"/></g></svg>`;
 
 const DEFAULT_FOOTER_CONFIG = {
   sectionsTitle: 'Sections',
   enabledSections: null,
-  exploreTitle: 'Explore the Privatian',
+  exploreTitle: 'Explore The Way (দ্য ওয়ে)',
   explore: [
     { id: 'f-exp-1', label: 'Events', href: '/events', target: '_self', enabled: true },
     { id: 'f-exp-2', label: 'Article archive', href: '/', target: '_self', enabled: true },
@@ -4977,7 +4995,7 @@ const DEFAULT_FOOTER_CONFIG = {
       id: 'f-ser-2',
       title: 'Life | Heritage',
       href: '/section/community-heritage',
-      description: 'A series focused on the personal side of Privatian family research and tradition.',
+      description: 'A series focused on the personal side of TheWay family research and tradition.',
       enabled: true
     }
   ],
@@ -4988,7 +5006,7 @@ const DEFAULT_FOOTER_CONFIG = {
     { id: 'f-soc-3', platform: 'tiktok', label: 'TikTok', href: 'https://tiktok.com', enabled: true },
     { id: 'f-soc-4', platform: 'facebook', label: 'Facebook', href: 'https://facebook.com', enabled: true },
     { id: 'f-soc-5', platform: 'youtube', label: 'YouTube', href: 'https://youtube.com', enabled: true },
-    { id: 'f-soc-6', platform: 'email', label: 'Email', href: 'mailto:contact@privatian.org', enabled: true }
+    { id: 'f-soc-6', platform: 'email', label: 'Email', href: 'mailto:contact@theway.org', enabled: true }
   ],
   logoSvg: '',
   logoHeight: 80,
@@ -5075,11 +5093,11 @@ async function initFooterPage() {
   // Tier 3: Try Supabase REST fetch
   if (!loadedConfig) {
     try {
-      if (typeof PRIVATIAN_SUPABASE_URL !== 'undefined' && typeof PRIVATIAN_SUPABASE_KEY !== 'undefined') {
-        const res = await fetch(`${PRIVATIAN_SUPABASE_URL}/rest/v1/sections?admin_id=eq.__footer_config__&select=name`, {
+      if (typeof THEWAY_SUPABASE_URL !== 'undefined' && typeof THEWAY_SUPABASE_KEY !== 'undefined') {
+        const res = await fetch(`${THEWAY_SUPABASE_URL}/rest/v1/sections?admin_id=eq.__footer_config__&select=name`, {
           headers: {
-            'apikey': PRIVATIAN_SUPABASE_KEY,
-            'Authorization': 'Bearer ' + PRIVATIAN_SUPABASE_KEY
+            'apikey': THEWAY_SUPABASE_KEY,
+            'Authorization': 'Bearer ' + THEWAY_SUPABASE_KEY
           }
         });
         if (res.ok) {
@@ -5343,7 +5361,7 @@ function renderFooterPreview() {
 function renderFooterExplore() {
   const container = document.getElementById('ft-explore-list-container');
   const titleInput = document.getElementById('ft-explore-title-input');
-  if (titleInput && footerDraftConfig) titleInput.value = footerDraftConfig.exploreTitle || 'Explore the Privatian';
+  if (titleInput && footerDraftConfig) titleInput.value = footerDraftConfig.exploreTitle || 'Explore The Way (দ্য ওয়ে)';
   if (!container || !footerDraftConfig) return;
 
   const items = footerDraftConfig.explore || [];
@@ -5877,7 +5895,7 @@ function onFooterSocialPlatformChange(platform) {
     tiktok:    { label: 'TikTok',    href: 'https://tiktok.com' },
     facebook:  { label: 'Facebook',  href: 'https://facebook.com' },
     youtube:   { label: 'YouTube',   href: 'https://youtube.com' },
-    email:     { label: 'Email',     href: 'mailto:contact@privatian.org' },
+    email:     { label: 'Email',     href: 'mailto:contact@theway.org' },
     twitter:   { label: 'X / Twitter', href: 'https://x.com' },
     custom:    { label: 'Website',   href: 'https://' }
   };
@@ -6392,7 +6410,7 @@ function exportActivityLogs(format) {
     const dataStr = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(_allActivityLogs, null, 2));
     const dlAnchor = document.createElement('a');
     dlAnchor.setAttribute('href', dataStr);
-    dlAnchor.setAttribute('download', `the_privatian_family_activity_log_${dateStamp}.json`);
+    dlAnchor.setAttribute('download', `the_way_activity_log_${dateStamp}.json`);
     document.body.appendChild(dlAnchor);
     dlAnchor.click();
     dlAnchor.remove();
@@ -6416,7 +6434,7 @@ function exportActivityLogs(format) {
     const csvContent = 'data:text/csv;charset=utf-8,' + encodeURIComponent([headers.join(','), ...rows.map(r => r.join(','))].join('\n'));
     const dlAnchor = document.createElement('a');
     dlAnchor.setAttribute('href', csvContent);
-    dlAnchor.setAttribute('download', `the_privatian_family_activity_log_${dateStamp}.csv`);
+    dlAnchor.setAttribute('download', `the_way_activity_log_${dateStamp}.csv`);
     document.body.appendChild(dlAnchor);
     dlAnchor.click();
     dlAnchor.remove();
@@ -6424,6 +6442,511 @@ function exportActivityLogs(format) {
   }
 }
 
+// =================================================================
+// SUBMISSIONS & REVISIONS REVIEW ENGINE
+// =================================================================
+
+let _allAdminSubmissions = [];
+let _currentSubFilter = 'all';
+let _selectedSubmission = null;
+
+async function loadAdminSubmissions() {
+  const container = document.getElementById('admin-submissions-container');
+  if (!container) return;
+  container.innerHTML = '<div style="text-align:center;padding:40px;color:#9ca3af;">Loading submissions from database...</div>';
+
+  try {
+    const res = await fetch('/api/submissions?action=list', {
+      headers: _authHeaders()
+    });
+
+    if (res.ok) {
+      _allAdminSubmissions = await res.json();
+    } else {
+      _allAdminSubmissions = [];
+    }
+
+    renderAdminSubmissionsTable();
+  } catch (e) {
+    container.innerHTML = `<div style="text-align:center;padding:30px;color:#dc2626;">Error loading submissions: ${escapeHtml(e.message)}</div>`;
+  }
+}
+
+function filterAdminSubmissions(filter, btn) {
+  _currentSubFilter = filter;
+  document.querySelectorAll('.sub-filter-btn').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  renderAdminSubmissionsTable();
+}
+
+function renderAdminSubmissionsTable() {
+  const container = document.getElementById('admin-submissions-container');
+  if (!container) return;
+
+  let list = [..._allAdminSubmissions];
+  if (_currentSubFilter !== 'all') {
+    list = list.filter(s => s.status === _currentSubFilter);
+  }
+
+  if (!list.length) {
+    container.innerHTML = `
+      <div style="text-align:center;padding:48px 20px;color:#9ca3af;">
+        <div style="font-size:32px;margin-bottom:8px;">📬</div>
+        <div style="font-size:15px;font-weight:600;color:#374151;">No submissions found</div>
+        <div style="font-size:13px;margin-top:4px;">No article drafts or revision requests match this filter.</div>
+      </div>`;
+    return;
+  }
+
+  const rows = list.map(s => {
+    const isRev = s.submission_type === 'revision';
+    const typePill = isRev
+      ? '<span style="background:#eff6ff;color:#1d4ed8;border:1px solid #bfdbfe;border-radius:12px;padding:3px 9px;font-size:11px;font-weight:700;">📝 Revision Request</span>'
+      : '<span style="background:#fdf2f8;color:#be185d;border:1px solid #fbcfe8;border-radius:12px;padding:3px 9px;font-size:11px;font-weight:700;">✍️ New Article</span>';
+
+    const statusPill = s.status === 'approved'
+      ? '<span style="background:#ecfdf5;color:#059669;border:1px solid #a7f3d0;border-radius:12px;padding:3px 9px;font-size:11px;font-weight:700;">✓ Approved & Published</span>'
+      : s.status === 'rejected'
+      ? '<span style="background:#fef2f2;color:#dc2626;border:1px solid #fecaca;border-radius:12px;padding:3px 9px;font-size:11px;font-weight:700;">✕ Rejected</span>'
+      : '<span style="background:#fffbeb;color:#d97706;border:1px solid #fde68a;border-radius:12px;padding:3px 9px;font-size:11px;font-weight:700;">⏳ Pending Review</span>';
+
+    const dateStr = s.created_at ? new Date(s.created_at).toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' }) : '—';
+
+    return `
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid #f3f4f6;flex-wrap:wrap;gap:14px;">
+        <div style="flex:1;min-width:260px;">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:5px;">
+            ${typePill}
+            ${statusPill}
+            <span style="font-size:12px;color:#9ca3af;">${dateStr}</span>
+          </div>
+          <h4 style="margin:0 0 4px;font-size:15px;font-weight:700;color:#111827;">${escapeHtml(s.title)}</h4>
+          <div style="font-size:12.5px;color:#6b7280;">
+            Author: <strong>${escapeHtml(s.author_name || 'Anonymous')}</strong> &lt;${escapeHtml(s.author_email || 'no-email')}&gt;
+            ${s.revision_notes ? `&bull; <em>Note: ${escapeHtml(s.revision_notes.slice(0, 70))}...</em>` : ''}
+          </div>
+        </div>
+
+        <div style="display:flex;align-items:center;gap:8px;">
+          <button onclick="inspectSubmissionModal('${s.id}')"
+            style="background:#f8fafc;border:1px solid #cbd5e1;border-radius:8px;padding:7px 14px;font-size:12.5px;font-weight:600;color:#334155;cursor:pointer;">
+            🔍 Inspect & Review
+          </button>
+          ${s.status === 'pending' ? `
+            <button onclick="quickReviewSubmission('${s.id}', 'approved')"
+              style="background:#059669;color:#fff;border:none;border-radius:8px;padding:7px 14px;font-size:12.5px;font-weight:700;cursor:pointer;">
+              ✓ Approve
+            </button>
+            <button onclick="quickReviewSubmission('${s.id}', 'rejected')"
+              style="background:#fee2e2;color:#dc2626;border:1px solid #fecaca;border-radius:8px;padding:7px 12px;font-size:12.5px;font-weight:600;cursor:pointer;">
+              ✕ Reject
+            </button>
+          ` : ''}
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  container.innerHTML = rows;
+}
+
+function inspectSubmissionModal(subId) {
+  const sub = _allAdminSubmissions.find(s => String(s.id) === String(subId));
+  if (!sub) return;
+  _selectedSubmission = sub;
+
+  let modal = document.getElementById('_sub-inspect-modal');
+  if (!modal) {
+    modal = document.createElement('div');
+    modal.id = '_sub-inspect-modal';
+    modal.style.cssText = 'position:fixed;inset:0;z-index:99999;display:flex;align-items:center;justify-content:center;background:rgba(8,18,36,.6);backdrop-filter:blur(4px);padding:20px;';
+    document.body.appendChild(modal);
+  }
+
+  const isRev = sub.submission_type === 'revision';
+  modal.innerHTML = `
+    <div style="background:#fff;border-radius:16px;max-width:850px;width:100%;max-height:90vh;display:flex;flex-direction:column;box-shadow:0 25px 60px rgba(0,0,0,0.3);overflow:hidden;">
+      <div style="padding:18px 24px;border-bottom:1px solid #e5e7eb;display:flex;align-items:center;justify-content:space-between;background:#f8fafc;">
+        <div>
+          <span style="font-size:12px;font-weight:700;color:${isRev ? '#1d4ed8' : '#be185d'};text-transform:uppercase;">
+            ${isRev ? '📝 Revision Proposal for Published Article' : '✍️ New Article Draft Submission'}
+          </span>
+          <h2 style="margin:2px 0 0;font-size:18px;font-weight:700;color:#111827;">${escapeHtml(sub.title)}</h2>
+        </div>
+        <button onclick="document.getElementById('_sub-inspect-modal').remove()" style="background:none;border:none;font-size:22px;cursor:pointer;color:#9ca3af;">&times;</button>
+      </div>
+
+      <div style="padding:24px;overflow-y:auto;flex:1;line-height:1.6;font-size:14px;color:#374151;">
+        <div style="background:#f1f5f9;padding:14px 18px;border-radius:10px;margin-bottom:18px;font-size:13px;display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+          <div><strong>Author:</strong> ${escapeHtml(sub.author_name)} (${escapeHtml(sub.author_email)})</div>
+          <div><strong>Section:</strong> ${escapeHtml(sub.section || 'N/A')}</div>
+          ${sub.target_article_slug ? `<div style="grid-column:span 2;"><strong>Target Article Slug:</strong> <code>${escapeHtml(sub.target_article_slug)}</code></div>` : ''}
+          ${sub.revision_notes ? `<div style="grid-column:span 2;color:#b45309;background:#fef3c7;padding:8px 12px;border-radius:6px;"><strong>Revision Reason / Notes:</strong> ${escapeHtml(sub.revision_notes)}</div>` : ''}
+        </div>
+
+        <h4 style="margin:0 0 8px;font-size:14px;font-weight:700;color:#111827;">Article Summary (Deck):</h4>
+        <p style="background:#fafbfc;border-left:3px solid #cbd5e1;padding:8px 12px;margin:0 0 16px;color:#475569;">${escapeHtml(sub.deck || 'No deck provided')}</p>
+
+        <h4 style="margin:0 0 8px;font-size:14px;font-weight:700;color:#111827;">Full Content:</h4>
+        <div style="background:#fafbfc;border:1px solid #e2e8f0;border-radius:8px;padding:16px;max-height:280px;overflow-y:auto;font-family:sans-serif;font-size:13.5px;">
+          ${sub.content_html || '<p>No content</p>'}
+        </div>
+
+        <div style="margin-top:18px;">
+          <label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;color:#475569;">Reviewer Feedback / Note to Author (optional):</label>
+          <input type="text" id="_modal-reviewer-feedback" placeholder="e.g. Excellent piece, approved and published immediately." value="${escapeHtml(sub.reviewer_feedback || '')}"
+            style="width:100%;padding:9px 12px;border:1px solid #cbd5e1;border-radius:8px;font-size:13.5px;" />
+        </div>
+      </div>
+
+      <div style="padding:16px 24px;border-top:1px solid #e5e7eb;background:#f8fafc;display:flex;align-items:center;justify-content:space-between;">
+        <button onclick="document.getElementById('_sub-inspect-modal').remove()" class="btn btn--secondary" style="padding:8px 18px;">Close</button>
+        <div style="display:flex;gap:10px;">
+          <button onclick="submitReviewFromModal('${sub.id}', 'rejected')" style="background:#fee2e2;color:#dc2626;border:1px solid #fecaca;border-radius:8px;padding:9px 18px;font-weight:600;cursor:pointer;">
+            ✕ Reject Submission
+          </button>
+          <button onclick="submitReviewFromModal('${sub.id}', 'approved')" style="background:#059669;color:#fff;border:none;border-radius:8px;padding:9px 22px;font-weight:700;cursor:pointer;">
+            ✓ Approve & Publish Article
+          </button>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+async function submitReviewFromModal(subId, status) {
+  const fbInput = document.getElementById('_modal-reviewer-feedback');
+  const feedback = fbInput ? fbInput.value.trim() : '';
+  const modal = document.getElementById('_sub-inspect-modal');
+  if (modal) modal.remove();
+  await executeSubmissionReview(subId, status, feedback);
+}
+
+async function quickReviewSubmission(subId, status) {
+  const sub = _allAdminSubmissions.find(s => String(s.id) === String(subId));
+  const actionText = status === 'approved' ? 'Approve and publish' : 'Reject';
+  
+  _confirmModal({
+    title: `${status === 'approved' ? 'Approve' : 'Reject'} Submission`,
+    body: `${actionText} "<strong>${escapeHtml(sub ? sub.title : 'this submission')}</strong>"?` +
+          (status === 'approved' ? '<br>The article will be published immediately to the website.' : ''),
+    confirmText: status === 'approved' ? 'Approve & Publish' : 'Reject',
+    confirmColor: status === 'approved' ? '#059669' : '#dc2626',
+    onConfirm: async () => {
+      await executeSubmissionReview(subId, status, '');
+    }
+  });
+}
+
+async function executeSubmissionReview(subId, status, feedback) {
+  try {
+    const res = await fetch('/api/submissions?action=review', {
+      method: 'POST',
+      headers: _authHeaders(),
+      body: JSON.stringify({
+        submission_id: subId,
+        status: status,
+        reviewer_feedback: feedback
+      })
+    });
+
+    const data = await res.json();
+    if (res.ok && data.success) {
+      showToast('success', data.message || 'Submission reviewed successfully.');
+      loadAdminSubmissions();
+    } else {
+      showToast('error', data.error || 'Failed to review submission.');
+    }
+  } catch (e) {
+    showToast('error', 'Server error: ' + e.message);
+  }
+}
 
 
 
+
+
+
+
+// ══════════════════════════════════════════════════════════════════
+// BOOKS LIBRARY & UNABRIDGED CHAPTERS MANAGER
+// ══════════════════════════════════════════════════════════════════
+
+let _allAdminBooks = [];
+
+async function loadAdminBooks() {
+  const tbody = document.getElementById('admin-books-tbody');
+  if (tbody) {
+    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:30px;color:var(--text-muted);">Syncing books from Supabase and cache...</td></tr>';
+  }
+
+  try {
+    let books = [];
+    try {
+      const res = await fetch('/api/books?action=list');
+      if (res.ok) {
+        const data = await res.json();
+        if (Array.isArray(data) && data.length > 0) books = data;
+      }
+    } catch(e) {}
+
+    if (books.length === 0 && window.THE_WAY_BOOKS) {
+      books = window.THE_WAY_BOOKS.getAllBooks();
+    }
+
+    _allAdminBooks = books;
+    renderAdminBooks(books);
+
+    const countEl = document.getElementById('books-stat-count');
+    if (countEl) countEl.textContent = books.length;
+
+    let totalChapters = 0;
+    books.forEach(b => totalChapters += (b.chapters ? b.chapters.length : (b.pages_count || 1)));
+    const chEl = document.getElementById('books-stat-chapters');
+    if (chEl) chEl.textContent = totalChapters || 36;
+  } catch (err) {
+    if (tbody) tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:red;padding:20px;">Failed to load books: ' + escapeHtml(err.message) + '</td></tr>';
+  }
+}
+
+function renderAdminBooks(books) {
+  const tbody = document.getElementById('admin-books-tbody');
+  if (!tbody) return;
+
+  if (books.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:30px;color:var(--text-muted);">No books found in library.</td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = books.map(book => {
+    const authors = book.authors ? book.authors.map(a => a.name).join(' ও ') : (book.author_bn || 'অজ্ঞাত');
+    const chCount = book.chapters ? book.chapters.length : (book.slug === 'maxim-gorky-mother-novel' ? 36 : 1);
+    
+    return `
+      <tr>
+        <td style="padding:14px 18px;">
+          <div style="font-weight:700;color:var(--text-primary);font-size:14px;">${escapeHtml(book.title_bn)}</div>
+          <div style="font-size:12px;color:var(--text-muted);margin-top:2px;">${escapeHtml(book.subtitle_bn || book.title_en || '')}</div>
+          <code style="font-size:11px;color:#c2182b;background:rgba(194,24,43,0.08);padding:2px 5px;border-radius:4px;display:inline-block;margin-top:4px;">slug: ${escapeHtml(book.slug)}</code>
+        </td>
+        <td style="padding:14px 18px;font-size:13px;">
+          <div style="font-weight:600;">${escapeHtml(authors)}</div>
+          ${book.translator_bn ? `<div style="font-size:11.5px;color:var(--text-muted);">অনুবাদ: ${escapeHtml(book.translator_bn)}</div>` : ''}
+        </td>
+        <td style="padding:14px 18px;font-size:12.5px;">
+          <span style="background:#f1f5f9;color:#334155;padding:3px 8px;border-radius:6px;font-weight:600;">${escapeHtml(book.category_name_bn || book.category || 'Classics')}</span>
+        </td>
+        <td style="padding:14px 18px;font-size:13px;font-weight:600;">${escapeHtml(book.year || '—')}</td>
+        <td style="padding:14px 18px;font-size:13px;">
+          <span style="font-weight:700;color:#059669;">${chCount} Chapters</span>
+          <div style="font-size:11px;color:var(--text-muted);">~${book.reading_time_mins || 60} mins read</div>
+        </td>
+        <td style="padding:14px 18px;">
+          <div style="display:flex;gap:6px;">
+            <a href="book-reader.html?book=${encodeURIComponent(book.slug)}" target="_blank" class="btn btn--ghost btn--sm" title="Read on Web Reader" style="padding:4px 10px;font-size:12px;color:#c2182b;border:1px solid rgba(194,24,43,0.2);">
+              Open Reader
+            </a>
+            <button class="btn btn--secondary btn--sm" onclick="inspectBookDetails('${escapeHtml(book.slug)}')" style="padding:4px 10px;font-size:12px;">
+              Details
+            </button>
+          </div>
+        </td>
+      </tr>
+    `;
+  }).join('');
+}
+
+function filterAdminBooks(q) {
+  const query = String(q || '').toLowerCase().trim();
+  if (!query) {
+    renderAdminBooks(_allAdminBooks);
+    return;
+  }
+  const filtered = _allAdminBooks.filter(b =>
+    (b.title_bn || '').toLowerCase().includes(query) ||
+    (b.title_en || '').toLowerCase().includes(query) ||
+    (b.slug || '').toLowerCase().includes(query) ||
+    (b.author_bn || '').toLowerCase().includes(query) ||
+    (b.authors && b.authors.some(a => a.name.toLowerCase().includes(query)))
+  );
+  renderAdminBooks(filtered);
+}
+
+function inspectBookDetails(slug) {
+  const book = _allAdminBooks.find(b => b.slug === slug);
+  if (!book) return;
+
+  _confirmModal({
+    title: `Book Details: ${book.title_bn}`,
+    body: `
+      <div style="font-size:13px;line-height:1.6;color:#334155;">
+        <div><strong>Title:</strong> ${escapeHtml(book.title_bn)} (${escapeHtml(book.title_en || '')})</div>
+        <div><strong>Slug:</strong> <code>${escapeHtml(book.slug)}</code></div>
+        <div><strong>Year:</strong> ${escapeHtml(book.year || '—')}</div>
+        <div><strong>Category:</strong> ${escapeHtml(book.category_name_bn || '—')}</div>
+        <div style="margin-top:10px;padding:10px;background:#f8fafc;border-radius:6px;border:1px solid #e2e8f0;">
+          <strong>Summary:</strong><br>${escapeHtml(book.summary_bn || '—')}
+        </div>
+      </div>
+    `,
+    confirmText: 'Open in Web Reader',
+    confirmColor: '#c2182b',
+    onConfirm: () => {
+      window.open(`book-reader.html?book=${encodeURIComponent(book.slug)}`, '_blank');
+    }
+  });
+}
+
+// ══════════════════════════════════════════════════════════════════
+// SOLIDARITY & MOVEMENT NETWORK MANAGER ("সংগঠিত হোন")
+// ══════════════════════════════════════════════════════════════════
+
+let _allMovementSignups = [];
+let _currentMovementStatusFilter = 'all';
+
+async function loadAdminMovementSignups() {
+  const tbody = document.getElementById('admin-movement-tbody');
+  if (tbody) {
+    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:30px;color:var(--text-muted);">Loading members from database...</td></tr>';
+  }
+
+  try {
+    const res = await fetch('/api/movement?action=list', {
+      headers: _authHeaders()
+    });
+    const data = await res.json();
+    const list = (data && Array.isArray(data.data)) ? data.data : [];
+    _allMovementSignups = list;
+
+    // Update counts
+    const countAll = list.length;
+    const countNew = list.filter(m => m.status === 'new').length;
+    const countContacted = list.filter(m => m.status === 'contacted').length;
+    const countActive = list.filter(m => m.status === 'active').length;
+
+    const elAll = document.getElementById('mov-count-all');
+    const elNew = document.getElementById('mov-count-new');
+    const elContacted = document.getElementById('mov-count-contacted');
+    const elActive = document.getElementById('mov-count-active');
+
+    if (elAll) elAll.textContent = countAll;
+    if (elNew) elNew.textContent = countNew;
+    if (elContacted) elContacted.textContent = countContacted;
+    if (elActive) elActive.textContent = countActive;
+
+    renderAdminMovementSignups();
+  } catch (err) {
+    if (tbody) tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:red;padding:20px;">Error loading movement signups: ' + escapeHtml(err.message) + '</td></tr>';
+  }
+}
+
+function filterMovementTab(status, btn) {
+  _currentMovementStatusFilter = status;
+  if (btn) {
+    btn.closest('.tab-bar').querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+  }
+  renderAdminMovementSignups();
+}
+
+function renderAdminMovementSignups() {
+  const tbody = document.getElementById('admin-movement-tbody');
+  if (!tbody) return;
+
+  let list = _allMovementSignups;
+  if (_currentMovementStatusFilter !== 'all') {
+    list = list.filter(m => m.status === _currentMovementStatusFilter);
+  }
+
+  if (list.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:30px;color:var(--text-muted);">No members found in this status.</td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = list.map(member => {
+    const statusBadges = {
+      new: '<span style="background:#fef3c7;color:#b45309;padding:3px 8px;border-radius:12px;font-size:11px;font-weight:700;">New Signup</span>',
+      contacted: '<span style="background:#e0f2fe;color:#0369a1;padding:3px 8px;border-radius:12px;font-size:11px;font-weight:700;">Contacted</span>',
+      active: '<span style="background:#dcfce7;color:#15803d;padding:3px 8px;border-radius:12px;font-size:11px;font-weight:700;">Active Organizer</span>',
+      archived: '<span style="background:#f1f5f9;color:#64748b;padding:3px 8px;border-radius:12px;font-size:11px;font-weight:700;">Archived</span>'
+    };
+
+    const dateStr = member.created_at ? new Date(member.created_at).toLocaleDateString('bn-BD', { year:'numeric', month:'short', day:'numeric' }) : '—';
+
+    return `
+      <tr>
+        <td style="padding:14px 18px;">
+          <div style="font-weight:700;color:var(--text-primary);font-size:14px;">${escapeHtml(member.name)}</div>
+          <a href="mailto:${escapeHtml(member.email)}" style="font-size:12.5px;color:#0284c7;text-decoration:none;">${escapeHtml(member.email)}</a>
+          ${member.phone ? `<div style="font-size:11px;color:var(--text-muted);margin-top:2px;">📞 ${escapeHtml(member.phone)}</div>` : ''}
+        </td>
+        <td style="padding:14px 18px;font-size:13px;font-weight:600;color:#1e293b;">
+          ${escapeHtml(member.interest || 'General')}
+        </td>
+        <td style="padding:14px 18px;font-size:12.5px;color:var(--text-secondary);">
+          ${escapeHtml(member.location || '—')}
+        </td>
+        <td style="padding:14px 18px;font-size:12.5px;color:var(--text-muted);">
+          ${dateStr}
+        </td>
+        <td style="padding:14px 18px;">
+          ${statusBadges[member.status] || statusBadges.new}
+        </td>
+        <td style="padding:14px 18px;">
+          <div style="display:flex;gap:6px;">
+            <select onchange="updateMovementStatus('${member.id}', this.value)" style="padding:4px 8px;border:1px solid #cbd5e1;border-radius:6px;font-size:11.5px;font-weight:600;background:#fff;">
+              <option value="new" ${member.status==='new'?'selected':''}>Set New</option>
+              <option value="contacted" ${member.status==='contacted'?'selected':''}>Set Contacted</option>
+              <option value="active" ${member.status==='active'?'selected':''}>Set Active</option>
+              <option value="archived" ${member.status==='archived'?'selected':''}>Set Archived</option>
+            </select>
+            <button onclick="deleteMovementMember('${member.id}')" class="btn btn--ghost btn--sm" title="Delete Member" style="padding:4px 8px;color:#dc2626;">
+              ✕
+            </button>
+          </div>
+        </td>
+      </tr>
+    `;
+  }).join('');
+}
+
+async function updateMovementStatus(id, newStatus) {
+  try {
+    const res = await fetch(`/api/movement?action=update&id=${id}`, {
+      method: 'PATCH',
+      headers: _authHeaders(),
+      body: JSON.stringify({ status: newStatus })
+    });
+    if (res.ok) {
+      showToast('success', 'Member status updated successfully.');
+      loadAdminMovementSignups();
+    } else {
+      showToast('error', 'Failed to update status.');
+    }
+  } catch(e) {
+    showToast('error', e.message);
+  }
+}
+
+async function deleteMovementMember(id) {
+  _confirmModal({
+    title: 'Delete Member',
+    body: 'Are you sure you want to remove this solidarity signup from the network?',
+    confirmText: 'Delete',
+    confirmColor: '#dc2626',
+    onConfirm: async () => {
+      try {
+        const res = await fetch(`/api/movement?action=delete&id=${id}`, {
+          method: 'DELETE',
+          headers: _authHeaders()
+        });
+        if (res.ok) {
+          showToast('success', 'Member deleted.');
+          loadAdminMovementSignups();
+        }
+      } catch(e) {
+        showToast('error', e.message);
+      }
+    }
+  });
+}

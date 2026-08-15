@@ -6,10 +6,9 @@
   'use strict';
 
   const TOKEN_KEY = 'theway_token';
-  const FALLBACK_TOKEN_KEY = 'privatian_token';
   const LOGIN_URL = '/admin-login.html';
 
-  function getToken() { return localStorage.getItem(TOKEN_KEY) || localStorage.getItem(FALLBACK_TOKEN_KEY); }
+  function getToken() { return localStorage.getItem(TOKEN_KEY) || ''; }
 
   function esc(s) {
     return String(s || '')
@@ -32,9 +31,7 @@
 
   function clearSession() {
     localStorage.removeItem(TOKEN_KEY);
-    localStorage.removeItem(FALLBACK_TOKEN_KEY);
     document.cookie = 'theway_session=; Max-Age=0; path=/';
-    document.cookie = 'privatian_session=; Max-Age=0; path=/';
   }
 
   function redirectToLogin(msg) {
