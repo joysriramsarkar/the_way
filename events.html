@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>সংহতি ক্যালেন্ডার ও গণআন্দোলন — দ্য ওয়ে (The Way)</title>
+  <link rel="icon" type="image/svg+xml" href="assets/images/logo.svg">
+  <link rel="stylesheet" href="assets/css/style.css">
+  <style>
+    .events-hero-box {
+      background: linear-gradient(135deg, #18090c 0%, #0d1117 100%);
+      color: #fff;
+      padding: 3rem 2rem;
+      border-radius: var(--radius-lg);
+      margin: 2rem 0 3rem;
+      border: 1px solid rgba(194, 24, 43, 0.4);
+    }
+    .events-timeline-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 2.5rem;
+      margin-bottom: 4rem;
+    }
+    .event-card-item {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      display: grid;
+      grid-template-columns: 90px 1fr;
+      gap: 1.5rem;
+      box-shadow: var(--shadow-sm);
+      transition: all var(--transition-fast);
+    }
+    .event-card-item:hover {
+      border-color: var(--border-crimson);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+    .event-date-badge {
+      background: var(--crimson-subtle);
+      border: 1px solid var(--border-crimson);
+      color: var(--crimson-primary);
+      border-radius: var(--radius-sm);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 0.5rem;
+    }
+    .event-date-badge .day {
+      font-size: 1.8rem;
+      font-weight: 900;
+      line-height: 1;
+    }
+    .event-date-badge .month {
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      margin-top: 0.2rem;
+    }
+    .event-details h3 {
+      font-family: var(--font-bengali-serif);
+      font-size: 1.3rem;
+      font-weight: 700;
+      margin-bottom: 0.4rem;
+    }
+    .event-location-row {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      margin-bottom: 0.6rem;
+      display: flex;
+      gap: 1rem;
+    }
+  </style>
+</head>
+<body id="top">
+
+  <!-- Ticker Mount -->
+  <div id="theway-ticker-mount" class="theway-ticker-bar"></div>
+
+  <!-- Header Mount -->
+  <header id="theway-header-mount" class="theway-header"></header>
+
+  <main class="container">
+    
+    <!-- Hero Banner -->
+    <div class="events-hero-box">
+      <div class="lead-section-badge" style="position:static; display:inline-block; margin-bottom:0.8rem;">আন্তর্জাতিক সংহতি ফ্রন্ট</div>
+      <h1 style="font-family:var(--font-bengali-serif); font-size:2.2rem; margin-bottom:0.6rem;">🚩 সংহতি ক্যালেন্ডার ও বৈশ্বিক সমাবেশ</h1>
+      <p style="font-size:1.05rem; color:#d1d5db; max-width:700px; line-height:1.6;">
+        মেহনতি মানুষের বৈশ্বিক প্রতিরোধ, শ্রমিক ধর্মঘট, সাম্রাজ্যবাদ-বিরোধী মহাসমাবেশ ও সমাজতান্ত্রিক পাঠচক্রের কেন্দ্রীয় তথ্যমঞ্চ।
+      </p>
+    </div>
+
+    <!-- Events Grid -->
+    <div class="events-timeline-grid">
+      
+      <!-- Event List -->
+      <div class="events-list-col">
+        <h2 style="font-family:var(--font-bengali-serif); font-size:1.6rem; margin-bottom:1.5rem;">আসন্ন গণসমাবেশ ও পাঠচক্র</h2>
+
+        <!-- Event 1 -->
+        <article class="event-card-item">
+          <div class="event-date-badge">
+            <span class="day">২০</span>
+            <span class="month">আগস্ট</span>
+          </div>
+          <div class="event-details">
+            <span class="sec-badge">আন্তর্জাতিক মহাসমাবেশ</span>
+            <h3>প্যালেস্টাইন সংহতি ও যুদ্ধাপরাধবিরোধী বৈশ্বিক পদযাত্রা</h3>
+            <div class="event-location-row">
+              <span>📍 কেন্দ্রীয় শহীদ মিনার ও আন্তর্জাতিক ভার্চুয়াল সংযোগ</span>
+              <span>⏰ বিকাল ৪:০০ টা</span>
+            </div>
+            <p style="font-size:0.9rem; color:var(--text-secondary); line-height:1.6;">
+              পশ্চিমা সাম্রাজ্যবাদী মদদ ও জায়নবাদী আগ্রাসনের বিরুদ্ধে বিশ্বের মুক্তিকামী জনতার সাথে একাত্মতা প্রকাশ।
+            </p>
+          </div>
+        </article>
+
+        <!-- Event 2 -->
+        <article class="event-card-item">
+          <div class="event-date-badge">
+            <span class="day">২৫</span>
+            <span class="month">আগস্ট</span>
+          </div>
+          <div class="event-details">
+            <span class="sec-badge">তাত্ত্বিক পাঠচক্র</span>
+            <h3>সমাজতান্ত্রিক পাঠচক্র: গ্রামশির প্রিজন নোটবুকস ও আধুনিক হেজেমনি</h3>
+            <div class="event-location-row">
+              <span>🌐 জুম ও দ্য ওয়ে স্টাডি রুম</span>
+              <span>⏰ রাত ৮:০০ টা</span>
+            </div>
+            <p style="font-size:0.9rem; color:var(--text-secondary); line-height:1.6;">
+              সাংস্কৃতিক প্রতিরোধ ও জৈব বুদ্ধিজীবীদের ভূমিকা নিয়ে গভীর আলোচনা। আলোচক: ড. সৌমিক রায়হান।
+            </p>
+          </div>
+        </article>
+
+        <!-- Event 3 -->
+        <article class="event-card-item">
+          <div class="event-date-badge">
+            <span class="day">০২</span>
+            <span class="month">সেপ্টেম্বর</span>
+          </div>
+          <div class="event-details">
+            <span class="sec-badge">শ্রমিক সম্মেলন</span>
+            <h3>গিগ অর্থনীতি ও আধুনিক কন্ট্রাক্ট শ্রমিকের অধিকার সম্মেলন</h3>
+            <div class="event-location-row">
+              <span>📍 জাতীয় প্রেসক্লাব মিলনায়তন</span>
+              <span>⏰ সকাল ১০:০০ টা</span>
+            </div>
+            <p style="font-size:0.9rem; color:var(--text-secondary); line-height:1.6;">
+              ডেলিভারি, রাইডার ও পোশাক কারখানার শ্রমিক প্রতিনিধিদের যৌথ সংহতি সভা।
+            </p>
+          </div>
+        </article>
+
+      </div>
+
+      <!-- Submit Event Sidebar Box -->
+      <div class="events-sidebar-box">
+        <div style="background:var(--bg-card); border:1px solid var(--border-crimson); border-radius:var(--radius-md); padding:1.8rem; box-shadow:var(--shadow-sm);">
+          <h3 style="font-family:var(--font-bengali-serif); font-size:1.3rem; margin-bottom:0.5rem; color:var(--crimson-primary);">
+            📢 আন্দোলনের খবর বা ইভেন্ট পাঠান
+          </h3>
+          <p style="font-size:0.85rem; color:var(--text-secondary); line-height:1.5; margin-bottom:1.2rem;">
+            আপনার এলাকায় শ্রমিক ধর্মঘট, পাঠচক্র বা সাম্রাজ্যবাদবিরোধী কোনো কর্মসূচি থাকলে ক্যালেন্ডারে অন্তর্ভুক্ত করতে বিবরণ পাঠান।
+          </p>
+          <form onsubmit="event.preventDefault(); alert('ধন্যবাদ! আপনার ইভেন্ট তথ্য সম্পাদকীয় পর্ষদে পাঠানো হয়েছে।');" style="display:flex; flex-direction:column; gap:0.8rem;">
+            <input type="text" placeholder="ইভেন্ট বা সমাবেশের শিরোনাম" required class="subscribe-input" style="font-size:0.85rem;">
+            <input type="text" placeholder="তারিখ ও সময়" required class="subscribe-input" style="font-size:0.85rem;">
+            <input type="text" placeholder="স্থান বা অনলাইন লিংক" required class="subscribe-input" style="font-size:0.85rem;">
+            <textarea placeholder="সংক্ষিপ্ত বিবরণ ও আয়োজক..." rows="4" required class="subscribe-input" style="font-size:0.85rem; resize:vertical;"></textarea>
+            <button type="submit" class="btn-solid-crimson" style="justify-content:center;">জমা দিন</button>
+          </form>
+        </div>
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- Footer Mount -->
+  <footer id="theway-footer-mount" class="theway-footer"></footer>
+
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="assets/js/supabase-config.js"></script>
+  <script src="assets/js/components.js"></script>
+</body>
+</html>

@@ -10,7 +10,8 @@
 const { OAuth2Client } = require('google-auth-library');
 const { createClient }  = require('@supabase/supabase-js');
 const jwt               = require('jsonwebtoken');
-const { verifySession } = require('./_lib/auth');
+const { verifySession, requireAuth } = require('./_lib/auth');
+const { logActivity }   = require('./_lib/activity');
 
 module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', req.headers.origin || '*');
@@ -23,14 +24,27 @@ module.exports = async function handler(req, res) {
 
   // ── ME ──────────────────────────────────────────────────────────
   if (action === 'me') {
-    const s = verifySession(req);
-    if (!s) return res.status(401).json({ error: 'Not authenticated' });
+    const s = await requireAuth(req, res);
+    if (!s) return;
     return res.status(200).json({ email: s.email, role: s.role, name: s.name || s.email, picture: s.picture || '' });
   }
 
   // ── LOGOUT ──────────────────────────────────────────────────────
   if (action === 'logout') {
-    res.setHeader('Set-Cookie', 'privatian_session=; HttpOnly; Secure; SameSite=Strict; Max-Age=0; Path=/');
+    const s = verifySession(req);
+    if (s) {
+      logActivity({
+        actor: s,
+        action: 'auth.logout',
+        category: 'auth',
+        summary: `${s.name || s.email} logged out of Admin Panel`,
+        target_id: s.email,
+        target_name: s.email,
+        details: {},
+        req
+      }).catch(() => {});
+    }
+    res.setHeader('Set-Cookie', 'theway_session=; HttpOnly; Secure; SameSite=Strict; Max-Age=0; Path=/');
     return res.status(200).json({ success: true });
   }
 
@@ -40,11 +54,10 @@ module.exports = async function handler(req, res) {
     if (!credential) return res.status(400).json({ error: 'No credential provided' });
 
     try {
-      const googleClientId = process.env.GOOGLE_CLIENT_ID || '998492025686-flk32n9j8s28b5r3s98l1k18k2h7h51o.apps.googleusercontent.com';
-      const gClient = new OAuth2Client(googleClientId);
+      const gClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
       const ticket  = await gClient.verifyIdToken({
         idToken:  credential,
-        audience: googleClientId,
+        audience: process.env.GOOGLE_CLIENT_ID,
       });
       const gp = ticket.getPayload();
       if (!gp.email_verified) return res.status(401).json({ error: 'Email not verified with Google' });
@@ -53,9 +66,7 @@ module.exports = async function handler(req, res) {
       const name    = gp.name    || email;
       const picture = gp.picture || '';
 
-      const sbUrl = process.env.SUPABASE_URL || 'https://aenhajqjsgskimfzvlfr.supabase.co';
-      const sbKey = process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFlbmhhanFqc2dza2ltZnp2bGZyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY2MDc1MDUsImV4cCI6MjEwMjE4MzUwNX0.q0wmF77hpsb8M7CQOYMq8GrDuQJ32vn1NcWFXTc5UAY';
-      const sb = createClient(sbUrl, sbKey);
+      const sb = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
       const { data: admin, error } = await sb
         .from('allowed_admins')
         .select('*')
@@ -70,16 +81,27 @@ module.exports = async function handler(req, res) {
         });
       }
 
-      const sessionSecret = process.env.SESSION_SECRET || 'theprivatianfamily_secret_jwt_key_2026_secure';
       const token = jwt.sign(
         { email: admin.email, role: admin.role, name, picture },
-        sessionSecret,
+        process.env.SESSION_SECRET,
         { expiresIn: '24h' }
       );
 
       res.setHeader('Set-Cookie',
-        `privatian_session=${token}; HttpOnly; Secure; SameSite=Strict; Max-Age=86400; Path=/`
+        `theway_session=${token}; HttpOnly; Secure; SameSite=Strict; Max-Age=86400; Path=/`
       );
+
+      // Record Activity Log for login
+      logActivity({
+        actor: { email: admin.email, name, role: admin.role },
+        action: 'auth.login',
+        category: 'auth',
+        summary: `${name} (${admin.email}) logged in successfully via Google OAuth`,
+        target_id: admin.id || admin.email,
+        target_name: admin.email,
+        details: { method: 'Google OAuth', role: admin.role },
+        req
+      }).catch(() => {});
 
       return res.status(200).json({
         success: true, token,

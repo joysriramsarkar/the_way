@@ -1,6 +1,7 @@
 {
-  "name": "theprivatianfamily",
-  "version": "1.0.0",
+  "name": "the-way-portal",
+  "version": "2.0.0",
+  "description": "দ্য ওয়ে (The Way) — আন্তর্জাতিক সমাজতান্ত্রিক চিন্তন ও গণআন্দোলনের উন্মুক্ত পোর্টাল",
   "private": true,
   "scripts": {
     "start": "node dev-server.js",

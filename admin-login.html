@@ -3,66 +3,48 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Sign In — The Privatian Family Admin</title>
+  <title>Sign In — The Way (দ্য ওয়ে) Editorial HQ</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@300;400;600;700&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@600;700&family=Inter:wght@400;500;600;700&family=Noto+Serif+Bengali:wght@700;800&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet" />
   <script src="https://accounts.google.com/gsi/client" async defer></script>
+  <link rel="icon" type="image/svg+xml" href="assets/images/logo.svg">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --blue:    #0a528e;
-      --blue-d:  #073d6a;
-      --blue-l:  #1a7abf;
-      --cream:   #faf8f4;
-      --text:    #1a1a1a;
-      --muted:   #6b7280;
-      --border:  rgba(0,0,0,.1);
-      --red:     #dc2626;
-      --shadow:  0 25px 60px rgba(0,0,0,.18);
+      --crimson:   #c2182b;
+      --crimson-d: #8b0e1b;
+      --gold:      #d97706;
+      --bg:        #090d14;
+      --card-bg:   #121722;
+      --text:      #f3f4f6;
+      --muted:     #9ca3af;
+      --border:    rgba(255,255,255,0.1);
+      --shadow:    0 25px 60px rgba(0,0,0,0.6);
     }
 
-    html, body { height: 100%; font-family: 'Source Sans 3', sans-serif; }
+    html, body { height: 100%; font-family: 'Inter', 'Hind Siliguri', sans-serif; }
 
     body {
-      background: var(--cream);
+      background: radial-gradient(circle at center, #161c28 0%, var(--bg) 100%);
       display: flex;
       align-items: center;
       justify-content: center;
       min-height: 100vh;
+      color: var(--text);
+      padding: 1.5rem;
       position: relative;
-      overflow: hidden;
-    }
-
-    /* Decorative background blobs */
-    body::before, body::after {
-      content: '';
-      position: fixed;
-      border-radius: 50%;
-      filter: blur(80px);
-      opacity: .12;
-      pointer-events: none;
-    }
-    body::before {
-      width: 600px; height: 600px;
-      background: var(--blue);
-      top: -200px; left: -200px;
-    }
-    body::after {
-      width: 400px; height: 400px;
-      background: var(--blue-l);
-      bottom: -100px; right: -100px;
     }
 
     .login-card {
-      background: #fff;
-      border-radius: 20px;
-      padding: 52px 44px;
+      background: var(--card-bg);
+      border-radius: 16px;
+      padding: 48px 40px;
       width: 100%;
-      max-width: 420px;
+      max-width: 440px;
       box-shadow: var(--shadow);
-      border: 1px solid var(--border);
+      border: 1px solid rgba(194, 24, 43, 0.35);
       position: relative;
       z-index: 1;
       text-align: center;
@@ -70,7 +52,7 @@
     }
 
     @keyframes slideUp {
-      from { opacity: 0; transform: translateY(24px); }
+      from { opacity: 0; transform: translateY(20px); }
       to   { opacity: 1; transform: translateY(0); }
     }
 
@@ -78,63 +60,23 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 10px;
-      margin-bottom: 32px;
-    }
-
-    .login-logo-icon {
-      width: 42px; height: 42px;
-      background: var(--blue);
-      border-radius: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #fff;
-      font-family: Georgia, serif;
-      font-size: 22px;
-      font-weight: 700;
-      flex-shrink: 0;
-    }
-
-    .login-logo-text { text-align: left; }
-    .login-logo-title {
-      font-family: 'Libre Baskerville', serif;
-      font-size: 15px;
-      color: var(--text);
-      font-weight: 700;
-      display: block;
-      line-height: 1.2;
-    }
-    .login-logo-sub {
-      font-size: 11px;
-      color: var(--muted);
-      text-transform: uppercase;
-      letter-spacing: .06em;
-      display: block;
-    }
-
-    .login-divider {
-      width: 40px; height: 1px;
-      background: var(--border);
-      margin: 0 auto 28px;
+      margin-bottom: 24px;
     }
 
     .login-heading {
-      font-family: 'Libre Baskerville', serif;
-      font-size: 22px;
-      color: var(--text);
-      margin-bottom: 8px;
-      line-height: 1.3;
+      font-family: 'Playfair Display', 'Noto Serif Bengali', serif;
+      font-size: 24px;
+      color: #fff;
+      margin-bottom: 6px;
     }
 
     .login-sub {
-      font-size: 14px;
+      font-size: 13.5px;
       color: var(--muted);
-      margin-bottom: 32px;
+      margin-bottom: 28px;
       line-height: 1.6;
     }
 
-    /* Google button container — center it */
     .google-btn-wrap {
       display: flex;
       justify-content: center;
@@ -142,35 +84,24 @@
       min-height: 44px;
     }
 
-    .login-notice {
-      font-size: 12px;
-      color: var(--muted);
-      line-height: 1.6;
-      padding-top: 20px;
-      border-top: 1px solid var(--border);
-      margin-top: 8px;
-    }
-
-    /* Error / info messages */
     .msg-box {
-      border-radius: 10px;
-      padding: 12px 16px;
-      font-size: 13.5px;
-      margin-bottom: 20px;
+      border-radius: 8px;
+      padding: 12px 14px;
+      font-size: 13px;
+      margin-bottom: 18px;
       line-height: 1.5;
       display: none;
       text-align: left;
     }
     .msg-box.visible { display: block; }
-    .msg-box.error { background: #fef2f2; border: 1px solid #fecaca; color: var(--red); }
-    .msg-box.info  { background: #eff6ff; border: 1px solid #bfdbfe; color: var(--blue); }
+    .msg-box.error { background: #3b0d11; border: 1px solid #7f1d1d; color: #fca5a5; }
+    .msg-box.info  { background: #0f2438; border: 1px solid #1e4976; color: #93c5fd; }
 
-    /* Loading spinner */
     .spinner {
       display: none;
-      width: 20px; height: 20px;
-      border: 2.5px solid rgba(10,82,142,.2);
-      border-top-color: var(--blue);
+      width: 22px; height: 22px;
+      border: 2.5px solid rgba(194,24,43,.2);
+      border-top-color: var(--crimson);
       border-radius: 50%;
       animation: spin .7s linear infinite;
       margin: 12px auto;
@@ -178,10 +109,13 @@
     .spinner.visible { display: block; }
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    .login-footer {
-      margin-top: 24px;
+    .login-notice {
       font-size: 11.5px;
-      color: #aaa;
+      color: var(--muted);
+      line-height: 1.6;
+      padding-top: 18px;
+      border-top: 1px solid var(--border);
+      margin-top: 12px;
     }
   </style>
 </head>
@@ -190,17 +124,11 @@
   <div class="login-card">
 
     <div class="login-logo">
-      <div class="login-logo-icon">P</div>
-      <div class="login-logo-text">
-        <span class="login-logo-title">The Privatian Family</span>
-        <span class="login-logo-sub">Admin Panel</span>
-      </div>
+      <img src="assets/images/logo.svg" alt="The Way (দ্য ওয়ে)" style="height:52px;" onerror="this.src='logo.svg'">
     </div>
 
-    <div class="login-divider"></div>
-
-    <h1 class="login-heading">Secure Sign In</h1>
-    <p class="login-sub">Only authorized Google accounts can access this panel. Sign in with your whitelisted Gmail to continue.</p>
+    <h1 class="login-heading">Editorial & Movement HQ</h1>
+    <p class="login-sub">Authorized portal for The Way editorial collective and movement coordinators.</p>
 
     <div id="msg-box" class="msg-box"></div>
     <div id="spinner" class="spinner"></div>
@@ -214,27 +142,25 @@
       <div class="g_id_signin"
            data-type="standard"
            data-size="large"
-           data-theme="outline"
+           data-theme="filled_black"
            data-text="sign_in_with"
            data-shape="rectangular"
            data-logo_alignment="left"
-           data-width="340">
+           data-width="320">
       </div>
     </div>
 
     <p class="login-notice">
-      Access is restricted to approved team members only. If you believe you should have access, contact the site administrator.
+      Access restricted to authenticated editorial collective members.
     </p>
-
-    <div class="login-footer">The Privatian Family &mdash; Private Administration</div>
   </div>
 
   <script>
-    const TOKEN_KEY = 'privatian_token';
+    const TOKEN_KEY = 'theway_token';
 
     // If already logged in, redirect directly
     (async function () {
-      const token = localStorage.getItem(TOKEN_KEY);
+      const token = localStorage.getItem(TOKEN_KEY) || localStorage.getItem('privatian_token');
       if (!token) return;
       try {
         const r = await fetch('/api/auth?action=me', { headers: { 'Authorization': 'Bearer ' + token } });
@@ -242,7 +168,6 @@
       } catch(e) {}
     })();
 
-    // Show any session-expired message
     const loginMsg = sessionStorage.getItem('login_message');
     if (loginMsg) {
       showMsg('info', loginMsg);
@@ -261,7 +186,7 @@
 
     async function handleCredentialResponse(response) {
       setLoading(true);
-      showMsg('info', 'Verifying your identity...');
+      showMsg('info', 'Verifying your credentials...');
 
       try {
         const res = await fetch('/api/auth?action=verify', {
@@ -275,18 +200,18 @@
 
         if (data.success && data.token) {
           localStorage.setItem(TOKEN_KEY, data.token);
-          showMsg('info', 'Access granted! Redirecting...');
+          localStorage.setItem('privatian_token', data.token); // dual support
+          showMsg('info', 'Access granted! Redirecting to Editorial HQ...');
           setTimeout(function() { window.location.replace('/admin.html'); }, 600);
         } else {
-          showMsg('error', data.error || 'Authentication failed. Please try again.');
+          showMsg('error', data.error || 'Authentication failed. Please check your credentials.');
         }
 
       } catch(e) {
         setLoading(false);
-        showMsg('error', 'Network error. Please check your connection and try again.');
+        showMsg('error', 'Network error. Please try again.');
       }
     }
   </script>
 </body>
 </html>
-

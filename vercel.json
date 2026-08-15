@@ -1,6 +1,14 @@
 {
-  "version": 2,
   "cleanUrls": true,
+  "trailingSlash": false,
+  "rewrites": [
+    { "source": "/sitemap.xml", "destination": "/api/sitemap" },
+    { "source": "/section/:path*", "destination": "/section.html" },
+    { "source": "/article/:path*", "destination": "/api/article-seo?slug=:path*" },
+    { "source": "/events", "destination": "/events.html" },
+    { "source": "/admin", "destination": "/admin.html" },
+    { "source": "/login", "destination": "/admin-login.html" }
+  ],
   "headers": [
     {
       "source": "/assets/(.*)",

@@ -11,7 +11,8 @@
  */
 
 const { createClient } = require('@supabase/supabase-js');
-const { verifySession } = require('./_lib/auth');
+const { verifySession, requireAuth, requireAdmin } = require('./_lib/auth');
+const { logActivity } = require('./_lib/activity');
 
 function rowToAdminSection(row) {
   return {
@@ -33,9 +34,769 @@ module.exports = async function handler(req, res) {
 
   if (req.method === 'OPTIONS') return res.status(200).end();
 
-  const url = process.env.SUPABASE_URL || 'https://aenhajqjsgskimfzvlfr.supabase.co';
-  const key = process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFlbmhhanFqc2dza2ltZnp2bGZyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY2MDc1MDUsImV4cCI6MjEwMjE4MzUwNX0.q0wmF77hpsb8M7CQOYMq8GrDuQJ32vn1NcWFXTc5UAY';
-  const sb = createClient(url, key);
+  const sb = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
+  const action = req.query && req.query.action;
+
+  // ── MENU CONFIGURATION (GET / POST) ─────────────────────────────────────
+  if (action === 'menu') {
+    const DEFAULT_MENU_CONFIG = {
+      sectionsTitle: 'Sections',
+      seriesTitle: 'Featured series',
+      series: [
+        {
+          id: 'series-1',
+          title: 'Wondering',
+          href: '/section/findings',
+          description: 'A series of profound questions explored by The Way (দ্য ওয়ে) experts.',
+          enabled: true
+        }
+      ],
+      exploreTitle: 'Explore the Privatian',
+      explore: [
+        { id: 'exp-1', label: 'Events', href: '/events', target: '_self', enabled: true },
+        { id: 'exp-2', label: 'Article archive', href: '/', target: '_self', enabled: true },
+        { id: 'exp-3', label: 'About us', href: '/', target: '_self', enabled: true },
+        { id: 'exp-4', label: 'News+', href: '/', target: '_self', enabled: true },
+        { id: 'exp-5', label: 'Podcast', href: '/', target: '_self', enabled: true }
+      ],
+      latestTitle: 'Read the latest',
+      latestMode: 'curated',
+      latest: [
+        {
+          id: 'latest-1',
+          title: "For families in transition, 'not all traditions are equal'",
+          href: '/section/community-heritage',
+          imageUrl: 'img1.png',
+          enabled: true
+        },
+        {
+          id: 'latest-2',
+          title: 'The art of the pen: How writing shapes cultural identity',
+          href: '/section/culture',
+          imageUrl: 'img3.png',
+          enabled: true
+        }
+      ]
+    };
+
+    if (req.method === 'GET') {
+      try {
+        const { data } = await sb.from('site_settings').select('value').eq('key', 'navigation_menu_config').maybeSingle();
+        if (data && data.value) return res.status(200).json(data.value);
+      } catch(e) {}
+
+      // Fallback read from sections table
+      try {
+        const { data: sData } = await sb.from('sections').select('name').eq('admin_id', '__menu_config__').maybeSingle();
+        if (sData && sData.name) {
+          const parsed = JSON.parse(sData.name);
+          if (parsed && typeof parsed === 'object') return res.status(200).json(parsed);
+        }
+      } catch(e) {}
+
+      return res.status(200).json(DEFAULT_MENU_CONFIG);
+    }
+
+    if (req.method === 'POST') {
+      const session = await requireAuth(req, res);
+      if (!session) return;
+      const menuConfig = req.body || {};
+
+      let saved = false;
+      try {
+        const { error } = await sb.from('site_settings').upsert({
+          key: 'navigation_menu_config',
+          value: menuConfig,
+          updated_at: new Date().toISOString()
+        }, { onConflict: 'key' });
+        if (!error) saved = true;
+      } catch(err) {}
+
+      if (!saved) {
+        // Fallback save in sections table
+        try {
+          const { data: existing } = await sb.from('sections').select('id').eq('admin_id', '__menu_config__').maybeSingle();
+          if (existing) {
+            await sb.from('sections').update({
+              name: JSON.stringify(menuConfig),
+              slug: '__menu_config__',
+              display_order: 9999,
+              is_active: false,
+              locked: true,
+              is_deleted: true
+            }).eq('admin_id', '__menu_config__');
+          } else {
+            await sb.from('sections').insert({
+              admin_id: '__menu_config__',
+              name: JSON.stringify(menuConfig),
+              slug: '__menu_config__',
+              display_order: 9999,
+              is_active: false,
+              locked: true,
+              is_deleted: true
+            });
+          }
+        } catch(err) {
+          console.warn('[DB fallback save error]:', err.message);
+        }
+      }
+      logActivity({
+        actor: session,
+        action: 'layout.menu_save',
+        category: 'layout',
+        summary: `${session.name || session.email} updated Navigation Menu configuration`,
+        target_id: 'navigation_menu_config',
+        target_name: 'Navigation Menu',
+        details: {},
+        req
+      }).catch(() => {});
+
+      return res.status(200).json({ ok: true, data: menuConfig });
+    }
+  }
+
+  // ── HEADER CONFIGURATION (GET / POST) ───────────────────────────────────
+  if (action === 'header') {
+    const DEFAULT_HEADER_CONFIG = {
+      siteTitle: 'The Way (দ্য ওয়ে)',
+      tabTagline: 'Insights, Stories & Heritage',
+      browserTabTitle: 'The Way (দ্য ওয়ে) — Insights, Stories & Heritage',
+      metaDescription: 'The Official Publication of The Way Society — Cambridge, Massachusetts.',
+      faviconUrl: '',
+      logoSvg: null,
+      logoHeight: 80,
+      enabledNavSections: null,
+      subsections: [
+        { id: 'sub-1', label: 'FAMILY LEGACY', href: '/section/community-heritage', icon: null, enabled: true },
+        { id: 'sub-2', label: 'EXPERIENCE', href: '/section/culture', icon: null, enabled: true },
+        { id: 'sub-3', label: 'RESEARCH & VALUES', href: '/section/privacy-values', icon: null, enabled: true },
+        { id: 'sub-4', label: 'PERSPECTIVES', href: '/section/opinion', icon: null, enabled: true }
+      ],
+      social: [
+        { id: 'soc-1', platform: 'instagram', label: 'Instagram', href: 'https://instagram.com', enabled: true },
+        { id: 'soc-2', platform: 'linkedin', label: 'LinkedIn', href: 'https://linkedin.com', enabled: true },
+        { id: 'soc-3', platform: 'tiktok', label: 'TikTok', href: 'https://tiktok.com', enabled: true },
+        { id: 'soc-4', platform: 'facebook', label: 'Facebook', href: 'https://facebook.com', enabled: true },
+        { id: 'soc-5', platform: 'youtube', label: 'YouTube', href: 'https://youtube.com', enabled: true }
+      ]
+    };
+
+    if (req.method === 'GET') {
+      try {
+        const { data } = await sb.from('site_settings').select('value').eq('key', 'site_header_config').maybeSingle();
+        if (data && data.value) return res.status(200).json(data.value);
+      } catch(e) {}
+
+      // Fallback read from sections table
+      try {
+        const { data: sData } = await sb.from('sections').select('name').eq('admin_id', '__header_config__').maybeSingle();
+        if (sData && sData.name) {
+          const parsed = JSON.parse(sData.name);
+          if (parsed && typeof parsed === 'object') return res.status(200).json(parsed);
+        }
+      } catch(e) {}
+
+      return res.status(200).json(DEFAULT_HEADER_CONFIG);
+    }
+
+    if (req.method === 'POST') {
+      const session = await requireAuth(req, res);
+      if (!session) return;
+      const headerConfig = req.body || {};
+
+      let saved = false;
+      try {
+        const { error } = await sb.from('site_settings').upsert({
+          key: 'site_header_config',
+          value: headerConfig,
+          updated_at: new Date().toISOString()
+        }, { onConflict: 'key' });
+        if (!error) saved = true;
+      } catch(err) {}
+
+      if (!saved) {
+        // Fallback save in sections table
+        try {
+          const { data: existing } = await sb.from('sections').select('id').eq('admin_id', '__header_config__').maybeSingle();
+          if (existing) {
+            await sb.from('sections').update({
+              name: JSON.stringify(headerConfig),
+              slug: '__header_config__',
+              display_order: 9998,
+              is_active: false,
+              locked: true,
+              is_deleted: true
+            }).eq('admin_id', '__header_config__');
+          } else {
+            await sb.from('sections').insert({
+              admin_id: '__header_config__',
+              name: JSON.stringify(headerConfig),
+              slug: '__header_config__',
+              display_order: 9998,
+              is_active: false,
+              locked: true,
+              is_deleted: true
+            });
+          }
+        } catch(err) {
+          console.warn('[DB fallback header save error]:', err.message);
+        }
+      }
+
+      logActivity({
+        actor: session,
+        action: 'layout.header_save',
+        category: 'layout',
+        summary: `${session.name || session.email} updated Header configuration & site title`,
+        target_id: 'site_header_config',
+        target_name: 'Header Settings',
+        details: {},
+        req
+      }).catch(() => {});
+
+      return res.status(200).json({ ok: true, data: headerConfig });
+    }
+  }
+
+  // ── HOMEPAGE CONFIGURATION (GET / POST) ──────────────────────────────────
+  if (action === 'homepage') {
+    const DEFAULT_HOMEPAGE_CONFIG = {
+      hero: {
+        main: {
+          articleId: null,
+          title: 'The art of private wisdom: how Privatian families shape culture and legacy.',
+          subtitle: 'An exclusive exploration of family heritage, intellectual tradition, and the enduring power of private knowledge.',
+          imageUrl: 'img1.png',
+          href: '/section/findings',
+          enabled: true
+        },
+        sidebar: [
+          {
+            id: 'h-side-1',
+            articleId: null,
+            title: 'Part legacy, part field study: the Privatian story across generations',
+            description: 'From a family archive, the Privatian tradition sees pathways forged through private endeavors',
+            imageUrl: 'img5.png',
+            tag: 'Heritage Archive',
+            href: '/section/community-heritage',
+            enabled: true
+          },
+          {
+            id: 'h-side-2',
+            articleId: null,
+            title: 'How the Privatian legacy helped define an era of private excellence',
+            description: "The family's influence on culture, art, and intellectual discourse runs deeper than most realize",
+            imageUrl: 'img6.png',
+            tag: '',
+            href: '/section/culture',
+            enabled: true
+          }
+        ]
+      },
+      smallArticles: [
+        {
+          id: 'sm-1',
+          articleId: null,
+          title: 'When Privatians meet: the quiet power of community',
+          imageUrl: 'img2.png',
+          href: '/section/community-heritage',
+          enabled: true
+        },
+        {
+          id: 'sm-2',
+          articleId: null,
+          title: 'Why handwritten correspondence is making a private comeback',
+          imageUrl: 'img3.png',
+          href: '/section/culture',
+          enabled: true
+        },
+        {
+          id: 'sm-3',
+          articleId: null,
+          title: 'Liberal tradition in the modern age: how the Privatian family stays ahead',
+          imageUrl: 'img4.png',
+          href: '/section/privacy-values',
+          enabled: true
+        }
+      ],
+      eventsSection: {
+        eventsHeading: 'Upcoming Events',
+        seeAllText: 'See all events',
+        seeAllHref: '/events',
+        events: [
+          {
+            id: 'ev-1',
+            date: 'Sep. 22, 2026',
+            title: 'Debate, Debrief, and Dissect: The Role of Privacy in the Modern Family and American Life',
+            meta: '4 p.m. Thursday ■ Privatian Forum, Main Hall, Private Campus; via livestream',
+            href: '/events',
+            enabled: true
+          },
+          {
+            id: 'ev-2',
+            date: 'Oct. 16, 2026',
+            title: 'America at 250 and Beyond: A Well-Informed Privatian Citizenry',
+            meta: '4 p.m. Friday ■ Privatian Institute, 79 Heritage Ave., Cambridge',
+            href: '/events',
+            enabled: true
+          },
+          {
+            id: 'ev-3',
+            date: 'Nov. 12, 2026',
+            title: 'Winter Symposium on Archival Preservation and Family Documentation',
+            meta: '2 p.m. Thursday ■ Cambridge Heritage Library & Virtual Room A',
+            href: '/events',
+            enabled: true
+          },
+          {
+            id: 'ev-4',
+            date: 'Dec. 04, 2026',
+            title: 'Annual Privatian Literary Honors and Endowed Fellowship Awards',
+            meta: '6 p.m. Friday ■ Grand Ballroom, The Way Society',
+            href: '/events',
+            enabled: true
+          }
+        ],
+        featured: {
+          articleId: null,
+          title: "Rubies decoded: 'Heritage is just one piece of the puzzle'",
+          description: 'Rare family gems shine in new Privatian retrospective',
+          imageUrl: 'img5.png',
+          href: '/section/community-heritage',
+          enabled: true
+        }
+      },
+      allNews: {
+        heading: 'All News',
+        columns: [
+          {
+            id: 'col-1',
+            label: 'COMMUNITY & HERITAGE',
+            sectionSlug: 'community-heritage',
+            lead: {
+              articleId: null,
+              title: "Don't hold back, the Privatian elders told scholars. It worked.",
+              imageUrl: 'img2.png',
+              href: '/section/community-heritage',
+              enabled: true
+            },
+            subArticles: [
+              { id: 'sub-1-1', title: 'Elena Voss named curator of The Way Foundation for Letters', href: '/section/community-heritage', enabled: true },
+              { id: 'sub-1-2', title: 'Family council opposes changes to federal heritage-protection programs', href: '/section/community-heritage', enabled: true },
+              { id: 'sub-1-3', title: "Henry's remarkable legacy of giving: what it means to the family today", href: '/section/community-heritage', enabled: true },
+              { id: 'sub-1-4', title: 'Letters to the archive: understanding the Privatian correspondence collection', href: '/section/community-heritage', enabled: true }
+            ]
+          },
+          {
+            id: 'col-2',
+            label: 'CULTURE',
+            sectionSlug: 'culture',
+            lead: {
+              articleId: null,
+              title: "For Privatian women in arts, 'not all cultural diets are equal'",
+              imageUrl: 'img1.png',
+              href: '/section/culture',
+              enabled: true
+            },
+            subArticles: [
+              { id: 'sub-2-1', title: 'AI use surging for creative writing among young Privatian members', href: '/section/culture', enabled: true },
+              { id: 'sub-2-2', title: 'Pen refill? Go for it, says the Privatian Calligraphy Society', href: '/section/culture', enabled: true },
+              { id: 'sub-2-3', title: 'Music residency, says Privatian Arts & Culture Society, is about connection', href: '/section/culture', enabled: true }
+            ]
+          },
+          {
+            id: 'col-3',
+            label: 'PRIVACY & VALUES',
+            sectionSlug: 'privacy-values',
+            lead: {
+              articleId: null,
+              title: 'Do you have a private AI secret?',
+              imageUrl: 'img4.png',
+              href: '/section/privacy-values',
+              enabled: true
+            },
+            subArticles: [
+              { id: 'sub-3-1', title: 'Families alone, yes. But watching the community is another thing.', href: '/section/privacy-values', enabled: true },
+              { id: 'sub-3-2', title: 'Is that family member a Privatian or not — and who decides the rules?', href: '/section/privacy-values', enabled: true },
+              { id: 'sub-3-3', title: 'Bowling alone, yes. But the Privatian family still gathers.', href: '/section/privacy-values', enabled: true }
+            ]
+          },
+          {
+            id: 'col-4',
+            label: 'NATION & WORLD',
+            sectionSlug: 'nation-world',
+            lead: {
+              articleId: null,
+              title: 'How the Privatian diaspora is keeping tradition alive in a globalized world',
+              imageUrl: 'img6.png',
+              href: '/section/nation-world',
+              enabled: true
+            },
+            subArticles: [
+              { id: 'sub-4-1', title: 'Bearing down on global secrecy: what the Privatian model teaches us', href: '/section/nation-world', enabled: true },
+              { id: 'sub-4-2', title: 'Currency of trust: how the Privatian family built international networks', href: '/section/nation-world', enabled: true }
+            ]
+          },
+          {
+            id: 'col-5',
+            label: 'ARTS & LEGACY',
+            sectionSlug: 'arts-legacy',
+            lead: {
+              articleId: null,
+              title: 'New research shows writing by hand preserves memory and sharpens intellect',
+              imageUrl: 'img3.png',
+              href: '/section/arts-legacy',
+              enabled: true
+            },
+            subArticles: [
+              { id: 'sub-5-1', title: 'Rowing, dance: yes. But the Privatian pen holds a special place of honor.', href: '/section/arts-legacy', enabled: true },
+              { id: 'sub-5-2', title: 'Novelist argues the world needs more well-written letters, not fewer', href: '/section/arts-legacy', enabled: true },
+              { id: 'sub-5-3', title: 'Turnover at The Way Society demands that cultural legacy must be paid.', href: '/section/arts-legacy', enabled: true }
+            ]
+          },
+          {
+            id: 'col-6',
+            label: 'WORK & ECONOMY',
+            sectionSlug: 'work-economy',
+            lead: {
+              articleId: null,
+              title: 'Go-to Privatian professionals redefine private practices in modern economy',
+              imageUrl: 'img5.png',
+              href: '/section/work-economy',
+              enabled: true
+            },
+            subArticles: [
+              { id: 'sub-6-1', title: "Rural flower power: the Privatian family's investment in private land", href: '/section/work-economy', enabled: true },
+              { id: 'sub-6-2', title: 'The Way economy advisor talks to the state of family wealth', href: '/section/work-economy', enabled: true },
+              { id: 'sub-6-3', title: 'Letters of the law: the Privatian legal scholars improve upon family statutes', href: '/section/work-economy', enabled: true }
+            ]
+          }
+        ]
+      }
+    };
+
+    if (req.method === 'GET') {
+      try {
+        const { data } = await sb.from('site_settings').select('value').eq('key', 'site_homepage_config').maybeSingle();
+        if (data && data.value) return res.status(200).json(data.value);
+      } catch(e) {}
+
+      // Fallback read from sections table
+      try {
+        const { data: sData } = await sb.from('sections').select('name').eq('admin_id', '__homepage_config__').maybeSingle();
+        if (sData && sData.name) {
+          const parsed = JSON.parse(sData.name);
+          if (parsed && typeof parsed === 'object') return res.status(200).json(parsed);
+        }
+      } catch(e) {}
+
+      return res.status(200).json(DEFAULT_HOMEPAGE_CONFIG);
+    }
+
+    if (req.method === 'POST') {
+      const session = await requireAuth(req, res);
+      if (!session) return;
+      const homepageConfig = req.body || {};
+
+      let saved = false;
+      try {
+        const { error } = await sb.from('site_settings').upsert({
+          key: 'site_homepage_config',
+          value: homepageConfig,
+          updated_at: new Date().toISOString()
+        }, { onConflict: 'key' });
+        if (!error) saved = true;
+      } catch(err) {}
+
+      if (!saved) {
+        // Fallback save in sections table
+        try {
+          const { data: existing } = await sb.from('sections').select('id').eq('admin_id', '__homepage_config__').maybeSingle();
+          if (existing) {
+            await sb.from('sections').update({
+              name: JSON.stringify(homepageConfig),
+              slug: '__homepage_config__',
+              display_order: 9997,
+              is_active: false,
+              locked: true,
+              is_deleted: true
+            }).eq('admin_id', '__homepage_config__');
+          } else {
+            await sb.from('sections').insert({
+              admin_id: '__homepage_config__',
+              name: JSON.stringify(homepageConfig),
+              slug: '__homepage_config__',
+              display_order: 9997,
+              is_active: false,
+              locked: true,
+              is_deleted: true
+            });
+          }
+        } catch(err) {
+          console.warn('[DB fallback homepage save error]:', err.message);
+        }
+      }
+
+      logActivity({
+        actor: session,
+        action: 'layout.homepage_save',
+        category: 'layout',
+        summary: `${session.name || session.email} updated Homepage builder configuration (Hero, Events, Series)`,
+        target_id: 'site_homepage_config',
+        target_name: 'Homepage Builder',
+        details: {},
+        req
+      }).catch(() => {});
+
+      return res.status(200).json({ ok: true, data: homepageConfig });
+    }
+  }
+
+  // ── FOOTER CONFIGURATION (GET / POST) ───────────────────────────────────
+  if (action === 'footer') {
+    const DEFAULT_FOOTER_CONFIG = {
+      sectionsTitle: 'Sections',
+      enabledSections: null,
+      exploreTitle: 'Explore the Privatian',
+      explore: [
+        { id: 'f-exp-1', label: 'Events', href: '/events', target: '_self', enabled: true },
+        { id: 'f-exp-2', label: 'Article archive', href: '/', target: '_self', enabled: true },
+        { id: 'f-exp-3', label: 'About us', href: '/', target: '_self', enabled: true },
+        { id: 'f-exp-4', label: 'News+', href: '/', target: '_self', enabled: true },
+        { id: 'f-exp-5', label: 'Podcast', href: '/', target: '_self', enabled: true }
+      ],
+      seriesTitle: 'Our recent series',
+      series: [
+        {
+          id: 'f-ser-1',
+          title: 'Wondering',
+          href: '/section/findings',
+          description: 'A series of profound questions explored by The Way (দ্য ওয়ে) experts.',
+          enabled: true
+        },
+        {
+          id: 'f-ser-2',
+          title: 'Life | Heritage',
+          href: '/section/community-heritage',
+          description: 'A series focused on the personal side of Privatian family research and tradition.',
+          enabled: true
+        }
+      ],
+      socialTitle: 'Follow us on',
+      social: [
+        { id: 'f-soc-1', platform: 'instagram', label: 'Instagram', href: 'https://instagram.com', enabled: true },
+        { id: 'f-soc-2', platform: 'linkedin', label: 'LinkedIn', href: 'https://linkedin.com', enabled: true },
+        { id: 'f-soc-3', platform: 'tiktok', label: 'TikTok', href: 'https://tiktok.com', enabled: true },
+        { id: 'f-soc-4', platform: 'facebook', label: 'Facebook', href: 'https://facebook.com', enabled: true },
+        { id: 'f-soc-5', platform: 'youtube', label: 'YouTube', href: 'https://youtube.com', enabled: true },
+        { id: 'f-soc-6', platform: 'email', label: 'Email', href: 'mailto:contact@privatian.org', enabled: true }
+      ],
+      logoSvg: '',
+      logoHeight: 80,
+      tagline: 'The Official Publication of The Way Society — Cambridge, Massachusetts',
+      copyright: '© 2026 The Way (দ্য ওয়ে). All rights reserved.',
+      bottomLinks: [
+        { id: 'f-bot-1', label: 'For Media & Journalists', href: '#', target: '_self', enabled: true },
+        { id: 'f-bot-2', label: 'Family News & Archives', href: '#', target: '_self', enabled: true },
+        { id: 'f-bot-3', label: 'Digital Accessibility', href: '#', target: '_self', enabled: true },
+        { id: 'f-bot-4', label: 'Privacy Policy', href: '#', target: '_self', enabled: true },
+        { id: 'f-bot-5', label: 'Trademark', href: '#', target: '_self', enabled: true }
+      ]
+    };
+
+    if (req.method === 'GET') {
+      try {
+        const { data } = await sb.from('site_settings').select('value').eq('key', 'site_footer_config').maybeSingle();
+        if (data && data.value) return res.status(200).json(data.value);
+      } catch(e) {}
+
+      // Fallback read from sections table
+      try {
+        const { data: sData } = await sb.from('sections').select('name').eq('admin_id', '__footer_config__').maybeSingle();
+        if (sData && sData.name) {
+          const parsed = JSON.parse(sData.name);
+          if (parsed && typeof parsed === 'object') return res.status(200).json(parsed);
+        }
+      } catch(e) {}
+
+      return res.status(200).json(DEFAULT_FOOTER_CONFIG);
+    }
+
+    if (req.method === 'POST') {
+      const session = await requireAuth(req, res);
+      if (!session) return;
+      const footerConfig = req.body || {};
+
+      let saved = false;
+      try {
+        const { error } = await sb.from('site_settings').upsert({
+          key: 'site_footer_config',
+          value: footerConfig,
+          updated_at: new Date().toISOString()
+        }, { onConflict: 'key' });
+        if (!error) saved = true;
+      } catch(err) {}
+
+      if (!saved) {
+        // Fallback save in sections table
+        try {
+          const { data: existing } = await sb.from('sections').select('id').eq('admin_id', '__footer_config__').maybeSingle();
+          if (existing) {
+            await sb.from('sections').update({
+              name: JSON.stringify(footerConfig),
+              slug: '__footer_config__',
+              display_order: 9996,
+              is_active: false,
+              locked: true,
+              is_deleted: true
+            }).eq('admin_id', '__footer_config__');
+          } else {
+            await sb.from('sections').insert({
+              admin_id: '__footer_config__',
+              name: JSON.stringify(footerConfig),
+              slug: '__footer_config__',
+              display_order: 9996,
+              is_active: false,
+              locked: true,
+              is_deleted: true
+            });
+          }
+        } catch(err) {
+          console.warn('[DB fallback footer save error]:', err.message);
+        }
+      }
+
+      logActivity({
+        actor: session,
+        action: 'layout.footer_save',
+        category: 'layout',
+        summary: `${session.name || session.email} updated Footer layout configuration`,
+        target_id: 'site_footer_config',
+        target_name: 'Footer Layout',
+        details: {},
+        req
+      }).catch(() => {});
+
+      return res.status(200).json({ ok: true, data: footerConfig });
+    }
+  }
+
+  // ── INDIVIDUAL SECTION CUSTOM CONFIGURATION (GET / POST) ────────────────
+  if (action === 'section-config') {
+    const slug = (req.query && req.query.slug) || (req.body && req.body.slug) || 'all';
+
+    if (req.method === 'GET') {
+      let allConfigs = {};
+      try {
+        const { data } = await sb.from('site_settings').select('value').eq('key', 'sections_custom_configs').maybeSingle();
+        if (data && data.value && typeof data.value === 'object') {
+          allConfigs = data.value;
+        }
+      } catch(e) {}
+
+      if (Object.keys(allConfigs).length === 0) {
+        try {
+          const { data: sData } = await sb.from('sections').select('name').eq('admin_id', '__section_configs__').maybeSingle();
+          if (sData && sData.name) {
+            const parsed = JSON.parse(sData.name);
+            if (parsed && typeof parsed === 'object') allConfigs = parsed;
+          }
+        } catch(e) {}
+      }
+
+      if (req.query.all === '1' || !req.query.slug) {
+        return res.status(200).json(allConfigs);
+      }
+      return res.status(200).json(allConfigs[slug] || {
+        featuredArticleId: null,
+        selectedArticleIds: [],
+        customTitle: '',
+        description: ''
+      });
+    }
+
+    if (req.method === 'POST') {
+      const session = await requireAuth(req, res);
+      if (!session) return;
+
+      const payload = req.body || {};
+      let allConfigs = {};
+      try {
+        const { data } = await sb.from('site_settings').select('value').eq('key', 'sections_custom_configs').maybeSingle();
+        if (data && data.value && typeof data.value === 'object') {
+          allConfigs = data.value;
+        }
+      } catch(e) {}
+
+      if (Object.keys(allConfigs).length === 0) {
+        try {
+          const { data: sData } = await sb.from('sections').select('name').eq('admin_id', '__section_configs__').maybeSingle();
+          if (sData && sData.name) {
+            const parsed = JSON.parse(sData.name);
+            if (parsed && typeof parsed === 'object') allConfigs = parsed;
+          }
+        } catch(e) {}
+      }
+
+      allConfigs[slug] = {
+        featuredArticleId: payload.featuredArticleId || null,
+        selectedArticleIds: Array.isArray(payload.selectedArticleIds) ? payload.selectedArticleIds.slice(0, 4) : [],
+        customTitle: payload.customTitle || '',
+        description: payload.description || '',
+        updatedAt: new Date().toISOString()
+      };
+
+      let saved = false;
+      try {
+        const { error } = await sb.from('site_settings').upsert({
+          key: 'sections_custom_configs',
+          value: allConfigs,
+          updated_at: new Date().toISOString()
+        }, { onConflict: 'key' });
+        if (!error) saved = true;
+      } catch(err) {
+        console.warn('[Sections config save error]:', err.message);
+      }
+
+      // Fallback save in sections table
+      try {
+        const { data: existing } = await sb.from('sections').select('id').eq('admin_id', '__section_configs__').maybeSingle();
+        if (existing) {
+          await sb.from('sections').update({
+            name: JSON.stringify(allConfigs),
+            slug: '__section_configs__',
+            display_order: 9995,
+            is_active: false,
+            locked: true,
+            is_deleted: true
+          }).eq('admin_id', '__section_configs__');
+        } else {
+          await sb.from('sections').insert({
+            admin_id: '__section_configs__',
+            name: JSON.stringify(allConfigs),
+            slug: '__section_configs__',
+            display_order: 9995,
+            is_active: false,
+            locked: true,
+            is_deleted: true
+          });
+        }
+      } catch(err) {}
+
+      logActivity({
+        actor: session,
+        action: 'section.customize',
+        category: 'sections',
+        summary: `${session.name || session.email} updated Section Studio configuration for section "${slug}"`,
+        target_id: slug,
+        target_name: payload.customTitle || slug,
+        details: { slug, featuredArticleId: payload.featuredArticleId, selectedArticleIds: payload.selectedArticleIds },
+        req
+      }).catch(() => {});
+
+      return res.status(200).json({ ok: true, data: allConfigs[slug] });
+    }
+  }
 
   // ── GET ─────────────────────────────────────────────────────────────────
   if (req.method === 'GET') {
@@ -54,7 +815,7 @@ module.exports = async function handler(req, res) {
     const { data, error } = await query;
     if (error) return res.status(500).json({ error: error.message });
 
-    const rows = data || [];
+    const rows = (data || []).filter(r => r.admin_id !== '__menu_config__' && r.admin_id !== '__header_config__' && r.admin_id !== '__homepage_config__' && r.admin_id !== '__footer_config__' && r.admin_id !== '__section_configs__');
 
     if (statusParam === 'all' && session) {
       // Admin format: full section objects
@@ -69,12 +830,11 @@ module.exports = async function handler(req, res) {
     }
   }
 
-  // ── All mutations require auth ────────────────────────────────────────────
-  const session = verifySession(req);
-  if (!session) return res.status(401).json({ error: 'Not authenticated', redirect: '/admin-login.html' });
-
   // ── POST: create section ─────────────────────────────────────────────────
   if (req.method === 'POST') {
+    const session = await requireAuth(req, res);
+    if (!session) return;
+
     const body = req.body || {};
     const name    = (body.name   || '').trim();
     const slug    = (body.slug   || '').trim();
@@ -102,11 +862,26 @@ module.exports = async function handler(req, res) {
     }).select().single();
 
     if (error) return res.status(500).json({ error: error.message });
+
+    logActivity({
+      actor: session,
+      action: 'section.create',
+      category: 'sections',
+      summary: `${session.name || session.email} created new section "${name}" (/section/${slug})`,
+      target_id: adminId,
+      target_name: name,
+      details: { slug, name, admin_id: adminId },
+      req
+    }).catch(() => {});
+
     return res.status(201).json(rowToAdminSection(data));
   }
 
   // ── PUT: rename / re-slug ────────────────────────────────────────────────
   if (req.method === 'PUT') {
+    const session = await requireAuth(req, res);
+    if (!session) return;
+
     const id   = req.query && req.query.id;
     const body = req.body || {};
     const name = (body.name || '').trim();
@@ -121,11 +896,26 @@ module.exports = async function handler(req, res) {
       .select().single();
 
     if (error) return res.status(500).json({ error: error.message });
+
+    logActivity({
+      actor: session,
+      action: 'section.edit',
+      category: 'sections',
+      summary: `${session.name || session.email} renamed section ID "${id}" to "${name}" (/section/${slug})`,
+      target_id: id,
+      target_name: name,
+      details: { slug, name },
+      req
+    }).catch(() => {});
+
     return res.status(200).json(rowToAdminSection(data));
   }
 
   // ── PATCH: restore from trash ─────────────────────────────────────────────
   if (req.method === 'PATCH') {
+    const session = await requireAuth(req, res);
+    if (!session) return;
+
     const id = req.query && req.query.id;
     if (!id) return res.status(400).json({ error: 'id (admin_id) is required' });
 
@@ -135,6 +925,18 @@ module.exports = async function handler(req, res) {
       .select().single();
 
     if (error) return res.status(500).json({ error: error.message });
+
+    logActivity({
+      actor: session,
+      action: 'section.restore',
+      category: 'sections',
+      summary: `${session.name || session.email} restored section "${data.name || id}" from trash`,
+      target_id: id,
+      target_name: data.name || id,
+      details: {},
+      req
+    }).catch(() => {});
+
     return res.status(200).json(rowToAdminSection(data));
   }
 
@@ -144,19 +946,54 @@ module.exports = async function handler(req, res) {
     const mode = req.query && req.query.mode;
     if (!id) return res.status(400).json({ error: 'id (admin_id) is required' });
 
+    if (id === 'all' || id.toLowerCase() === 'all') {
+      return res.status(400).json({ error: 'The "All" section is a permanent core section and cannot be deleted.' });
+    }
+
     if (mode === 'permanent') {
+      // Hard delete — STRICTLY Admin only with live DB check
+      const session = await requireAdmin(req, res);
+      if (!session) return;
+
       const { error } = await sb.from('sections').delete().eq('admin_id', id);
       if (error) return res.status(500).json({ error: error.message });
+
+      logActivity({
+        actor: session,
+        action: 'section.delete_permanent',
+        category: 'sections',
+        summary: `${session.name || session.email} permanently deleted section ID "${id}"`,
+        target_id: id,
+        target_name: id,
+        details: { permanent: true },
+        req
+      }).catch(() => {});
+
       return res.status(200).json({ ok: true });
     }
 
     // Soft delete (move to trash)
+    const session = await requireAuth(req, res);
+    if (!session) return;
+
     const { data, error } = await sb.from('sections')
       .update({ is_active: false, is_deleted: true, deleted_at: new Date().toISOString() })
       .eq('admin_id', id)
       .select().single();
 
     if (error) return res.status(500).json({ error: error.message });
+
+    logActivity({
+      actor: session,
+      action: 'section.delete',
+      category: 'sections',
+      summary: `${session.name || session.email} moved section "${data.name || id}" to trash`,
+      target_id: id,
+      target_name: data.name || id,
+      details: { is_deleted: true },
+      req
+    }).catch(() => {});
+
     return res.status(200).json(rowToAdminSection(data));
   }
 

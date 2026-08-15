@@ -2,21 +2,19 @@
  * api/articles.js — Single endpoint for all article operations
  * Routes via ?action= query param to stay within Vercel Hobby 12-function limit
  *
- * GET    /api/articles?action=list                  — list articles (public: published only; auth: all)
- * GET    /api/articles?action=get&id=X (or &slug=X) — get single article (public: published only; auth: all)
- * POST   /api/articles?action=save                  — create or update (requireAuth)
- * POST   /api/articles?action=publish&id=X          — toggle draft/published (requireAdmin)
- * DELETE /api/articles?action=delete&id=X           — delete permanently (requireAdmin)
- * POST   /api/articles?action=upload                — upload image (requireAuth)
+ * GET  /api/articles?action=list           — list all articles (requireAuth)
+ * GET  /api/articles?action=get&id=X       — get single article (requireAuth)
+ * POST /api/articles?action=save           — create or update (requireAuth)
+ * POST /api/articles?action=publish&id=X   — toggle draft/published (requireAdmin)
+ * DELETE /api/articles?action=delete&id=X  — delete permanently (requireAdmin)
  */
 
-const { verifySession, requireAuth, requireAdmin } = require('./_lib/auth');
+const { requireAuth, requireAdmin } = require('./_lib/auth');
+const { logActivity } = require('./_lib/activity');
 const { createClient } = require('@supabase/supabase-js');
 
 function sb() {
-  const url = process.env.SUPABASE_URL || 'https://aenhajqjsgskimfzvlfr.supabase.co';
-  const key = process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFlbmhhanFqc2dza2ltZnp2bGZyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY2MDc1MDUsImV4cCI6MjEwMjE4MzUwNX0.q0wmF77hpsb8M7CQOYMq8GrDuQJ32vn1NcWFXTc5UAY';
-  return createClient(url, key);
+  return createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
 }
 
 function slugify(text) {
@@ -28,30 +26,6 @@ function slugify(text) {
     .substring(0, 100) || 'untitled';
 }
 
-function normalizeArticle(row) {
-  if (!row) return null;
-  return {
-    id:               row.id,
-    slug:             row.slug || '',
-    title:            row.title || '',
-    deck:             row.deck || row.excerpt || '',
-    section:          row.section || row.section_slug || '',
-    author:           row.author || 'The Privatian Family',
-    author_role:      row.author_role || '',
-    author_bio:       row.author_bio || '',
-    author_photo_url: row.author_photo_url || '',
-    hero_img_url:     row.hero_img_url || row.featured_image || '',
-    hero_caption:     row.hero_caption || '',
-    hero_credit:      row.hero_credit || '',
-    content_html:     row.content_html || row.content || '',
-    status:           row.status || (row.is_featured !== undefined ? 'published' : 'draft'),
-    created_by:       row.created_by || '',
-    created_at:       row.created_at || null,
-    updated_at:       row.updated_at || row.created_at || null,
-    published_at:     row.published_at || row.created_at || null,
-  };
-}
-
 module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', req.headers.origin || '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, DELETE, OPTIONS');
@@ -59,188 +33,419 @@ module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Credentials', 'true');
   if (req.method === 'OPTIONS') return res.status(200).end();
 
-  const { action, id, slug: querySlug, section, limit, status } = req.query || {};
+  const { action, id } = req.query;
 
-  // ── LIST ────────────────────────────────────────────────────────
-  if (action === 'list' && req.method === 'GET') {
-    const session = verifySession(req);
-    const client = sb();
-    let query = client.from('articles').select('*');
-
-    const { data, error } = await query;
-    if (error) {
-      // Return empty array gracefully if table is empty or permission denied
-      console.warn('[Articles API] list error:', error.message);
-      return res.status(200).json([]);
-    }
-
-    let rows = (data || []).map(normalizeArticle);
-
-    // Public / unauthenticated callers only get published articles
-    if (!session) {
-      rows = rows.filter(a => a.status === 'published');
-    } else if (status) {
-      rows = rows.filter(a => a.status === status);
-    }
-
+  // ── PUBLIC: list published articles (no auth) ───────────────────
+  if (action === 'public' && req.method === 'GET') {
+    const section = req.query.section || '';
+    const limit   = Math.min(parseInt(req.query.limit  || '50', 10), 100);
+    const offset  = Math.max(parseInt(req.query.offset || '0',  10), 0);
+    let query = sb().from('articles')
+      .select('id, slug, title, deck, section, author, published_at, hero_img_url, tags')
+      .eq('status', 'published')
+      .or('is_deleted.is.null,is_deleted.eq.false')
+      .order('published_at', { ascending: false })
+      .range(offset, offset + limit - 1);
     if (section && section !== 'all') {
-      const sLower = section.toLowerCase();
-      rows = rows.filter(a => (a.section || '').toLowerCase() === sLower || (a.slug || '').toLowerCase().includes(sLower));
+      query = query.ilike('section', '%' + section.replace(/-/g, '%') + '%');
     }
-
-    // Sort by published_at or updated_at DESC
-    rows.sort((a, b) => new Date(b.published_at || b.updated_at || 0) - new Date(a.published_at || a.updated_at || 0));
-
-    if (limit) {
-      const l = parseInt(limit, 10);
-      if (!isNaN(l) && l > 0) rows = rows.slice(0, l);
-    }
-
-    return res.status(200).json(rows);
+    const { data, error } = await query;
+    if (error) return res.status(500).json({ error: error.message });
+    return res.status(200).json(data || []);
   }
 
-  // ── GET ─────────────────────────────────────────────────────────
-  if (action === 'get' && req.method === 'GET') {
-    const session = verifySession(req);
-    const client = sb();
+  // ── GET SINGLE ARTICLE: by slug (public live) OR by Unique ID (admin draft/preview only) ─────
+  if (action === 'public-get' && req.method === 'GET') {
+    const slug = req.query.slug || '';
+    if (id) {
+      // By Unique ID (Draft Preview Mode) -> STRICTLY require authenticated admin session
+      const session = await requireAuth(req, res);
+      if (!session) return; // requireAuth sends 401/403
 
-    if (!id && !querySlug) {
+      let query = sb().from('articles').select('*')
+        .eq('id', id)
+        .or('is_deleted.is.null,is_deleted.eq.false');
+
+      const { data, error } = await query.single();
+      if (error || !data) return res.status(404).json({ error: 'Article not found' });
+
+      // If accessed via preview mode with id, and there is a working draft stored in content, merge it for preview
+      if (req.query.preview === '1' && data.content) {
+        try {
+          const draftObj = JSON.parse(data.content);
+          if (draftObj && typeof draftObj === 'object') {
+            Object.assign(data, draftObj);
+          }
+        } catch(e) {}
+      }
+
+      return res.status(200).json(data);
+    } else if (slug) {
+      // By slug -> public live site, published articles only (no auth required)
+      let query = sb().from('articles').select('*')
+        .eq('slug', slug)
+        .eq('status', 'published')
+        .or('is_deleted.is.null,is_deleted.eq.false');
+
+      const { data, error } = await query.single();
+      if (error || !data) return res.status(404).json({ error: 'Article not found or not published' });
+
+      return res.status(200).json(data);
+    } else {
+      return res.status(400).json({ error: 'id or slug required' });
+    }
+  }
+
+  // ── LIST (public: published only; admin: all active) ──────────────
+  if (action === 'list' && req.method === 'GET') {
+    const { verifySession } = require('./_lib/auth');
+    const session = verifySession(req);
+    let query = sb().from('articles').select('id, slug, title, deck, section, author, status, created_at, updated_at, published_at, hero_img_url, tags, content_html, content');
+
+    if (!session) {
+      // Public caller: return published only
+      query = query.eq('status', 'published').or('is_deleted.is.null,is_deleted.eq.false');
+    } else {
+      // Authenticated admin/staff: return all active non-deleted
+      query = query.or('is_deleted.is.null,is_deleted.eq.false');
+    }
+
+    const { data, error } = await query.order('updated_at', { ascending: false });
+    if (error) return res.status(500).json({ error: error.message });
+    return res.status(200).json(data || []);
+  }
+
+  // ── TRASH LIST (admin) ──────────────────────────────────────
+  if (action === 'trash' && req.method === 'GET') {
+    const session = await requireAuth(req, res);
+    if (!session) return;
+    const { data, error } = await sb()
+      .from('articles')
+      .select('id, slug, title, section, author, status, deleted_at, hero_img_url')
+      .eq('is_deleted', true)
+      .order('deleted_at', { ascending: false });
+    if (error) return res.status(500).json({ error: error.message });
+    return res.status(200).json(data || []);
+  }
+
+  // ── RESTORE (from trash) ────────────────────────────────────
+  if (action === 'restore' && req.method === 'PATCH') {
+    const session = await requireAuth(req, res);
+    if (!session) return;
+    if (!id) return res.status(400).json({ error: 'id required' });
+    const { error } = await sb().from('articles')
+      .update({ is_deleted: false, deleted_at: null })
+      .eq('id', id);
+    if (error) return res.status(500).json({ error: error.message });
+    return res.status(200).json({ success: true });
+  }
+
+  // ── GET (public: published; admin: any status with draft) ───
+  if (action === 'get' && req.method === 'GET') {
+    const { verifySession } = require('./_lib/auth');
+    const session = verifySession(req);
+    const slug = req.query.slug || '';
+
+    let query = sb().from('articles').select('*');
+    if (id) {
+      query = query.eq('id', id);
+    } else if (slug) {
+      query = query.eq('slug', slug);
+    } else {
       return res.status(400).json({ error: 'id or slug required' });
     }
 
-    let query = client.from('articles').select('*');
-    if (id) {
-      query = query.eq('id', id);
-    } else {
-      query = query.eq('slug', querySlug);
+    query = query.or('is_deleted.is.null,is_deleted.eq.false');
+    if (!session) {
+      query = query.eq('status', 'published');
     }
 
     const { data, error } = await query.maybeSingle();
-    if (error) return res.status(500).json({ error: error.message });
-    if (!data) return res.status(404).json({ error: 'Article not found' });
+    if (error || !data) return res.status(404).json({ error: 'Article not found' });
 
-    const normalized = normalizeArticle(data);
-
-    // If unauthenticated and article is still a draft, do not expose
-    if (!session && normalized.status !== 'published') {
-      return res.status(404).json({ error: 'Article not found' });
+    // If there is an active working draft in content and caller is authenticated, merge it
+    if (session && data.content) {
+      try {
+        const draftObj = JSON.parse(data.content);
+        if (draftObj && typeof draftObj === 'object') {
+          data._has_draft = true;
+          Object.assign(data, draftObj);
+        }
+      } catch(e) {}
     }
 
-    return res.status(200).json(normalized);
+    return res.status(200).json(data);
   }
 
-  // ── SAVE (create or update) ──────────────────────────────────────
+  // ── SAVE (create, update draft, or publish live) ──────────────────
   if (action === 'save' && req.method === 'POST') {
-    const session = requireAuth(req, res);
+    const session = await requireAuth(req, res);
     if (!session) return;
 
     const {
       id: bodyId, title = '', deck = '', section = '', author = '', author_role = '',
-      author_bio = '', author_photo_url = '', hero_img_url = '', hero_caption = '',
-      hero_credit = '', content_html = '', slug: bodySlug
+      author_bio = '', author_photo_url = '', hero_img_url = '', hero_img_alt = '',
+      hero_caption = '', hero_credit = '', content_html = '', slug: bodySlug,
+      seo_title = '', meta_description = '', tags = '', status: bodyStatus,
+      is_draft = false,
     } = req.body || {};
 
     const client = sb();
 
     if (bodyId) {
-      // UPDATE
+      // Check existing article status in database
+      const { data: existing } = await client.from('articles').select('id, status, content').eq('id', bodyId).single();
+
+      // IF ARTICLE IS PUBLISHED AND ACTION IS "SAVE DRAFT":
+      // We ONLY update the working draft in the `content` column without touching the live published article!
+      if (existing && existing.status === 'published' && is_draft) {
+        const draftPayload = {
+          title, deck, section, author, author_role, author_bio, author_photo_url,
+          hero_img_url, hero_img_alt, hero_caption, hero_credit, content_html,
+          seo_title, meta_description, tags,
+          draft_saved_at: new Date().toISOString()
+        };
+        const { data, error } = await client.from('articles')
+          .update({ content: JSON.stringify(draftPayload) })
+          .eq('id', bodyId)
+          .select()
+          .single();
+        if (error) return res.status(500).json({ error: error.message });
+
+        logActivity({
+          actor: session,
+          action: 'article.save_draft',
+          category: 'articles',
+          summary: `${session.name || session.email} saved working draft for article "${title || existing.title || bodyId}"`,
+          target_id: bodyId,
+          target_name: title || existing.title || bodyId,
+          details: { is_draft: true },
+          req
+        }).catch(() => {});
+
+        return res.status(200).json({ ...data, ...draftPayload, _is_working_draft: true });
+      }
+
+      // OTHERWISE: DIRECT LIVE PUBLISH OR DRAFT ARTICLE UPDATE
       const updates = {
         title, deck, section, author, author_role, author_bio, author_photo_url,
-        hero_img_url, hero_caption, hero_credit, content_html,
+        hero_img_url, hero_img_alt, hero_caption, hero_credit, content_html,
+        seo_title, meta_description, tags,
+        content: null, // Clear working draft because live article is now updated
         updated_at: new Date().toISOString(),
       };
-      if (bodySlug) updates.slug = bodySlug.toLowerCase().trim();
+      if (bodyStatus) {
+        updates.status = bodyStatus;
+        if (bodyStatus === 'published') {
+          updates.published_at = new Date().toISOString();
+        } else if (bodyStatus === 'draft') {
+          updates.published_at = null;
+        }
+      }
+      if (bodySlug) updates.slug = slugify(bodySlug);
       const { data, error } = await client.from('articles').update(updates).eq('id', bodyId).select().single();
       if (error) return res.status(500).json({ error: error.message });
-      return res.status(200).json(normalizeArticle(data));
+
+      logActivity({
+        actor: session,
+        action: bodyStatus === 'published' ? 'article.publish' : 'article.edit',
+        category: 'articles',
+        summary: bodyStatus === 'published'
+          ? `${session.name || session.email} published article "${title || data.title || bodyId}"`
+          : `${session.name || session.email} edited article "${title || data.title || bodyId}"`,
+        target_id: bodyId,
+        target_name: title || data.title || bodyId,
+        details: { status: data.status, section: data.section },
+        req
+      }).catch(() => {});
+
+      return res.status(200).json(data);
     } else {
-      // CREATE — auto unique slug
-      let slug = bodySlug ? slugify(bodySlug) : slugify(title || 'untitled');
-      const { data: existing } = await client.from('articles').select('slug').ilike('slug', slug + '%');
+      // CREATE — custom slug or auto unique slug from title
+      let rawSlug = (bodySlug || '').trim() ? slugify(bodySlug) : slugify(title || 'untitled');
+      let slug = rawSlug;
+      const { data: existing } = await client.from('articles').select('id, slug').ilike('slug', rawSlug + '%');
       if (existing && existing.length > 0) {
-        const nums = existing.map(a => { const m = a.slug.match(/-(\d+)$/); return m ? parseInt(m[1]) : 0; });
-        slug = slug + '-' + (Math.max(...nums) + 1);
+        const hasExact = existing.some(a => a.slug === rawSlug);
+        if (hasExact) {
+          const nums = existing.map(a => { const m = a.slug.match(/-(\d+)$/); return m ? parseInt(m[1]) : 0; });
+          slug = rawSlug + '-' + (Math.max(...nums, 0) + 1);
+        }
       }
-      const { data, error } = await client.from('articles').insert({
+      const newArticle = {
         slug, title, deck, section, author, author_role, author_bio, author_photo_url,
-        hero_img_url, hero_caption, hero_credit, content_html,
-        status: 'draft', created_by: session.email,
-      }).select().single();
+        hero_img_url, hero_img_alt, hero_caption, hero_credit, content_html,
+        seo_title, meta_description, tags,
+        status: bodyStatus || 'draft',
+        created_by: session.email,
+      };
+      if (bodyId) newArticle.id = bodyId;
+      if (bodyStatus === 'published') newArticle.published_at = new Date().toISOString();
+      const { data, error } = await client.from('articles').insert(newArticle).select().single();
       if (error) return res.status(500).json({ error: error.message });
-      return res.status(201).json(normalizeArticle(data));
+
+      logActivity({
+        actor: session,
+        action: bodyStatus === 'published' ? 'article.publish' : 'article.create',
+        category: 'articles',
+        summary: `${session.name || session.email} created new article "${data.title || 'Untitled'}" (${data.status})`,
+        target_id: data.id,
+        target_name: data.title || 'Untitled',
+        details: { status: data.status, section: data.section },
+        req
+      }).catch(() => {});
+
+      return res.status(201).json(data);
     }
   }
 
-  // ── PUBLISH (toggle) ────────────────────────────────────────────
+  // ── PUBLISH ──────────────────────────────────────────────────────
   if (action === 'publish' && req.method === 'POST') {
     const session = await requireAdmin(req, res);
     if (!session) return;
     if (!id) return res.status(400).json({ error: 'id required' });
     const client = sb();
-    const { data: article } = await client.from('articles').select('status').eq('id', id).single();
-    if (!article) return res.status(404).json({ error: 'Not found' });
-    const newStatus = article.status === 'published' ? 'draft' : 'published';
-    const { data, error } = await client.from('articles').update({
-      status: newStatus,
-      published_at: newStatus === 'published' ? new Date().toISOString() : null,
+    const { data: existing } = await client.from('articles').select('*').eq('id', id).single();
+    if (!existing) return res.status(404).json({ error: 'Not found' });
+
+    // If there is a working draft in content, apply it to the live columns
+    let liveUpdates = {
+      status: 'published',
+      published_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
-    }).eq('id', id).select().single();
+      content: null, // Clear working draft
+    };
+    if (existing.content) {
+      try {
+        const draftObj = JSON.parse(existing.content);
+        if (draftObj && typeof draftObj === 'object') {
+          Object.assign(liveUpdates, draftObj);
+          delete liveUpdates.draft_saved_at;
+        }
+      } catch(e) {}
+    }
+
+    const { data, error } = await client.from('articles').update(liveUpdates).eq('id', id).select().single();
     if (error) return res.status(500).json({ error: error.message });
-    return res.status(200).json(normalizeArticle(data));
+
+    logActivity({
+      actor: session,
+      action: 'article.publish',
+      category: 'articles',
+      summary: `${session.name || session.email} published article "${data.title || existing.title || id}"`,
+      target_id: id,
+      target_name: data.title || existing.title || id,
+      details: { status: 'published' },
+      req
+    }).catch(() => {});
+
+    return res.status(200).json(data);
   }
 
-  // ── DELETE ──────────────────────────────────────────────────────
-  if (action === 'delete' && req.method === 'DELETE') {
+  // ── UNPUBLISH ────────────────────────────────────────────────────
+  if (action === 'unpublish' && req.method === 'POST') {
     const session = await requireAdmin(req, res);
     if (!session) return;
     if (!id) return res.status(400).json({ error: 'id required' });
-    const { error } = await sb().from('articles').delete().eq('id', id);
+    const client = sb();
+    const { data, error } = await client.from('articles').update({
+      status: 'draft',
+      published_at: null,
+      updated_at: new Date().toISOString(),
+    }).eq('id', id).select().single();
     if (error) return res.status(500).json({ error: error.message });
-    return res.status(200).json({ success: true });
+
+    logActivity({
+      actor: session,
+      action: 'article.unpublish',
+      category: 'articles',
+      summary: `${session.name || session.email} unpublished article "${data.title || id}" to draft`,
+      target_id: id,
+      target_name: data.title || id,
+      details: { status: 'draft' },
+      req
+    }).catch(() => {});
+
+    return res.status(200).json(data);
+  }
+
+  // ── DELETE ─────────────────────────────────────────────────────
+  if (action === 'delete' && req.method === 'DELETE') {
+    if (!id) return res.status(400).json({ error: 'id required' });
+    const mode = req.query.mode;
+    if (mode === 'permanent') {
+      // Hard delete — STRICTLY requires Admin role with live DB check
+      const session = await requireAdmin(req, res);
+      if (!session) return;
+      const { error } = await sb().from('articles').delete().eq('id', id);
+      if (error) return res.status(500).json({ error: error.message });
+
+      logActivity({
+        actor: session,
+        action: 'article.delete_permanent',
+        category: 'articles',
+        summary: `${session.name || session.email} permanently deleted article ID "${id}"`,
+        target_id: id,
+        target_name: id,
+        details: { permanent: true },
+        req
+      }).catch(() => {});
+
+      return res.status(200).json({ success: true, permanent: true });
+    }
+    // Soft delete — move to trash (allowed for authenticated staff)
+    const session = await requireAuth(req, res);
+    if (!session) return;
+    const { error } = await sb().from('articles')
+      .update({ is_deleted: true, deleted_at: new Date().toISOString() })
+      .eq('id', id);
+    if (error) return res.status(500).json({ error: error.message });
+
+    logActivity({
+      actor: session,
+      action: 'article.move_to_trash',
+      category: 'articles',
+      summary: `${session.name || session.email} moved article ID "${id}" to trash`,
+      target_id: id,
+      target_name: id,
+      details: { is_deleted: true },
+      req
+    }).catch(() => {});
+
+    return res.status(200).json({ success: true, soft: true });
   }
 
   // ── UPLOAD (image) ───────────────────────────────────────────────
+  // POST /api/articles?action=upload  multipart/form-data  field: file
   if (action === 'upload' && req.method === 'POST') {
-    const session = requireAuth(req, res);
+    const session = await requireAuth(req, res);
     if (!session) return;
 
-    try {
-      if (req.body && req.body.image) {
-        return res.status(200).json({ url: req.body.image });
-      }
-      if (req.body && typeof req.body === 'object' && req.body.data) {
-        return res.status(200).json({ url: req.body.data });
-      }
-      if (req.rawBody) {
-        const base64 = `data:image/jpeg;base64,${req.rawBody.toString('base64')}`;
-        return res.status(200).json({ url: base64 });
-      }
+    // Parse multipart — use built-in formidable-style via Vercel's body parser
+    // Vercel does NOT auto-parse multipart; we need the raw buffer.
+    // Best approach: store in Supabase Storage via signed upload URL pattern.
+    // Since we don't have formidable, store image as base64 data URL temporarily
+    // and let the client handle it via Supabase Storage JS SDK.
+    // HOWEVER: simplest production approach — return a Supabase Storage signed URL
+    // for client-side direct upload.
 
-      // Signed Supabase Storage upload URL pattern
-      const client = sb();
-      const fileName = 'article-imgs/' + Date.now() + '-' + Math.random().toString(36).slice(2) + '.jpg';
-      const { data: signedData, error: signErr } = await client.storage
-        .from('article-images')
-        .createSignedUploadUrl(fileName);
+    const { createClient: sc } = require('@supabase/supabase-js');
+    const client = sc(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
+    const fileName = 'article-imgs/' + Date.now() + '-' + Math.random().toString(36).slice(2) + '.jpg';
 
-      if (signedData && !signErr) {
-        const publicUrl = client.storage.from('article-images').getPublicUrl(fileName).data.publicUrl;
-        return res.status(200).json({
-          uploadUrl: signedData.signedUrl,
-          token: signedData.token,
-          path: fileName,
-          publicUrl,
-          url: publicUrl,
-        });
-      }
+    // Create a signed upload URL (client will PUT the file directly to Supabase Storage)
+    const { data: signedData, error: signErr } = await client.storage
+      .from('article-images')
+      .createSignedUploadUrl(fileName);
 
-      return res.status(200).json({
-        url: req.body?.url || 'assets/images/img1.png',
-        success: true
-      });
-    } catch (e) {
-      return res.status(500).json({ error: 'Image upload failed: ' + e.message });
-    }
+    if (signErr) return res.status(500).json({ error: signErr.message });
+    const publicUrl = client.storage.from('article-images').getPublicUrl(fileName).data.publicUrl;
+    return res.status(200).json({
+      uploadUrl: signedData.signedUrl,
+      token: signedData.token,
+      path: fileName,
+      publicUrl,
+    });
   }
 
   return res.status(400).json({ error: 'Unknown action or method' });

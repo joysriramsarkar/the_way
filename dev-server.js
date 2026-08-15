@@ -1,5 +1,5 @@
 /**
- * THE PRIVATIAN FAMILY — Local Development Server
+ * THE WAY (দ্য ওয়ে) — Local Development Server
  * Zero-dependency Node.js server that serves static frontend files & executes /api serverless functions.
  * Run with: node dev-server.js (or npm start)
  */
@@ -37,7 +37,7 @@ function loadEnv() {
     process.env.SUPABASE_SERVICE_KEY = process.env.SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFlbmhhanFqc2dza2ltZnp2bGZyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY2MDc1MDUsImV4cCI6MjEwMjE4MzUwNX0.q0wmF77hpsb8M7CQOYMq8GrDuQJ32vn1NcWFXTc5UAY';
   }
   if (!process.env.SESSION_SECRET) {
-    process.env.SESSION_SECRET = 'privatian_dev_session_secret_12345';
+    process.env.SESSION_SECRET = 'theway_dev_session_secret_12345';
   }
 }
 loadEnv();
@@ -57,12 +57,28 @@ const MIME_TYPES = {
   '.ico':  'image/x-icon',
   '.woff': 'font/woff',
   '.woff2':'font/woff2',
-  '.ttf':  'font/ttf'
+  '.ttf':  'font/ttf',
+  '.xml':  'application/xml; charset=utf-8',
+  '.txt':  'text/plain; charset=utf-8'
 };
 
 const server = http.createServer(async (req, res) => {
   const reqUrl = new URL(req.url, `http://localhost:${PORT}`);
   let pathname = reqUrl.pathname || '/';
+
+  // ── Handle /sitemap.xml ───────────────────────────────────────────
+  if (pathname === '/sitemap.xml') {
+    const sitemapApi = path.join(__dirname, 'api', 'sitemap.js');
+    if (fs.existsSync(sitemapApi)) {
+      try {
+        const handler = require(sitemapApi);
+        req.query = Object.fromEntries(reqUrl.searchParams.entries());
+        res.status = function(c) { this.statusCode = c; return this; };
+        res.send = function(d) { this.end(d); return this; };
+        return await handler(req, res);
+      } catch(e) {}
+    }
+  }
 
   // ── Handle /api/* serverless routes ────────────────────────────────
   if (pathname.startsWith('/api/')) {
@@ -71,13 +87,11 @@ const server = http.createServer(async (req, res) => {
 
     if (fs.existsSync(apiFile)) {
       try {
-        // Collect request body
         const chunks = [];
         for await (const chunk of req) chunks.push(chunk);
         const rawBuffer = Buffer.concat(chunks);
         const rawBody = rawBuffer.toString('utf8');
 
-        // Parse body
         let parsedBody = null;
         const contentType = req.headers['content-type'] || '';
         if (contentType.includes('application/json') && rawBody.trim()) {
@@ -86,12 +100,10 @@ const server = http.createServer(async (req, res) => {
           parsedBody = rawBody;
         }
 
-        // Attach serverless helper properties
         req.query = Object.fromEntries(reqUrl.searchParams.entries());
         req.body = parsedBody;
         req.rawBody = rawBuffer;
 
-        // Response helpers
         res.status = function(code) {
           this.statusCode = code;
           return this;
@@ -102,7 +114,6 @@ const server = http.createServer(async (req, res) => {
           return this;
         };
 
-        // Clear require cache for hot-reload in dev
         delete require.cache[require.resolve(apiFile)];
         const handler = require(apiFile);
 
@@ -120,11 +131,28 @@ const server = http.createServer(async (req, res) => {
     }
   }
 
+  // ── Pretty URL rewrites ───────────────────────────────────────────
+  if (pathname.startsWith('/article/')) {
+    const slug = pathname.replace(/^\/article\//, '').replace(/\/$/, '');
+    reqUrl.searchParams.set('slug', slug);
+    pathname = '/article.html';
+  } else if (pathname.startsWith('/section/')) {
+    const sec = pathname.replace(/^\/section\//, '').replace(/\/$/, '');
+    reqUrl.searchParams.set('sec', sec);
+    pathname = '/section.html';
+  } else if (pathname === '/events' || pathname === '/events/') {
+    pathname = '/events.html';
+  } else if (pathname === '/admin' || pathname === '/admin/') {
+    pathname = '/admin.html';
+  } else if (pathname === '/login' || pathname === '/login/') {
+    pathname = '/admin-login.html';
+  } else if (pathname === '/') {
+    pathname = '/index.html';
+  }
+
   // ── Static Files ──────────────────────────────────────────────────
-  if (pathname === '/') pathname = '/index.html';
   const filePath = path.join(__dirname, pathname);
 
-  // Security check: keep inside directory
   if (!filePath.startsWith(__dirname)) {
     res.statusCode = 403;
     return res.end('Forbidden');
@@ -134,7 +162,7 @@ const server = http.createServer(async (req, res) => {
     if (err || !stats.isFile()) {
       res.statusCode = 404;
       res.setHeader('Content-Type', 'text/html; charset=utf-8');
-      return res.end('<h1>404 Not Found</h1><p><a href="/">Return to Home</a></p>');
+      return res.end('<h1>404 — পৃষ্ঠা পাওয়া যায়নি</h1><p><a href="/">হোমপেজে ফিরে যান</a></p>');
     }
 
     const ext = path.extname(filePath).toLowerCase();
@@ -148,9 +176,9 @@ const server = http.createServer(async (req, res) => {
 
 server.listen(PORT, () => {
   console.log('════════════════════════════════════════════════════════════════');
-  console.log(`  The Privatian Family Dev Server`);
-  console.log(`  Local URL:    http://localhost:${PORT}`);
-  console.log(`  Admin URL:    http://localhost:${PORT}/admin.html`);
-  console.log(`  Articles API: http://localhost:${PORT}/api/articles?action=list`);
+  console.log(`  ★ THE WAY (দ্য ওয়ে) — Local Development Server`);
+  console.log(`  ★ Portal URL:  http://localhost:${PORT}`);
+  console.log(`  ★ Admin HQ:    http://localhost:${PORT}/admin.html`);
+  console.log(`  ★ Articles:    http://localhost:${PORT}/api/articles?action=list`);
   console.log('════════════════════════════════════════════════════════════════');
 });

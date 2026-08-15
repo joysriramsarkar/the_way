@@ -1,121 +1,82 @@
-# The Privatian Family
+# দ্য ওয়ে (The Way) — আন্তর্জাতিক সমাজতান্ত্রিক চিন্তন ও গণআন্দোলনের উন্মুক্ত পোর্টাল
+### Voice of Socialism & Global Anti-Imperialist Solidarity
 
-> A modern, elegant web publishing platform and editorial archive for **The Privatian Family**, featuring dynamic sections, rich article formatting, cross-browser real-time synchronization, and a Google OAuth-protected administrative management dashboard.
-
----
-
-## 📁 Project Architecture & Directory Structure
-
-```text
-ThePrivatianFamily/
-├── index.html                  # Homepage (Hero, Small Articles, Events, All News Grid)
-├── section.html                # Dynamic Section Page (Filtered articles, hero & sidebar)
-├── article.html                # Dynamic Article Page (Full content, author bio, related stories)
-├── admin.html                  # Admin Dashboard (Sections CRUD, Header Settings, Manage Access)
-├── admin-login.html            # Google OAuth Sign-In Portal
-├── admin-article-editor.html   # In-theme WYSIWYG Article Editor
-│
-├── api/                        # Vercel Serverless Functions (Backend API)
-│   ├── _lib/
-│   │   └── auth.js             # JWT session verification & live DB role guard
-│   ├── admins.js               # Admin access management (List, Add, Role Update, Recycle Bin)
-│   ├── articles.js             # Article CRUD, publishing, image upload & public read endpoints
-│   ├── auth.js                 # Google OAuth verification & session management
-│   └── sections.js             # Section management & dynamic navbar sync
-│
-├── assets/                     # Static Client Assets
-│   ├── css/
-│   │   ├── style.css           # Global typography, color system & homepage layout
-│   │   ├── admin.css           # Admin panel & modal stylesheet
-│   │   └── article.css         # Harvard-Gazette-style editorial layout
-│   ├── js/
-│   │   ├── script.js           # Homepage dynamic label updates
-│   │   ├── components.js       # Shared Header, Sub-header, Nav, Search & Footer
-│   │   ├── admin.js            # Admin dashboard logic & real-time sync
-│   │   ├── admin-auth.js       # Client-side route guard & session check
-│   │   └── supabase-config.js  # Client-side Supabase helper with API fallback
-│   └── images/                 # Editorial imagery & SVG vector logos
-│       ├── logo.svg
-│       ├── logo-cover.svg
-│       ├── img1.png ... img6.png
-│
-├── dev-server.js               # Zero-dependency local Node.js development server
-├── supabase_schema.sql         # Supabase PostgreSQL schema, RLS policies & GRANT script
-├── vercel.json                 # Vercel deployment routing & caching configuration
-├── package.json                # Project dependencies & npm scripts
-├── .env.example                # Template for environment variables
-└── .gitignore                  # Git ignore rules for node_modules and secrets
-```
+> *“জগতের সকল শোষিত মানুষ এক হও!”*  
+> *“Workers & Oppressed Peoples of All Lands, Unite!”*
 
 ---
 
-## 🚀 Quick Start (Local Development)
+## 🚩 পরিচিতি ও মতাদর্শিক লক্ষ্য (Vision & Mission)
 
-### 1. Install Dependencies
+**দ্য ওয়ে (The Way)** হলো একবিংশ শতাব্দীর নব্য-সাম্রাজ্যবাদী ও নব্য-উদারবাদী বৈশ্বিক শোষণের বিরুদ্ধে বিশ্ব মেহনতি জনতার এক বৈপ্লবিক চিন্তন, তাত্ত্বিক গবেষণা ও গণসংগ্রামের বহুভাষিক উন্মুক্ত পোর্টাল।
+
+পুঁজিবাদের অন্তর্নিহিত সংকট, চরম সম্পদ বৈষম্য, করপোরেট পরিবেশ ধ্বংসযজ্ঞ ও সাম্রাজ্যবাদী যুদ্ধের বিপরীতে সমাজতন্ত্রের মানবিক ও পরিকল্পিত অর্থনীতিই মানবজাতির মুক্তির একমাত্র ভবিষ্যৎ।
+
+---
+
+## ✨ প্রধান বৈশিষ্ট্যসমূহ (Key Features)
+
+1. **বহুভাষিক আর্কিটেকচার (Multilingual Platform)**:
+   - বাংলা (বাংলা), ইংরেজি (English), স্প্যানিশ (Español) সহ আন্তর্জাতিক ভাষার রিয়েল-টাইম সুইচিং ও স্থানীয়করণ (i18n)।
+   - বাংলা ফন্ট (`Noto Serif Bengali`, `Hind Siliguri`, `Anek Bangla`) ও আন্তর্জাতিক সেরিপ টাইপোগ্রাফি।
+
+2. **লাইভ গ্লোবাল স্ট্রাগল ওয়্যার (Global Struggle Wire)**:
+   - বিশ্বজুড়ে শ্রমিক ধর্মঘট, প্যালেস্টাইন সংহতি, কৃষক আন্দোলন ও পরিবেশগত সমাজতান্ত্রিক (Eco-socialism) খবরের রিয়েল-টাইম টিকার।
+
+3. **আজকের বৈপ্লবিক চিন্তা (Thought of the Day)**:
+   - মার্ক্স, লেনিন, গ্রামশি, চে গুয়েভারা, ফ্যানন, মওলানা ভাসানী, সুকান্ত ভট্টাচার্যের অমর উদ্ধৃতি এবং ১-ক্লিকে সোশ্যাল মিডিয়ায় শেয়ার ও উদ্ধৃতি কার্ড কপি সুবিধা।
+
+4. **মুভমেন্ট অ্যাকশন সেন্টার (Movement Action Hub)**:
+   - সমাজতান্ত্রিক পাঠচক্র নিবন্ধন, মেহনতি মানুষের সাপ্তাহিক বুলেটিন সাবস্ক্রিপশন, এবং গবেষক/লেখকদের সরাসরি প্রবন্ধ পাঠানোর ব্যবস্থা।
+
+5. **আন্তর্জাতিক সংহতি ক্যালেন্ডার (Solidarity Events)**:
+   - বিশ্বব্যাপী র‍্যালি, ভার্চুয়াল পাঠচক্র ও সমাজতান্ত্রিক সম্মেলনের তথ্যশালা।
+
+6. **উন্নত এডিটোরিয়াল স্টুডিও ও সিএমএস (Enterprise CMS & Studio)**:
+   - **Section Studio**: কাস্টম টাইটেল, সাবটাইটেল, ১টি হিরো ও ৪টি কিউরেটেড স্লট নির্বাচন।
+   - **Article Editor v4**: জেন মোড (Zen Focus Mode), টেবিল অব কন্টেন্টস (TOC), কলআউট বক্স, কালার প্যালেট, এসইও কন্ট্রোল, ফিচার্ড ইমেজ পজিশনিং ও অটো-সেভ ড্রাফট।
+   - **Activity Log & Audit Trail**: ডেটাবেজ-সংরক্ষিত অপরিবর্তনীয় (Immutable) লগ।
+   - **SEO Suite**: ডায়নামিক `sitemap.xml`, `robots.txt`, OpenGraph এবং Google NewsArticle Schema.org।
+
+---
+
+## 🛠️ প্রযুক্তি ও আর্কিটেকচার (Tech Stack)
+
+- **Frontend**: Vanilla HTML5, Modern CSS3 (CSS Variables, Flexbox, Grid, Dark/Light modes), Pure JavaScript (ES6+ Modules & i18n).
+- **Backend APIs**: Zero-dependency Serverless functions in `api/` (Vercel Hobby 12-function compliant).
+- **Database**: Supabase PostgreSQL with multi-tier resilient local fallback engine.
+- **Local Dev Server**: Zero-dependency Node.js server (`dev-server.js`) supporting hot-reload and clean URL rewrites.
+
+---
+
+## 🚀 লোকাল সেটআপ ও রান (Getting Started)
+
 ```bash
+# ডিপেন্ডেন্সি ইনস্টল (ঐচ্ছিক, ব্যাকএন্ড টেস্টের জন্য)
 npm install
-```
 
-### 2. Configure Environment Variables
-Copy `.env.example` to `.env` (or configure your Supabase keys):
-```bash
-cp .env.example .env
-```
-
-### 3. Start the Full-Stack Dev Server
-```bash
+# লোকাল ডেভেলপমেন্ট সার্ভার চালু করুন
 npm start
+# অথবা
+node dev-server.js
 ```
-- **Main Website:** [http://localhost:3000](http://localhost:3000)
-- **Section Page:** [http://localhost:3000/section.html?slug=findings](http://localhost:3000/section.html?slug=findings)
-- **Article Page:** [http://localhost:3000/article.html](http://localhost:3000/article.html)
-- **Admin Panel:** [http://localhost:3000/admin.html](http://localhost:3000/admin.html)
-- **Admin Login:** [http://localhost:3000/admin-login.html](http://localhost:3000/admin-login.html)
+
+ব্রাউজারে ওপেন করুন:
+- **পোর্টাল**: `http://localhost:3000`
+- **এডিটোরিয়াল এইচকিউ / অ্যাডমিন**: `http://localhost:3000/admin.html`
+- **প্রবন্ধ এডিটর**: `http://localhost:3000/admin-article-editor.html`
 
 ---
 
-## 🗄️ Database Setup (Supabase)
+## 🌐 ভার্সেল ডেপ্লয়মেন্ট (Vercel Deployment)
 
-1. Open your project on [Supabase Dashboard](https://supabase.com/dashboard).
-2. Navigate to **SQL Editor** from the left navigation menu.
-3. Open `supabase_schema.sql` from this repository, paste the contents into the SQL Editor, and click **Run**.
-4. This script sets up:
-   - `sections` table with slug index and display order.
-   - `articles` table with publication status, full content HTML, and metadata.
-   - `allowed_admins` table for Google OAuth access control.
-   - Row Level Security (RLS) policies allowing public read of published content and full service-role management.
+প্রজেক্টটি সরাসরি Vercel-এ হোস্ট করার জন্য প্রস্তুত (`vercel.json` কনফিগার করা রয়েছে)।
+এনভায়রনমেন্ট ভ্যারিয়েবল সেট করুন:
+- `SUPABASE_URL`
+- `SUPABASE_SERVICE_KEY`
+- `SESSION_SECRET`
+- `GOOGLE_CLIENT_ID`
 
 ---
 
-## ⚙️ Environment Variables
-
-| Variable | Description |
-| :--- | :--- |
-| `SUPABASE_URL` | Your Supabase Project URL (`https://<project-ref>.supabase.co`) |
-| `SUPABASE_ANON_KEY` | Supabase public anonymous API key |
-| `SUPABASE_SERVICE_KEY` | Supabase private `service_role` key (used by `/api/*` endpoints) |
-| `SESSION_SECRET` | 32+ character random string for signing JWT tokens |
-| `GOOGLE_CLIENT_ID` | Google OAuth 2.0 Client ID from Google Cloud Console |
-| `PORT` | Local development server port (Default: `3000`) |
-
----
-
-## ☁️ Deployment (Vercel)
-
-1. Push this repository to GitHub / GitLab / Bitbucket.
-2. Import the project in [Vercel](https://vercel.com).
-3. In the Vercel project settings, go to **Settings > Environment Variables** and add:
-   - `SUPABASE_URL`
-   - `SUPABASE_SERVICE_KEY`
-   - `SESSION_SECRET`
-   - `GOOGLE_CLIENT_ID`
-4. Click **Deploy**. Vercel will automatically serve the static assets and execute the serverless functions in `/api/`.
-
----
-
-## 🛡️ Admin & Security Features
-
-- **Google Sign-In Authentication:** Only whitelisted Google accounts in `allowed_admins` can sign in.
-- **Role-Based Access Control:** `Admin` (full management, publish/delete, role assignment) and `Moderator` roles.
-- **Stale JWT Escalation Protection:** Every privileged action performs a live database check to prevent session tampering.
-- **Recycle Bin & Min-2 Admin Guard:** Prevents accidental deletion of the last admin account and supports account suspension and restoration.
+© ২০২৬ দ্য ওয়ে কালেক্টিভ (The Way Collective)। মেহনতি মানুষের মুক্তির লক্ষ্যে উন্মুক্ত।

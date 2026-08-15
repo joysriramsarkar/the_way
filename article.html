@@ -1,319 +1,242 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="bn">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Article — The Privatian Family</title>
-  <meta name="description" content="" />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Source+Sans+3:wght@300;400;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="assets/css/style.css" />
-  <link rel="stylesheet" href="assets/css/article.css" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>প্রবন্ধ পাঠ — দ্য ওয়ে (The Way)</title>
+  <link rel="icon" type="image/svg+xml" href="assets/images/logo.svg">
+  
+  <link rel="stylesheet" href="assets/css/style.css">
+  <link rel="stylesheet" href="assets/css/article.css">
+</head>
+<body id="top">
+
+  <!-- Reading Progress Bar -->
+  <div id="reading-progress-bar"></div>
+
+  <!-- Ticker Mount -->
+  <div id="theway-ticker-mount" class="theway-ticker-bar"></div>
+
+  <!-- Header Mount -->
+  <header id="theway-header-mount" class="theway-header"></header>
+
+  <!-- Article Reader Body -->
+  <main class="article-reader-container" id="article-reader-main">
+    
+    <!-- Breadcrumb -->
+    <nav class="article-breadcrumb" id="article-breadcrumb">
+      <a href="/">হোম</a>
+      <span class="breadcrumb-sep">/</span>
+      <a href="/section.html?sec=theory-philosophy" id="bread-sec-link">তত্ত্ব ও দর্শন</a>
+      <span class="breadcrumb-sep">/</span>
+      <span id="bread-current-title" style="color:var(--text-muted);">প্রবন্ধ</span>
+    </nav>
+
+    <!-- Article Header -->
+    <header class="article-header">
+      <span class="article-section-pill" id="art-sec-pill">সাম্রাজ্যবাদ ও বিশ্ব-রাজনীতি</span>
+      <h1 class="article-title-main" id="art-title">লোড হচ্ছে...</h1>
+      <p class="article-deck-lead" id="art-deck"></p>
+
+      <!-- Author & Stats Bar -->
+      <div class="article-meta-card">
+        <div class="article-author-info">
+          <img src="assets/images/img1.png" alt="Author" class="author-photo-large" id="art-author-photo">
+          <div class="author-names">
+            <strong id="art-author-name">দ্য ওয়ে সম্পাদকীয় পর্ষদ</strong>
+            <span id="art-author-role">আন্তর্জাতিক ব্যুরো</span>
+          </div>
+        </div>
+
+        <div class="article-stats-right">
+          <span class="stat-badge" id="art-read-time">⏱️ ৫ মিনিট পাঠ</span>
+          <span class="stat-badge" id="art-date">📅 ১৫ আগস্ট, ২০২৬</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Reader Toolbar -->
+    <div class="reader-toolbar">
+      <div class="toolbar-group">
+        <span style="font-size:0.75rem; font-weight:700; color:var(--text-muted);">হরফের আকার:</span>
+        <button class="toolbar-btn" id="btn-font-dec" title="Decrease font size">A-</button>
+        <button class="toolbar-btn" id="btn-font-inc" title="Increase font size">A+</button>
+      </div>
+
+      <div class="toolbar-group">
+        <button class="toolbar-btn" id="btn-share-link" title="Copy article link">🔗 লিংক কপি</button>
+        <button class="toolbar-btn" onclick="window.print()" title="Print / PDF">🖨️ প্রিন্ট</button>
+      </div>
+    </div>
+
+    <!-- Featured Hero Image -->
+    <div class="article-featured-media" id="art-hero-media-wrap">
+      <img src="assets/images/img1.png" alt="Featured Image" id="art-hero-img">
+      <div class="media-caption-box">
+        <span id="art-hero-caption">নব্য-সাম্রাজ্যবাদী আগ্রাসনের বিরুদ্ধে মেহনতি জনতার লড়াই।</span>
+        <span id="art-hero-credit" style="color:var(--gold-accent);">দ্য ওয়ে আর্কাইভ</span>
+      </div>
+    </div>
+
+    <!-- Longform Article Body -->
+    <article class="article-content-body" id="art-content-body">
+      <!-- Injected dynamically -->
+    </article>
+
+    <!-- Tags Row -->
+    <div class="article-tags-wrap" id="art-tags-wrap">
+      <span class="tag-label">ট্যাগসমূহ:</span>
+      <span class="tag-badge">সমাজতন্ত্র</span>
+      <span class="tag-badge">সাম্রাজ্যবাদ</span>
+      <span class="tag-badge">রাজনৈতিক অর্থনীতি</span>
+    </div>
+
+    <!-- Author Detailed Bio Card -->
+    <div class="author-detailed-box">
+      <img src="assets/images/img1.png" alt="Author Bio Avatar" class="author-bio-avatar" id="author-bio-avatar">
+      <div class="author-bio-text">
+        <h3 id="author-bio-name">সম্পাদকীয় পর্ষদ (Editorial Collective)</h3>
+        <div class="author-title-line" id="author-bio-role">দ্য ওয়ে আন্তর্জাতিক ব্যুরো</div>
+        <p id="author-bio-desc">
+          ‘দ্য ওয়ে’ সম্পাদকীয় পর্ষদ বিশ্বের মেহনতি মানুষের মুক্তিকামী চেতনা ও সাম্রাজ্যবাদ-বিরোধী বিশ্লেষণের পক্ষে আন্তর্জাতিক গবেষকদের উন্মুক্ত যৌথ প্রয়াস।
+        </p>
+      </div>
+    </div>
+
+    <!-- Related Theory & Articles -->
+    <section class="related-articles-section">
+      <div class="section-header-row">
+        <h2 class="section-title-large">সম্পর্কিত অন্যান্য বিশ্লেষণ</h2>
+      </div>
+      <div class="articles-triplet-grid" id="related-articles-grid"></div>
+    </section>
+
+  </main>
+
+  <!-- Footer Mount -->
+  <footer id="theway-footer-mount" class="theway-footer"></footer>
+
+  <!-- Scripts -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="assets/js/supabase-config.js"></script>
   <script src="assets/js/components.js"></script>
-</head>
-<body class="article-page">
-  <div id="site-header-mount"></div>
-  <div class="article-hero-band" id="article-hero-band">
-    <div class="article-hero-inner">
-      <nav class="article-breadcrumb" id="article-breadcrumb" aria-label="breadcrumb">
-        <a href="index.html" class="breadcrumb-home">Home</a>
-        <span class="breadcrumb-sep">&#x203A;</span>
-        <a href="section.html?slug=findings" class="breadcrumb-section" id="article-section-link">Findings</a>
-      </nav>
-      <a href="section.html?slug=findings" class="article-section-pill" id="article-section-pill">Findings</a>
-      <h1 class="article-headline" id="article-headline">
-        Don&#x2019;t mince words &#x2014; the quiet power of private tradition
-      </h1>
-      <p class="article-deck" id="article-deck">
-        An exploration of how Privatian families have shaped culture, knowledge, and heritage across generations through deliberate private endeavors.
-      </p>
-      <div class="article-meta" id="article-meta">
-        <span class="article-author" id="article-author">By <strong>Eleanor Whitmore</strong></span>
-        <span class="meta-dot">&#xB7;</span>
-        <span class="article-date" id="article-date">August 13, 2026</span>
-        <span class="meta-dot">&#xB7;</span>
-        <span class="article-readtime" id="article-readtime">8 min read</span>
-      </div>
-    </div>
-  </div>
-
-  <div class="article-layout" id="article-layout">
-
-    <aside class="article-share-sidebar" id="article-share-sidebar" aria-label="Share this article">
-      <div class="share-label">Share</div>
-      <div class="share-buttons">
-        <button class="share-btn" id="share-twitter" title="Share on X" onclick="shareArticle('twitter')"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.742l7.73-8.835L1.254 2.25H8.08l4.253 5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg></button>
-        <button class="share-btn" id="share-facebook" title="Share on Facebook" onclick="shareArticle('facebook')"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg></button>
-        <button class="share-btn" id="share-linkedin" title="Share on LinkedIn" onclick="shareArticle('linkedin')"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg></button>
-        <button class="share-btn" id="share-email" title="Share via Email" onclick="shareArticle('email')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg></button>
-        <button class="share-btn" id="share-copy" title="Copy link" onclick="shareArticle('copy')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button>
-        <button class="share-btn" id="share-print" title="Print" onclick="window.print()"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg></button>
-      </div>
-    </aside>
-
-    <main class="article-body" id="article-body">
-      <figure class="article-hero-figure" id="article-hero-figure">
-        <img src="assets/images/img1.png" alt="Heritage gathering" class="article-hero-img" id="article-hero-img" loading="eager" />
-        <figcaption class="article-hero-caption" id="article-hero-caption">
-          A gathering of Privatian family members at an annual heritage symposium, 2024.
-          <span class="caption-credit">Photo by The Privatian Archive</span>
-        </figcaption>
-      </figure>
-
-      <div class="article-content" id="article-content">
-        <p class="article-lead" id="article-lead">For generations, the Privatian family has operated at the intersection of intellectual rigor and private tradition &#x2014; cultivating a heritage that rarely announces itself, yet shapes everything it touches.</p>
-        <p>In the spring of 2024, a group of Privatian scholars gathered at a heritage symposium unlike any other. Told to speak plainly &#x2014; to abandon the polished circumlocutions that often insulate academic discourse from meaningful confrontation &#x2014; the participants found themselves navigating disagreements of remarkable depth.</p>
-        <p>The results, according to those who participated, were transformative. &#x201C;There is something deeply clarifying about being asked to say exactly what you mean,&#x201D; said one participant, a third-generation Privatian researcher who asked not to be named. &#x201C;We don&#x2019;t often allow ourselves that honesty.&#x201D;</p>
-        <blockquote class="article-pullquote" id="article-pullquote-1">
-          <p>&#x201C;Private tradition is not secrecy &#x2014; it is the careful stewardship of knowledge across time, ensuring that what matters most is never diluted by passing trend.&#x201D;</p>
-          <cite>&#x2014; A senior Privatian family archivist</cite>
-        </blockquote>
-        <p>The initiative, which brought together historians, social scientists, and members of the extended Privatian network, was designed around a single provocative premise: that private families have been the hidden architects of culture far more than public institutions have acknowledged.</p>
-        <p>Findings from the symposium challenge the conventional academic narrative. Where traditional scholarship tends to center institutions as the primary engines of cultural transmission, the Privatian model suggests something more intimate: that the family unit, when structured around deliberate intellectual inheritance, outperforms institutional frameworks in sustaining knowledge across generations.</p>
-        <h2>A Different Model of Knowledge</h2>
-        <p>The Privatian approach to knowledge preservation begins not with libraries or archives, but with conversation. Family dinners become seminars. Walks in the garden become tutorials. The home itself is the institution.</p>
-        <p>This model, which scholars in the symposium termed &#x201C;intimate epistemology,&#x201D; has deep historical roots. From the Medici circles of Renaissance Florence to the intellectual salons of 18th-century Paris, private networks have always served as incubators for ideas that later transformed public life.</p>
-        <blockquote class="article-pullquote" id="article-pullquote-2">
-          <p>&#x201C;Every library in this family has been curated with purpose. Not to impress visitors, but to form minds.&#x201D;</p>
-          <cite>&#x2014; From the Privatian family correspondence, 1947</cite>
-        </blockquote>
-        <p>&#x201C;The family is the most durable institution human civilization has produced,&#x201D; said one symposium speaker, a historian of private intellectual life. &#x201C;Empires fall. Universities reform themselves out of existence. But families &#x2014; when they take their intellectual life seriously &#x2014; persist.&#x201D;</p>
-        <h2>The Question of Openness</h2>
-        <p>Critics of the Privatian model point to its exclusivity. What of the knowledge that remains private &#x2014; locked in family archives, passed only to blood relatives or trusted initiates? Is this not a form of intellectual hoarding?</p>
-        <p>Symposium participants engaged this challenge directly. The consensus that emerged was nuanced: privacy in intellectual life is not the same as secrecy, and stewardship is not the same as gatekeeping. The Privatian tradition, at its best, preserves knowledge precisely so that it can eventually be shared &#x2014; but shared thoughtfully, contextually, and with care for its proper reception.</p>
-        <p>&#x201C;We are not hiding these ideas,&#x201D; said one archivist. &#x201C;We are aging them. Like wine. Like certain kinds of understanding that require time to be properly received.&#x201D;</p>
-        <p>The symposium ended without resolution &#x2014; as perhaps it should have. The deepest questions about private intellectual life do not yield to weekend conferences. But the participants left with something perhaps more valuable: a shared language for disagreements that had previously gone unspoken, and the experience of having said exactly what they meant.</p>
-      </div>
-
-      <div class="article-author-bio" id="article-author-bio">
-        <div class="author-bio-avatar" id="author-bio-avatar">
-          <svg width="52" height="52" viewBox="0 0 52 52" fill="none"><circle cx="26" cy="26" r="26" fill="#e8f1f9"/><circle cx="26" cy="20" r="9" fill="#0a528e" opacity="0.35"/><ellipse cx="26" cy="42" rx="16" ry="9" fill="#0a528e" opacity="0.2"/></svg>
-        </div>
-        <div class="author-bio-text">
-          <div class="author-bio-name" id="author-bio-name">Eleanor Whitmore</div>
-          <div class="author-bio-role" id="author-bio-role">Staff Writer, The Privatian Family</div>
-          <p class="author-bio-desc" id="author-bio-desc">Eleanor covers heritage, intellectual tradition, and the long arc of private knowledge. She has been a contributing writer since 2021.</p>
-        </div>
-      </div>
-
-    </main>
-
-    <aside class="article-right-aside" id="article-right-aside" aria-hidden="true"></aside>
-  </div>
-
-  <section class="article-related" id="article-related">
-    <div class="article-related-inner">
-      <h2 class="related-heading">Related Stories</h2>
-      <div class="related-grid" id="related-grid">
-        <article class="related-card" id="related-card-1">
-          <a href="article.html" class="related-card-img-link">
-            <div class="related-card-img-wrap"><img src="assets/images/img2.png" alt="" class="related-card-img" loading="lazy" /></div>
-          </a>
-          <div class="related-card-body">
-            <a href="section.html?slug=community-heritage" class="related-card-section">Community &amp; Heritage</a>
-            <h3 class="related-card-title"><a href="article.html" class="related-card-title-link">When Privatians meet: the quiet power of community</a></h3>
-            <div class="related-card-meta">Aug 10, 2026 &middot; 6 min read</div>
-          </div>
-        </article>
-        <article class="related-card" id="related-card-2">
-          <a href="article.html" class="related-card-img-link">
-            <div class="related-card-img-wrap"><img src="assets/images/img3.png" alt="" class="related-card-img" loading="lazy" /></div>
-          </a>
-          <div class="related-card-body">
-            <a href="section.html?slug=culture" class="related-card-section">Culture</a>
-            <h3 class="related-card-title"><a href="article.html" class="related-card-title-link">Why handwritten correspondence is making a private comeback</a></h3>
-            <div class="related-card-meta">Aug 7, 2026 &middot; 5 min read</div>
-          </div>
-        </article>
-        <article class="related-card" id="related-card-3">
-          <a href="article.html" class="related-card-img-link">
-            <div class="related-card-img-wrap"><img src="assets/images/img4.png" alt="" class="related-card-img" loading="lazy" /></div>
-          </a>
-          <div class="related-card-body">
-            <a href="section.html?slug=findings" class="related-card-section">Findings</a>
-            <h3 class="related-card-title"><a href="article.html" class="related-card-title-link">Liberal tradition in the modern age: how the Privatian family stays ahead</a></h3>
-            <div class="related-card-meta">Aug 3, 2026 &middot; 7 min read</div>
-          </div>
-        </article>
-      </div>
-    </div>
-  </section>
-
-  <div id="site-footer-mount"></div>
-
   <script>
-    function shareArticle(platform) {
-      var url = encodeURIComponent(window.location.href);
-      var title = encodeURIComponent(document.getElementById('article-headline').textContent.trim());
-      var urls = {
-        twitter:  'https://twitter.com/intent/tweet?url=' + url + '&text=' + title,
-        facebook: 'https://www.facebook.com/sharer/sharer.php?u=' + url,
-        linkedin: 'https://www.linkedin.com/sharing/share-offsite/?url=' + url,
-        email:    'mailto:?subject=' + title + '&body=' + url
-      };
-      if (platform === 'copy') {
-        navigator.clipboard.writeText(window.location.href).then(function() {
-          var btn = document.getElementById('share-copy');
-          btn.style.color = 'var(--brand-navy)';
-          setTimeout(function() { btn.style.color = ''; }, 1500);
-        });
-        return;
-      }
-      if (urls[platform]) window.open(urls[platform], '_blank', 'width=600,height=400');
-    }
-    (function() {
-      var sidebar = document.getElementById('article-share-sidebar');
-      var band = document.getElementById('article-hero-band');
-      function onScroll() {
-        if (!band || !sidebar) return;
-        sidebar.classList.toggle('is-visible', band.getBoundingClientRect().bottom < 80);
-      }
-      window.addEventListener('scroll', onScroll, { passive: true });
-      onScroll();
-    })();
-    (function() {
-      var bar = document.createElement('div');
-      bar.id = 'read-progress';
-      bar.style.cssText = 'position:fixed;top:0;left:0;height:3px;background:var(--brand-navy,#0a528e);z-index:9999;width:0%;transition:width 0.1s;pointer-events:none;';
-      document.body.appendChild(bar);
-      window.addEventListener('scroll', function() {
-        var body = document.getElementById('article-body');
-        if (!body) return;
-        var rect = body.getBoundingClientRect();
-        var total = rect.height - window.innerHeight;
-        var scrolled = Math.max(0, -rect.top);
-        bar.style.width = Math.min(100, (scrolled / total) * 100) + '%';
-      }, { passive: true });
-    })();
+    (async function() {
+      // Reading progress bar
+      window.addEventListener('scroll', () => {
+        const totalHeight = document.documentElement.scrollHeight - window.innerHeight;
+        const progress = totalHeight > 0 ? (window.scrollY / totalHeight) * 100 : 0;
+        const bar = document.getElementById('reading-progress-bar');
+        if (bar) bar.style.width = Math.min(100, Math.max(0, progress)) + '%';
+      });
 
-    // ── Dynamic Article Loader ──────────────────────────────────────────
-    (async function loadArticleData() {
-      var params = new URLSearchParams(window.location.search);
-      var articleId = params.get('id') || params.get('slug');
-      if (!articleId) return;
+      // Font sizing controls
+      let currentFontSize = 1.15;
+      const contentBody = document.getElementById('art-content-body');
+      document.getElementById('btn-font-inc')?.addEventListener('click', () => {
+        if (currentFontSize < 1.6) {
+          currentFontSize += 0.1;
+          contentBody.style.fontSize = currentFontSize + 'rem';
+        }
+      });
+      document.getElementById('btn-font-dec')?.addEventListener('click', () => {
+        if (currentFontSize > 0.95) {
+          currentFontSize -= 0.1;
+          contentBody.style.fontSize = currentFontSize + 'rem';
+        }
+      });
 
+      // Copy link
+      document.getElementById('btn-share-link')?.addEventListener('click', () => {
+        navigator.clipboard.writeText(window.location.href);
+        alert('আর্টিকেল লিংক কপি হয়েছে!');
+      });
+
+      // Parse slug or ID
+      const urlParams = new URLSearchParams(window.location.search);
+      const slug = urlParams.get('slug') || urlParams.get('id') || 'socialism-renaissance-against-neo-imperialism';
+
+      let articles = (window.THE_WAY_CONFIG && window.THE_WAY_CONFIG.defaultArticles) || [];
       try {
-        var a = null;
-        if (typeof db_getArticle === 'function') {
-          a = await db_getArticle(articleId);
-        }
-        if (!a) {
-          var isUuid = /^[0-9a-f-]{36}$/i.test(articleId);
-          var q = isUuid ? 'id=' + encodeURIComponent(articleId) : 'slug=' + encodeURIComponent(articleId);
-          var res = await fetch('/api/articles?action=get&' + q);
-          if (res.ok) a = await res.json();
-        }
-
-        if (!a) return;
-
-        // Title & Meta
-        document.title = (a.title || 'Article') + ' — The Privatian Family';
-        var metaDesc = document.querySelector('meta[name="description"]');
-        if (metaDesc && a.deck) metaDesc.setAttribute('content', a.deck);
-
-        // Section Pill & Breadcrumb
-        var secName = a.section || 'Articles';
-        var secSlug = a.section ? a.section.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') : '';
-        var secLink = document.getElementById('article-section-link');
-        var secPill = document.getElementById('article-section-pill');
-        if (secLink) {
-          secLink.textContent = secName;
-          secLink.href = 'section.html?slug=' + encodeURIComponent(secSlug);
-        }
-        if (secPill) {
-          secPill.textContent = secName;
-          secPill.href = 'section.html?slug=' + encodeURIComponent(secSlug);
-        }
-
-        // Headline & Deck
-        var hl = document.getElementById('article-headline');
-        if (hl) hl.textContent = a.title || 'Untitled';
-        var deck = document.getElementById('article-deck');
-        if (deck) {
-          if (a.deck) {
-            deck.textContent = a.deck;
-            deck.style.display = '';
-          } else {
-            deck.style.display = 'none';
+        const res = await fetch(`/api/articles?action=get&slug=${slug}`);
+        if (res.ok) {
+          const fetched = await res.json();
+          if (fetched && fetched.title) {
+            renderArticle(fetched);
+            loadRelated(articles, fetched);
+            return;
           }
         }
+      } catch(e) {}
 
-        // Meta Info (Author, Date, Read Time)
-        var authorEl = document.getElementById('article-author');
-        if (authorEl) authorEl.innerHTML = a.author ? ('By <strong>' + a.author + '</strong>') : 'The Privatian Family';
-        var dateEl = document.getElementById('article-date');
-        if (dateEl) {
-          var d = a.published_at || a.created_at || new Date().toISOString();
-          dateEl.textContent = new Date(d).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
-        }
-        var readEl = document.getElementById('article-readtime');
-        if (readEl && a.content_html) {
-          var wc = a.content_html.replace(/<[^>]*>/g, ' ').split(/\s+/).filter(Boolean).length;
-          readEl.textContent = Math.max(1, Math.round(wc / 200)) + ' min read';
+      // Fallback local match
+      let matched = articles.find(a => a.slug === slug || a.id === slug) || articles[0];
+      renderArticle(matched);
+      loadRelated(articles, matched);
+
+      function renderArticle(art) {
+        document.title = `${art.title} — দ্য ওয়ে (The Way)`;
+        document.getElementById('bread-current-title').textContent = art.title.slice(0, 30) + '...';
+        document.getElementById('bread-sec-link').textContent = art.section_name || art.section;
+        document.getElementById('bread-sec-link').href = `/section.html?sec=${art.section}`;
+
+        document.getElementById('art-sec-pill').textContent = art.section_name || art.section;
+        document.getElementById('art-title').textContent = art.title;
+        document.getElementById('art-deck').textContent = art.deck || '';
+
+        document.getElementById('art-author-name').textContent = art.author || 'দ্য ওয়ে সম্পাদকীয় পর্ষদ';
+        document.getElementById('art-author-role').textContent = art.author_role || '';
+        if (art.author_photo_url) document.getElementById('art-author-photo').src = art.author_photo_url;
+
+        const dateStr = new Date(art.published_at || art.created_at || Date.now()).toLocaleDateString('bn-BD');
+        document.getElementById('art-date').textContent = `📅 ${dateStr}`;
+
+        const words = ((art.content_html || '') + (art.deck || '')).replace(/<[^>]*>/g, '').length;
+        const readMins = Math.max(2, Math.ceil(words / 800));
+        const toBn = window.TheWayComponents ? window.TheWayComponents.toBengaliDigits : (n) => n;
+        document.getElementById('art-read-time').textContent = `⏱️ ${toBn(readMins)} মিনিট পাঠ`;
+
+        if (art.hero_img_url) {
+          document.getElementById('art-hero-img').src = art.hero_img_url;
+          document.getElementById('art-hero-caption').textContent = art.hero_caption || art.title;
+          document.getElementById('art-hero-credit').textContent = art.hero_credit || 'দ্য ওয়ে আর্কাইভ';
+        } else {
+          document.getElementById('art-hero-media-wrap').style.display = 'none';
         }
 
-        // Hero Image & Caption
-        var heroFig = document.getElementById('article-hero-figure');
-        var heroImg = document.getElementById('article-hero-img');
-        var heroCap = document.getElementById('article-hero-caption');
-        if (a.hero_img_url) {
-          if (heroImg) heroImg.src = a.hero_img_url;
-          if (heroCap) {
-            heroCap.innerHTML = (a.hero_caption || '') +
-              (a.hero_credit ? '<span class="caption-credit">Photo: ' + a.hero_credit + '</span>' : '');
-            heroCap.style.display = (a.hero_caption || a.hero_credit) ? '' : 'none';
-          }
-          if (heroFig) heroFig.style.display = '';
-        } else if (heroFig) {
-          heroFig.style.display = 'none';
+        document.getElementById('art-content-body').innerHTML = art.content_html || '<p>কন্টেন্ট প্রস্তুত করা হচ্ছে...</p>';
+
+        // Tags
+        const tagsWrap = document.getElementById('art-tags-wrap');
+        if (art.tags) {
+          const tagsList = art.tags.split(',').map(t => t.trim()).filter(Boolean);
+          tagsWrap.innerHTML = `<span class="tag-label">ট্যাগসমূহ:</span>` + tagsList.map(t => `<span class="tag-badge">${t}</span>`).join('');
         }
 
-        // Content
-        var contentEl = document.getElementById('article-content');
-        if (contentEl && a.content_html) {
-          contentEl.innerHTML = a.content_html;
-        }
-
-        // Author Bio Box
-        var bioBox = document.getElementById('article-author-bio');
-        var bioName = document.getElementById('author-bio-name');
-        var bioRole = document.getElementById('author-bio-role');
-        var bioDesc = document.getElementById('author-bio-desc');
-        if (bioName) bioName.textContent = a.author || 'The Privatian Family';
-        if (bioRole) bioRole.textContent = a.author_role || (a.author ? 'Contributor' : '');
-        if (bioDesc) bioDesc.textContent = a.author_bio || '';
-        if (bioBox && !a.author && !a.author_bio) bioBox.style.display = 'none';
-
-        // Load Related Articles from Same Section
-        if (a.section) {
-          var relRes = await fetch('/api/articles?action=list&status=published&section=' + encodeURIComponent(a.section) + '&limit=3');
-          if (relRes.ok) {
-            var relData = await relRes.json();
-            var filteredRel = (relData || []).filter(function(r) { return r.id !== a.id; }).slice(0, 3);
-            var relGrid = document.getElementById('related-grid');
-            if (relGrid && filteredRel.length > 0) {
-              relGrid.innerHTML = filteredRel.map(function(r) {
-                var rDate = r.published_at ? new Date(r.published_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '';
-                return '<article class="related-card">' +
-                  '<a href="article.html?id=' + encodeURIComponent(r.id || r.slug) + '" class="related-card-img-link">' +
-                    '<div class="related-card-img-wrap"><img src="' + (r.hero_img_url || 'assets/images/img1.png') + '" alt="" class="related-card-img" loading="lazy" /></div>' +
-                  '</a>' +
-                  '<div class="related-card-body">' +
-                    '<a href="section.html?slug=' + encodeURIComponent(secSlug) + '" class="related-card-section">' + (r.section || secName) + '</a>' +
-                    '<h3 class="related-card-title"><a href="article.html?id=' + encodeURIComponent(r.id || r.slug) + '" class="related-card-title-link">' + (r.title || 'Untitled') + '</a></h3>' +
-                    '<div class="related-card-meta">' + rDate + '</div>' +
-                  '</div>' +
-                '</article>';
-              }).join('');
-            }
-          }
-        }
-      } catch(err) {
-        console.warn('[Article] Failed to load dynamic article:', err.message);
+        // Author bio
+        document.getElementById('author-bio-name').textContent = art.author || 'দ্য ওয়ে লেখক';
+        document.getElementById('author-bio-role').textContent = art.author_role || '';
+        document.getElementById('author-bio-desc').textContent = art.author_bio || 'মেহনতি মানুষের মুক্তিকামী চিন্তা ও সমাজতান্ত্রিক বিশ্লেষণের পক্ষে লেখক।';
+        if (art.author_photo_url) document.getElementById('author-bio-avatar').src = art.author_photo_url;
       }
+
+      function loadRelated(allArts, currentArt) {
+        const grid = document.getElementById('related-articles-grid');
+        const related = allArts.filter(a => a.slug !== currentArt.slug).slice(0, 3);
+        grid.innerHTML = related.map(a => `
+          <article class="standard-article-card">
+            <a href="/article.html?slug=${a.slug}" class="card-media-wrapper">
+              <img src="${a.hero_img_url || 'assets/images/img2.png'}" alt="${a.title}">
+            </a>
+            <div class="card-body-content">
+              <span class="card-tag-pill">${a.section_name || a.section}</span>
+              <h3 class="card-heading"><a href="/article.html?slug=${a.slug}">${a.title}</a></h3>
+              <p class="card-excerpt">${a.deck || ''}</p>
+            </div>
+          </article>
+        `).join('');
+      }
+
     })();
   </script>
 </body>

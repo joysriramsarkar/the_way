@@ -1,531 +1,233 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="bn">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Section - The Privatian Family</title>
-  <meta name="description" content="Browse articles in this section of The Privatian Family." />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Source+Sans+3:wght@300;400;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="assets/css/style.css" />
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="assets/js/supabase-config.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>বিষয়ভিত্তিক সংগ্রহশালা — দ্য ওয়ে (The Way)</title>
+  <link rel="icon" type="image/svg+xml" href="assets/images/logo.svg">
+  <link rel="stylesheet" href="assets/css/style.css">
   <style>
-    /* â”€â”€ CRITICAL OVERRIDES for section page â”€â”€ */
-    /* style.css sets img{width:100%} which breaks positioned images */
-    .hero-art img,
-    .hero-art .hero-img {
-      position: absolute !important;
-      width: 100% !important;
-      height: 100% !important;
-      object-fit: cover !important;
-      display: block !important;
-    }
-
-    /* â”€â”€ SECTION PAGE VARIABLES â”€â”€ */
-    :root {
-      --sec-navy: #0d3a63;
-      --sec-gold: #c9a96e;
-      --sec-div:  #dde5ef;
-      --tp: #1a2a3a;
-      --ts: #4a6278;
-      --tm: #7a96ab;
-    }
-
-    body { background: #f7f9fc; }
-
-    /* â”€â”€ IDENTITY BAR â”€â”€ */
-    .id-bar { background: var(--sec-navy); border-bottom: 3px solid var(--sec-gold); }
-    .id-inner {
-      max-width: var(--max-width);
-      margin: 0 auto;
-      padding: 36px 24px 32px;
-      display: flex;
-      align-items: flex-end;
-      justify-content: space-between;
-      gap: 24px;
-    }
-    .id-crumb {
-      font-family: var(--font-sans);
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: .1em;
-      text-transform: uppercase;
-      color: var(--sec-gold);
-      margin-bottom: 10px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .id-crumb a { color: inherit; text-decoration: none; }
-    .id-crumb a:hover { color: #fff; }
-    .id-crumb span { opacity: .5; }
-    .id-title {
-      font-family: var(--font-serif);
-      font-size: clamp(28px, 4vw, 50px);
-      font-weight: 700;
+    .section-hero-banner {
+      background: linear-gradient(135deg, #18090c 0%, #0d1117 100%);
       color: #fff;
-      line-height: 1.12;
-      margin: 0;
-      letter-spacing: -.01em;
+      padding: 3rem 2rem;
+      border-radius: var(--radius-lg);
+      margin: 2rem 0;
+      border: 1px solid rgba(194, 24, 43, 0.35);
+      position: relative;
     }
-    .id-meta { font-size: 13px; color: rgba(255,255,255,.45); margin-top: 8px; }
-    .id-back {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      color: rgba(255,255,255,.4);
-      text-decoration: none;
-      font-size: 12px;
-      font-family: var(--font-sans);
-      transition: color .15s;
-      flex-shrink: 0;
+    .section-hero-title {
+      font-family: var(--font-bengali-serif);
+      font-size: 2.4rem;
+      font-weight: 900;
+      color: #fff;
+      margin-bottom: 0.5rem;
     }
-    .id-back:hover { color: var(--sec-gold); }
-
-    /* â”€â”€ PAGE WRAPPER â”€â”€ */
-    .pw { max-width: var(--max-width); margin: 0 auto; padding: 0 24px 80px; }
-
-    /* â”€â”€ HERO AREA â”€â”€ */
-    .hero-wrap { padding-top: 0; }
-    .hero-area {
+    .section-hero-sub {
+      font-size: 1.1rem;
+      color: var(--gold-bright);
+      max-width: 750px;
+      line-height: 1.6;
+    }
+    .section-curated-grid {
       display: grid;
-      grid-template-columns: 1fr 320px;
-      gap: 0;
-      border-bottom: 2px solid var(--sec-div);
-      margin-bottom: 40px;
+      grid-template-columns: 1.5fr 1fr;
+      gap: 2rem;
+      margin-bottom: 3rem;
     }
-    .hero-art {
-      position: relative;
+    .curated-hero-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
       overflow: hidden;
-      background: #111;
-      min-height: 400px;
+    }
+    .curated-hero-card img {
+      width: 100%;
+      aspect-ratio: 16/9;
+      object-fit: cover;
+    }
+    .curated-hero-body {
+      padding: 1.5rem;
+    }
+    .curated-hero-body h2 {
+      font-family: var(--font-bengali-serif);
+      font-size: 1.6rem;
+      margin-bottom: 0.6rem;
+    }
+    .curated-list-col {
       display: flex;
       flex-direction: column;
-      justify-content: flex-end;
+      gap: 1rem;
     }
-    .hero-img {
-      position: absolute !important;
-      inset: 0;
-      width: 100% !important;
-      height: 100% !important;
-      object-fit: cover !important;
-      opacity: .7;
-      transition: opacity .3s, transform .4s;
-    }
-    .hero-art:hover .hero-img { opacity: .6; transform: scale(1.02); }
-    .hero-ov {
-      position: relative;
-      z-index: 1;
-      padding: 28px 32px;
-      background: linear-gradient(to top, rgba(0,0,0,.88) 0%, rgba(0,0,0,.25) 70%, transparent 100%);
-    }
-    .hero-badge {
-      font-family: var(--font-sans);
-      font-size: 10px;
-      font-weight: 700;
-      letter-spacing: .12em;
-      text-transform: uppercase;
-      color: var(--sec-gold);
-      margin-bottom: 10px;
-      display: inline-block;
-    }
-    .hero-h {
-      font-family: var(--font-serif);
-      font-size: clamp(18px, 2.2vw, 28px);
-      font-weight: 600;
-      color: #fff;
-      line-height: 1.3;
-      margin: 0 0 10px;
-    }
-    .hero-h a { color: inherit; text-decoration: none; }
-    .hero-h a:hover { text-decoration: underline; text-decoration-color: var(--sec-gold); }
-    .hero-meta-txt { font-family: var(--font-sans); font-size: 12px; color: rgba(255,255,255,.5); }
-
-    /* Hero sidebar */
-    .hero-sb {
-      background: #fff;
-      border-left: 1px solid var(--sec-div);
+    .curated-sub-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      padding: 1rem;
+      border-radius: var(--radius-sm);
       display: flex;
-      flex-direction: column;
+      gap: 1rem;
+      align-items: center;
     }
-    .hero-sb-hd {
-      font-family: var(--font-sans);
-      font-size: 10px;
-      font-weight: 700;
-      letter-spacing: .12em;
-      text-transform: uppercase;
-      color: var(--tm);
-      padding: 18px 20px 12px;
-      border-bottom: 1px solid var(--sec-div);
-      margin: 0;
+    .curated-sub-card img {
+      width: 80px;
+      height: 80px;
+      object-fit: cover;
+      border-radius: var(--radius-sm);
     }
-    .hero-sb-list { list-style: none; margin: 0; padding: 0; flex: 1; }
-    .hero-sb-item { border-bottom: 1px solid var(--sec-div); transition: background .15s; }
-    .hero-sb-item:last-child { border-bottom: none; }
-    .hero-sb-item:hover { background: #f5f8fb; }
-    .hero-sb-item a { display: block; padding: 14px 20px; text-decoration: none; color: inherit; }
-    .hsil { font-family: var(--font-sans); font-size: 9px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--sec-gold); margin-bottom: 4px; }
-    .hsit { font-family: var(--font-serif); font-size: 14px; font-weight: 600; color: var(--tp); line-height: 1.35; }
-    .hsid { font-family: var(--font-sans); font-size: 11px; color: var(--tm); margin-top: 5px; }
-
-    /* â”€â”€ CONTENT LAYOUT â”€â”€ */
-    .cl { display: grid; grid-template-columns: 1fr 280px; gap: 40px; align-items: start; }
-
-    /* â”€â”€ GRID HEADER â”€â”€ */
-    .gh {
+    .archive-filter-bar {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      border-bottom: 2px solid var(--sec-navy);
-      padding-bottom: 10px;
-      margin-bottom: 24px;
-    }
-    .ghl { font-family: var(--font-sans); font-size: 11px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--sec-navy); }
-    .ghc { font-family: var(--font-sans); font-size: 11px; color: var(--tm); }
-
-    /* â”€â”€ ARTICLE GRID â”€â”€ */
-    .ag { display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px 20px; }
-    .ac {
-      display: flex;
-      flex-direction: column;
-      background: #fff;
-      border: 1px solid var(--sec-div);
-      border-radius: 2px;
-      overflow: hidden;
-      transition: box-shadow .2s, transform .2s;
-      text-decoration: none;
-      color: inherit;
-    }
-    .ac:hover { box-shadow: 0 4px 20px rgba(13,58,99,.1); transform: translateY(-2px); }
-    .ac-iw {
-      position: relative;
-      overflow: hidden;
-      aspect-ratio: 16/10;
-      background: #e8edf3;
-    }
-    .ac-iw img {
-      width: 100% !important;
-      height: 100% !important;
-      object-fit: cover !important;
-      display: block !important;
-      transition: transform .35s;
-    }
-    .ac:hover .ac-iw img { transform: scale(1.04); }
-    .ac-b { padding: 16px 16px 18px; flex: 1; display: flex; flex-direction: column; gap: 7px; }
-    .ac-badge { font-family: var(--font-sans); font-size: 9px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--sec-gold); }
-    .ac-title { font-family: var(--font-serif); font-size: 15px; font-weight: 600; line-height: 1.4; color: var(--tp); margin: 0; flex: 1; }
-    .ac-meta { font-family: var(--font-sans); font-size: 11px; color: var(--tm); margin-top: auto; padding-top: 10px; border-top: 1px solid var(--sec-div); }
-
-    /* â”€â”€ EMPTY STATE â”€â”€ */
-    .ag-empty {
-      grid-column: 1 / -1;
-      padding: 56px 24px;
-      text-align: center;
-      background: #fff;
-      border: 1px solid var(--sec-div);
-      border-radius: 2px;
-    }
-    .ag-empty svg { color: #c0d0e0; margin-bottom: 14px; }
-    .ag-empty h3 { font-family: var(--font-serif); font-size: 19px; font-weight: 400; color: var(--ts); margin: 0 0 8px; }
-    .ag-empty p { font-family: var(--font-sans); font-size: 13.5px; color: var(--tm); max-width: 320px; margin: 0 auto; line-height: 1.6; }
-
-    /* â”€â”€ SIDEBAR â”€â”€ */
-    .sb { display: flex; flex-direction: column; gap: 28px; }
-    .sw { background: #fff; border: 1px solid var(--sec-div); }
-    .sw-hd { font-family: var(--font-sans); font-size: 10px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--tm); padding: 13px 18px; border-bottom: 1px solid var(--sec-div); margin: 0; }
-    .sw-b { padding: 18px; }
-    .sl { list-style: none; margin: 0; padding: 0; }
-    .sl li a { display: flex; align-items: center; justify-content: space-between; padding: 8px 0; font-family: var(--font-sans); font-size: 13.5px; color: var(--ts); text-decoration: none; border-bottom: 1px solid var(--sec-div); transition: color .15s; }
-    .sl li:last-child a { border-bottom: none; }
-    .sl li.cur a { color: var(--sec-navy); font-weight: 600; }
-    .sl li a:hover { color: var(--sec-navy); }
-    .sl li a svg { color: #c0ccd8; flex-shrink: 0; }
-    .sl li.cur a svg { color: var(--sec-gold); }
-    .sa-txt { font-family: var(--font-sans); font-size: 13px; color: var(--ts); line-height: 1.65; margin: 0 0 14px; }
-    .sa-btn { display: inline-flex; align-items: center; gap: 6px; font-family: var(--font-sans); font-size: 12.5px; font-weight: 600; color: var(--sec-navy); text-decoration: none; border: 1.5px solid var(--sec-navy); padding: 7px 14px; border-radius: 2px; transition: background .15s, color .15s; }
-    .sa-btn:hover { background: var(--sec-navy); color: #fff; }
-
-    /* â”€â”€ PAGINATION â”€â”€ */
-    .pag { display: flex; align-items: center; justify-content: center; gap: 6px; padding: 40px 0 0; margin-top: 40px; border-top: 1px solid var(--sec-div); }
-    .pag-btn { display: inline-flex; align-items: center; justify-content: center; width: 34px; height: 34px; border: 1px solid var(--sec-div); background: #fff; color: var(--ts); font-family: var(--font-sans); font-size: 13px; text-decoration: none; transition: background .15s, color .15s, border-color .15s; border-radius: 2px; }
-    .pag-btn:hover, .pag-btn.on { background: var(--sec-navy); border-color: var(--sec-navy); color: #fff; }
-    .pag-el { color: var(--tm); font-size: 13px; padding: 0 4px; }
-
-    
-    /* ── RESPONSIVE ── */
-    @media (max-width: 1024px) {
-      .hero-area { grid-template-columns: 1fr 260px; }
-      .ag { grid-template-columns: repeat(2, 1fr); }
-      .cl { gap: 28px; }
-    }
-    @media (max-width: 768px) {
-      .id-inner { padding: 24px 16px 20px; flex-wrap: wrap; }
-      .id-back { margin-top: 8px; }
-      .pw { padding: 0 16px 48px; }
-      .hero-area { grid-template-columns: 1fr; }
-      .hero-art { min-height: clamp(220px, 55vw, 380px); }
-      .hero-ov { padding: 20px; }
-      .hero-h { font-size: clamp(16px, 4vw, 24px); }
-      .hero-sb { border-left: none; border-top: 2px solid var(--sec-div); flex-direction: row; flex-wrap: wrap; }
-      .hero-sb-hd { width: 100%; }
-      .hero-sb-item { flex: 1; min-width: 50%; border-bottom: none; border-right: 1px solid var(--sec-div); }
-      .hero-sb-item:last-child { border-right: none; }
-      .cl { grid-template-columns: 1fr; gap: 0; }
-      .ag { grid-template-columns: repeat(2, 1fr); gap: 20px 16px; }
-    }
-    @media (max-width: 480px) {
-      .ag { grid-template-columns: 1fr; gap: 16px; }
-      .hero-art { min-height: 200px; }
-      .hero-sb-item { min-width: 100%; border-right: none; border-bottom: 1px solid var(--sec-div); }
-      .hero-sb-item:last-child { border-bottom: none; }
-      .id-title { font-size: clamp(22px, 7vw, 36px); }
+      border-bottom: 2px solid var(--text-primary);
+      padding-bottom: 0.85rem;
+      margin: 3rem 0 1.8rem;
+      flex-wrap: wrap;
+      gap: 1rem;
     }
   </style>
-  <script src="assets/js/components.js"></script>
 </head>
-<body>
+<body id="top">
 
-<!-- â”€â”€ SITE HEADER (identical to index.html) â”€â”€ -->
-<div id="site-header-mount"></div>
+  <!-- Ticker Mount -->
+  <div id="theway-ticker-mount" class="theway-ticker-bar"></div>
 
-<!-- â”€â”€ SECTION IDENTITY BAR â”€â”€ -->
-<div class="id-bar">
-  <div class="id-inner">
-    <div>
-      <div class="id-crumb">
-        <a href="index.html">Home</a>
-        <span>&#8250;</span>
-        <span id="bc">Section</span>
-      </div>
-      <h1 class="id-title" id="sec-title">Loading...</h1>
-      <p class="id-meta" id="sec-meta"></p>
+  <!-- Header Mount -->
+  <header id="theway-header-mount" class="theway-header"></header>
+
+  <!-- Main Section Body -->
+  <main class="container" id="section-main-content">
+    
+    <!-- Section Dynamic Header Banner -->
+    <div class="section-hero-banner" id="sec-banner-box">
+      <div class="lead-section-badge" style="position:static; display:inline-block; margin-bottom:0.8rem;">সেকশন ফোকাস</div>
+      <h1 class="section-hero-title" id="sec-title-display">লোড হচ্ছে...</h1>
+      <p class="section-hero-sub" id="sec-sub-display"></p>
     </div>
-    <a href="index.html" class="id-back">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14">
-        <polyline points="15 18 9 12 15 6"/>
-      </svg>
-      Back to Home
-    </a>
-  </div>
-</div>
 
-<!-- â”€â”€ HERO AREA â”€â”€ -->
-<div class="pw hero-wrap">
-  <div class="hero-area">
-    <div class="hero-art">
-      <img class="hero-img" id="hero-img" src="" alt="" />
-      <div class="hero-ov">
-        <span class="hero-badge" id="hero-badge"></span>
-        <h2 class="hero-h">
-          <a href="#" id="hero-link">Featured article will appear here once published</a>
-        </h2>
-        <div class="hero-meta-txt">Coming soon</div>
-      </div>
+    <!-- Curated Spotlight Grid (Hero + 4 Selected) -->
+    <div id="sec-curated-spotlight"></div>
+
+    <!-- All Section Articles Archive -->
+    <div class="archive-filter-bar">
+      <h3 style="font-family:var(--font-bengali-serif); font-size:1.4rem;" id="archive-count-heading">আর্কাইভের প্রবন্ধসমূহ</h3>
+      <input type="text" id="sec-archive-search" placeholder="এই বিষয়ের লেখা খুঁজুন..." class="subscribe-input" style="max-width:280px; font-size:0.82rem;">
     </div>
-    <div class="hero-sb">
-      <h3 class="hero-sb-hd">Latest in This Section</h3>
-      <ul class="hero-sb-list">
-        <li class="hero-sb-item"><a href="#">
-          <div class="hsil">Coming Soon</div>
-          <div class="hsit">Articles will appear here once published</div>
-          <div class="hsid">&mdash;</div>
-        </a></li>
-        <li class="hero-sb-item"><a href="#">
-          <div class="hsil">Coming Soon</div>
-          <div class="hsit">Stay tuned for upcoming stories</div>
-          <div class="hsid">&mdash;</div>
-        </a></li>
-        <li class="hero-sb-item"><a href="#">
-          <div class="hsil">Coming Soon</div>
-          <div class="hsit">New content is on the way</div>
-          <div class="hsid">&mdash;</div>
-        </a></li>
-      </ul>
+
+    <div class="articles-triplet-grid" id="sec-all-articles-grid">
+      <!-- Populated dynamically -->
     </div>
-  </div>
-</div>
 
-<!-- â”€â”€ MAIN CONTENT + SIDEBAR â”€â”€ -->
-<div class="pw">
-  <div class="cl">
-    <main>
-      <div class="gh">
-        <span class="ghl" id="grid-lbl">All Articles</span>
-        <span class="ghc" id="grid-cnt"></span>
-      </div>
-      <div class="ag" id="art-grid">
-        <div class="ag-empty">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="52" height="52">
-            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-            <polyline points="14 2 14 8 20 8"/>
-            <line x1="16" y1="13" x2="8" y2="13"/>
-            <line x1="16" y1="17" x2="8" y2="17"/>
-          </svg>
-          <h3>Articles coming soon</h3>
-          <p>Published articles for this section will appear here. Check back soon.</p>
-        </div>
-      </div>
-      <div class="pag" id="pag" style="display:none">
-        <a href="#" class="pag-btn">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><polyline points="15 18 9 12 15 6"/></svg>
-        </a>
-        <a href="#" class="pag-btn on">1</a>
-        <a href="#" class="pag-btn">2</a>
-        <a href="#" class="pag-btn">3</a>
-        <span class="pag-el">...</span>
-        <a href="#" class="pag-btn">8</a>
-        <a href="#" class="pag-btn">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><polyline points="9 18 15 12 9 6"/></svg>
-        </a>
-      </div>
-    </main>
-    <aside class="sb">
-      <div class="sw">
-        <h3 class="sw-hd">Browse Sections</h3>
-        <div class="sw-b" style="padding:6px 18px 14px">
-          <ul class="sl" id="sb-secs"></ul>
-        </div>
-      </div>
-      <div class="sw">
-        <h3 class="sw-hd">About The Privatian Family</h3>
-        <div class="sw-b">
-          <p class="sa-txt">The Privatian Family publishes original stories, findings, and commentary across culture, heritage, privacy, and the world we share.</p>
-          <a href="index.html" class="sa-btn">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="12" height="12"><polyline points="15 18 9 12 15 6"/></svg>
-            Return to Home
-          </a>
-        </div>
-      </div>
-    </aside>
-  </div>
-</div>
+  </main>
 
-<script>
-(async function(){
-  var AK='privatian_applied_sections', SK='privatian_sections';
-  function qp(n){return new URLSearchParams(window.location.search).get(n)||'';}
-  function getSecs(){
-    var r=[];
-    [AK,SK].forEach(function(k){
-      try{
-        var raw=localStorage.getItem(k); if(!raw)return;
-        var d=JSON.parse(raw);
-        var l=Array.isArray(d)?d:(d.sections||[]);
-        l.forEach(function(s){if(!r.find(function(x){return x.id===s.id;}))r.push(s);});
-      }catch(e){}
-    });
-    return r.filter(function(s){return !s.deleted&&!s.locked;});
-  }
-  var slug=qp('slug'), secs=getSecs();
-  var cur=secs.find(function(s){return s.slug===slug;})||null;
-  var name=cur?cur.name:(slug?slug.charAt(0).toUpperCase()+slug.slice(1).replace(/-/g,' '):'Section');
+  <!-- Footer Mount -->
+  <footer id="theway-footer-mount" class="theway-footer"></footer>
 
-  // Meta
-  document.querySelector('title').textContent=name+' - The Privatian Family';
-  document.querySelector('meta[name="description"]').setAttribute('content','Browse all articles in the '+name+' section of The Privatian Family.');
-  ['sec-title','bc'].forEach(function(id){var e=document.getElementById(id);if(e)e.textContent=name;});
-  var hb=document.getElementById('hero-badge'); if(hb)hb.textContent=name;
-  var gl=document.getElementById('grid-lbl'); if(gl)gl.textContent='All Articles in '+name;
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="assets/js/supabase-config.js"></script>
+  <script src="assets/js/components.js"></script>
+  <script>
+    (async function() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const secSlug = urlParams.get('sec') || 'theory-philosophy';
 
-  // Hero image default
-  var imgs=['assets/images/img1.png','assets/images/img2.png','assets/images/img3.png','assets/images/img4.png','assets/images/img5.png','assets/images/img6.png'];
-  var hi=document.getElementById('hero-img');
-  if(hi){hi.src=imgs[slug.length%imgs.length]; hi.alt=name+' section image';}
+      const sections = (window.THE_WAY_CONFIG && window.THE_WAY_CONFIG.defaultSections) || [];
+      const currentSec = sections.find(s => s.slug === secSlug) || {
+        name: 'তত্ত্ব ও দর্শন',
+        name_en: 'Theory & Philosophy',
+        subtitle: 'মার্ক্সীয় দ্বন্দ্ববাদ, ঐতিহাসিক বস্তুবাদ ও উত্তর-ঔপনিবেশিক মুক্তিচিন্তা'
+      };
 
-  // Sidebar sections
-  var sbl=document.getElementById('sb-secs');
-  if(sbl){
-    if(secs.length){
-      sbl.innerHTML='';
-      secs.forEach(function(s){
-        var li=document.createElement('li'); li.className=s.slug===slug?'cur':'';
-        var a=document.createElement('a');
-        a.href=s.slug?'section.html?slug='+s.slug:'#';
-        a.innerHTML='<span>'+s.name+'</span>'
-          +'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="11" height="11"><polyline points="9 18 15 12 9 6"/></svg>';
-        li.appendChild(a); sbl.appendChild(li);
-      });
-    } else {
-      sbl.innerHTML='<li style="padding:10px 0;color:#9ab;font-size:13px;font-family:sans-serif">No sections yet. Apply changes in admin.</li>';
-    }
-  }
+      const lang = window.TheWayComponents ? window.TheWayComponents.getLanguage() : 'bn';
+      const toBn = window.TheWayComponents ? window.TheWayComponents.toBengaliDigits : (n) => n;
 
-  // ── Fetch & Render Live Articles ──────────────────────────────────────
-  try {
-    let articles = null;
-    if (typeof db_getArticles === 'function') {
-      articles = await db_getArticles(name);
-      if (!articles || !articles.length) {
-        articles = await db_getArticles(slug);
-      }
-    }
+      document.getElementById('sec-title-display').textContent = lang === 'bn' ? (currentSec.name || currentSec.name_en) : (currentSec.name_en || currentSec.name);
+      document.getElementById('sec-sub-display').textContent = currentSec.subtitle || '';
+      document.title = `${currentSec.name || 'সেকশন'} — দ্য ওয়ে (The Way)`;
 
-    if (!articles) {
-      const res = await fetch('/api/articles?action=list&status=published&section=' + encodeURIComponent(name));
-      if (res.ok) articles = await res.json();
-    }
-
-    if (Array.isArray(articles) && articles.length > 0) {
-      // 1. Update Grid Counter
-      var gc = document.getElementById('grid-cnt');
-      if (gc) gc.textContent = '(' + articles.length + ' ' + (articles.length === 1 ? 'article' : 'articles') + ')';
-
-      // 2. Hero Area (Featured / First Article)
-      var hero = articles[0];
-      var heroLink = document.getElementById('hero-link');
-      var heroMeta = document.querySelector('.hero-meta-txt');
-      if (heroLink) {
-        heroLink.textContent = hero.title || 'Untitled';
-        heroLink.href = 'article.html?id=' + encodeURIComponent(hero.id || hero.slug);
-      }
-      if (hi && hero.hero_img_url) {
-        hi.src = hero.hero_img_url;
-      }
-      if (heroMeta) {
-        var hDate = hero.published_at ? new Date(hero.published_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '';
-        heroMeta.textContent = (hero.author ? 'By ' + hero.author + ' · ' : '') + hDate;
-      }
-
-      // 3. Hero Sidebar (Next 3 articles or recent)
-      var sbList = document.querySelector('.hero-sb-list');
-      if (sbList) {
-        var sbArticles = articles.slice(1, 4);
-        if (sbArticles.length) {
-          sbList.innerHTML = sbArticles.map(function(a) {
-            var aDate = a.published_at ? new Date(a.published_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '';
-            return '<li class="hero-sb-item"><a href="article.html?id=' + encodeURIComponent(a.id || a.slug) + '">' +
-              '<div class="hsil">' + (a.section || name) + '</div>' +
-              '<div class="hsit">' + (a.title || 'Untitled') + '</div>' +
-              '<div class="hsid">' + (a.author ? a.author + ' · ' : '') + aDate + '</div>' +
-            '</a></li>';
-          }).join('');
+      // Fetch all articles
+      let articles = (window.THE_WAY_CONFIG && window.THE_WAY_CONFIG.defaultArticles) || [];
+      try {
+        const res = await fetch('/api/articles?action=list');
+        if (res.ok) {
+          const data = await res.json();
+          if (Array.isArray(data) && data.length > 0) articles = data;
         }
+      } catch(e) {}
+
+      let secArticles = secSlug === 'all' ? articles : articles.filter(a => (a.section || '').toLowerCase() === secSlug.toLowerCase());
+      if (secArticles.length === 0) secArticles = articles; // fallback
+
+      // Render Spotlight
+      const spotlightMount = document.getElementById('sec-curated-spotlight');
+      if (secArticles.length > 0) {
+        const heroArt = secArticles[0];
+        const otherArts = secArticles.slice(1, 5);
+
+        spotlightMount.innerHTML = `
+          <div class="section-curated-grid">
+            <article class="curated-hero-card">
+              <a href="/article.html?slug=${heroArt.slug}">
+                <img src="${heroArt.hero_img_url || 'assets/images/img1.png'}" alt="${heroArt.title}">
+              </a>
+              <div class="curated-hero-body">
+                <h2><a href="/article.html?slug=${heroArt.slug}">${heroArt.title}</a></h2>
+                <p style="font-size:0.95rem; color:var(--text-secondary); line-height:1.6; margin-bottom:1rem;">${heroArt.deck || ''}</p>
+                <div style="font-size:0.8rem; color:var(--text-muted);">
+                  <span>✍️ ${heroArt.author}</span> • <span>📅 ${new Date(heroArt.published_at || Date.now()).toLocaleDateString('bn-BD')}</span>
+                </div>
+              </div>
+            </article>
+
+            <div class="curated-list-col">
+              ${otherArts.map(a => `
+                <article class="curated-sub-card">
+                  <img src="${a.hero_img_url || 'assets/images/img2.png'}" alt="${a.title}">
+                  <div>
+                    <h4 style="font-family:var(--font-bengali-serif); font-size:1rem; margin-bottom:0.3rem;">
+                      <a href="/article.html?slug=${a.slug}">${a.title}</a>
+                    </h4>
+                    <span style="font-size:0.75rem; color:var(--text-muted);">${a.author}</span>
+                  </div>
+                </article>
+              `).join('')}
+            </div>
+          </div>
+        `;
       }
 
-      // 4. Article Grid
-      var grid = document.getElementById('art-grid');
-      if (grid) {
-        grid.innerHTML = articles.map(function(a, idx) {
-          var imgUrl = a.hero_img_url || imgs[idx % imgs.length];
-          var aDate = a.published_at ? new Date(a.published_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '';
-          return '<a href="article.html?id=' + encodeURIComponent(a.id || a.slug) + '" class="ac">' +
-            '<div class="ac-iw"><img src="' + imgUrl + '" alt="" loading="lazy" /></div>' +
-            '<div class="ac-b">' +
-              '<span class="ac-badge">' + (a.section || name) + '</span>' +
-              '<h3 class="ac-title">' + (a.title || 'Untitled') + '</h3>' +
-              '<div class="ac-meta">' + (a.author ? 'By ' + a.author + ' · ' : '') + aDate + '</div>' +
-            '</div>' +
-          '</a>';
-        }).join('');
+      // Render All Grid
+      function renderArchive(list) {
+        const grid = document.getElementById('sec-all-articles-grid');
+        grid.innerHTML = list.map(art => `
+          <article class="standard-article-card">
+            <a href="/article.html?slug=${art.slug}" class="card-media-wrapper">
+              <img src="${art.hero_img_url || 'assets/images/img3.png'}" alt="${art.title}">
+            </a>
+            <div class="card-body-content">
+              <span class="card-tag-pill">${art.section_name || art.section}</span>
+              <h3 class="card-heading">
+                <a href="/article.html?slug=${art.slug}">${art.title}</a>
+              </h3>
+              <p class="card-excerpt">${art.deck || ''}</p>
+              <div class="card-footer-meta">
+                <span>✍️ ${art.author}</span>
+                <span>⏱️ ${toBn(Math.ceil(((art.content_html || '').length + (art.deck || '').length) / 800))} ${lang === 'bn' ? 'মিনিট' : 'min'}</span>
+              </div>
+            </div>
+          </article>
+        `).join('');
       }
-    }
-  } catch(err) {
-    console.warn('[Section] Failed to load articles:', err.message);
-  }
-})();
-</script>
-  <div id="site-footer-mount"></div>
+
+      renderArchive(secArticles);
+
+      // Search filter in section
+      document.getElementById('sec-archive-search')?.addEventListener('input', (e) => {
+        const q = e.target.value.toLowerCase();
+        const filtered = secArticles.filter(a => (a.title || '').toLowerCase().includes(q) || (a.deck || '').toLowerCase().includes(q));
+        renderArchive(filtered);
+      });
+    })();
+  </script>
 </body>
 </html>
