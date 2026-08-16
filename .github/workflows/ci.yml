@@ -1,0 +1,108 @@
+name: CI & Code Quality
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  validate:
+    name: Validate Code & Data Integrity
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [18.x, 20.x]
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v4
+
+    - name: Set up Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+
+    - name: Install Dependencies
+      run: npm ci
+
+    - name: Syntax Check Node.js Backend & API Handlers
+      run: |
+        node --check dev-server.js
+        node --check api/articles.js
+        node --check api/article-seo.js
+        node --check api/auth.js
+        node --check api/books.js
+        node --check api/sections.js
+        node --check api/sitemap.js
+        node --check api/submissions.js
+        node --check api/movement.js
+        node --check api/admins.js
+        node --check api/activity-log.js
+        node --check api/_lib/auth.js
+        node --check api/_lib/activity.js
+        node --check api/_lib/db-fallback.js
+
+    - name: Validate All Web Books JSON Data
+      run: |
+        node -e "
+          const fs = require('fs');
+          const path = require('path');
+          const booksDir = path.join(__dirname, 'assets', 'js', 'books');
+          const files = fs.readdirSync(booksDir).filter(f => f.endsWith('.json'));
+          console.log('Validating ' + files.length + ' book JSON files...');
+          let hasError = false;
+          for (const file of files) {
+            const filePath = path.join(booksDir, file);
+            try {
+              const content = fs.readFileSync(filePath, 'utf8');
+              const parsed = JSON.parse(content);
+              if (!Array.isArray(parsed)) {
+                console.error('❌ ' + file + ' is not a valid JSON array');
+                hasError = true;
+              } else {
+                console.log('✅ ' + file + ' (' + parsed.length + ' chapters/parts)');
+              }
+            } catch (err) {
+              console.error('❌ ' + file + ' JSON parse error: ' + err.message);
+              hasError = true;
+            }
+          }
+          if (hasError) process.exit(1);
+          console.log('All book data files validated successfully!');
+        "
+
+    - name: Verify Frontend JavaScript Syntax
+      run: |
+        node --check assets/js/supabase-config.js
+        node --check assets/js/books-data.js
+        node --check assets/js/components.js
+        node --check assets/js/script.js
+
+    - name: Test Local Server Boot
+      run: |
+        node -e "
+          const http = require('http');
+          const fs = require('fs');
+          console.log('Testing server bootstrap...');
+          process.env.PORT = '3999';
+          process.env.SESSION_SECRET = 'test_secret_for_ci_12345678901234';
+          require('./dev-server.js');
+          setTimeout(() => {
+            http.get('http://localhost:3999', (res) => {
+              console.log('Server responded with HTTP code:', res.statusCode);
+              if (res.statusCode === 200) {
+                console.log('✅ Local server bootstrap verified!');
+                process.exit(0);
+              } else {
+                console.error('❌ Unexpected status code:', res.statusCode);
+                process.exit(1);
+              }
+            }).on('error', (e) => {
+              console.error('❌ Server connection error:', e.message);
+              process.exit(1);
+            });
+          }, 1000);
+        "

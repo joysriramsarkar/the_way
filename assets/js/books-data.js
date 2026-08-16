@@ -339,6 +339,39 @@
     famous_quote_en: "“Any man who stands for progress has to criticize, disbelieve and challenge every item of the old faith.”",
     chapters: [],
     has_chapters_file: true
+  },
+  {
+    id: "crime-and-punishment",
+    slug: "dostoevsky-crime-and-punishment",
+    title_bn: "অপরাধ ও শাস্তি (উপন্যাস — সম্পূর্ণ সংস্করণ)",
+    title_en: "Crime and Punishment (Novel by Fyodor Dostoevsky)",
+    subtitle_bn: "সেন্ট পিটার্সবার্গের বস্তি, রদিয়ন রাসকোলনিকভ, সোনিয়া মারমেলাদোভা ও মানবিক মুক্তির অমর আখ্যান (১৮৬৬)",
+    subtitle_en: "The Psychological & Philosophical Masterpiece on Alienation, Guilt and Redemption (1866)",
+    authors: [
+      {
+        name: "ফিওদর দস্তয়ভস্কি (Fyodor Dostoevsky)",
+        role: "বিশ্বখ্যাত রুশ ঔপন্যাসিক ও মনস্তাত্ত্বিক দার্শনিক"
+      },
+      {
+        name: "অনুবাদ ও সম্পাদনা: দ্য ওয়ে অনুবাদ কালেক্টিভ",
+        role: "বাংলা ভাষান্তর ও বিশ্লেষণ"
+      }
+    ],
+    year: "১৮৬৬",
+    category: "literature",
+    category_name_bn: "বিপ্লবী সাহিত্য ও ধ্রুপদী উপন্যাস",
+    category_name_en: "Revolutionary Literature & Fiction",
+    cover_color: "linear-gradient(135deg, #18090c 0%, #450a0a 50%, #991b1b 100%)",
+    cover_icon: "⚖️",
+    reading_time_mins: 280,
+    pages_count: 540,
+    rating: 5,
+    summary_bn: "ফিওদর দস্তয়ভস্কির সর্বকালের অন্যতম শ্রেষ্ঠ উপন্যাস। চরম দারিদ্র্য ও মানসিক দ্বন্দ্বে জর্জরিত সেন্ট পিটার্সবার্গের আইনের ছাত্র রদিয়ন রাসকোলনিকভ নিজেকে নেপোলিয়নের মতো 'অসাধারণ মানুষ' ভেবে এক রক্তচোষা বৃদ্ধা সুদখোর মহাজনকে হত্যার সিদ্ধান্ত নেয়। কিন্তু হত্যার পরেই শুরু হয় তার অবচেতন মন, বিবেক এবং সমাজব্যবস্থার সাথে এক তীব্র মনস্তাত্ত্বিক ও অস্তিত্ববাদী যুদ্ধ। নিস্বার্থ সোনিয়ার আত্মত্যাগ ও ভালোবাসার স্পর্শে অবশেষে তার আত্মিক পুনর্জাগরণ ঘটে।",
+    summary_en: "Dostoevsky’s psychological titan exploring alienation, the illusion of the 'extraordinary man' above moral law, and the path to spiritual redemption through Sonya Marmeladov’s unconditional love and sacrifice.",
+    famous_quote_bn: "“আমরা সকলেই অন্ধকারে ঘুরপাক খাই, কিন্তু অন্ধকারকে জয় করার শক্তি লুকিয়ে থাকে মানবপ্রেম ও আত্মত্যাগের ভেতরে।”",
+    famous_quote_en: "“It takes something more than intelligence to act intelligently.”",
+    chapters: [],
+    has_chapters_file: true
   }
 ];
 
