@@ -438,8 +438,51 @@
           </div>
         </div>
       </nav>
+    `;
 
-      <!-- Mobile Navigation Drawer Overlay & Panel -->
+    // Inject the mobile drawer directly to document.body (outside sticky/backdrop-filter header)
+    injectMobileDrawer({
+      mobileAuthHtml,
+      mobileSectionsHtml
+    });
+
+    // Safe drag scroll
+    const navScroll = document.getElementById('nav-sections-scroll');
+    if (navScroll) {
+      let isDown = false, startX, scrollLeft, dragged = false;
+      navScroll.addEventListener('mousedown', (e) => {
+        isDown = true;
+        dragged = false;
+        startX = e.pageX - navScroll.offsetLeft;
+        scrollLeft = navScroll.scrollLeft;
+      });
+      navScroll.addEventListener('mouseleave', () => isDown = false);
+      navScroll.addEventListener('mouseup', () => { isDown = false; });
+      navScroll.addEventListener('mousemove', (e) => {
+        if (!isDown) return;
+        const x = e.pageX - navScroll.offsetLeft;
+        const walk = (x - startX) * 1.5;
+        if (Math.abs(walk) > 6) {
+          dragged = true;
+          navScroll.scrollLeft = scrollLeft - walk;
+        }
+      });
+    }
+  }
+
+  // ── Mount Mobile Drawer directly to document.body ────────────────────
+  function injectMobileDrawer(context) {
+    let container = document.getElementById('theway-drawer-container');
+    if (!container) {
+      container = document.createElement('div');
+      container.id = 'theway-drawer-container';
+      document.body.appendChild(container);
+    }
+
+    const { mobileAuthHtml, mobileSectionsHtml } = context || {};
+
+    container.innerHTML = `
+      <!-- Mobile Navigation Drawer Overlay & Panel (Direct Body Child) -->
       <div class="mobile-drawer-backdrop" id="mobile-drawer-backdrop" onclick="TheWayComponents.toggleMobileMenu(false)"></div>
       <div class="mobile-drawer-panel" id="mobile-drawer-panel" aria-label="Mobile Navigation">
         <div class="mobile-drawer-header">
@@ -460,13 +503,13 @@
           </div>
 
           <div class="mobile-drawer-section mobile-auth-section">
-            ${mobileAuthHtml}
+            ${mobileAuthHtml || ''}
           </div>
 
           <div class="mobile-drawer-nav-group">
             <span class="mobile-drawer-nav-heading">${currentLang === 'bn' ? 'বিভাগসমূহ' : 'Sections'}</span>
             <div class="mobile-drawer-links">
-              ${mobileSectionsHtml}
+              ${mobileSectionsHtml || ''}
             </div>
           </div>
 
@@ -502,29 +545,6 @@
         </div>
       </div>
     `;
-
-    // Safe drag scroll
-    const navScroll = document.getElementById('nav-sections-scroll');
-    if (navScroll) {
-      let isDown = false, startX, scrollLeft, dragged = false;
-      navScroll.addEventListener('mousedown', (e) => {
-        isDown = true;
-        dragged = false;
-        startX = e.pageX - navScroll.offsetLeft;
-        scrollLeft = navScroll.scrollLeft;
-      });
-      navScroll.addEventListener('mouseleave', () => isDown = false);
-      navScroll.addEventListener('mouseup', () => { isDown = false; });
-      navScroll.addEventListener('mousemove', (e) => {
-        if (!isDown) return;
-        const x = e.pageX - navScroll.offsetLeft;
-        const walk = (x - startX) * 1.5;
-        if (Math.abs(walk) > 6) {
-          dragged = true;
-          navScroll.scrollLeft = scrollLeft - walk;
-        }
-      });
-    }
   }
 
   // ── Render Universal Footer ──────────────────────────────────────────
@@ -659,12 +679,12 @@
       <!-- Search Modal -->
       <div class="theway-modal-backdrop" id="search-modal">
         <div class="modal-window">
-          <button class="modal-close-btn" onclick="TheWayComponents.closeModal('search-modal')">✕</button>
-          <div style="display:flex; align-items:center; gap:0.5rem; border-bottom:2px solid var(--crimson-primary); padding-bottom:0.5rem; margin-bottom:1.2rem;">
-            <span style="font-size:1.3rem; color:var(--crimson-primary);">${SVGIcons.search}</span>
-            <input type="text" id="live-search-input" placeholder="তত্ত্ব, আন্দোলন, প্রবন্ধ বা লেখকের নাম..." style="flex:1; border:none; outline:none; background:transparent; font-size:1.1rem; color:var(--text-primary);">
+          <button class="modal-close-btn" onclick="TheWayComponents.closeModal('search-modal')" aria-label="Close search">✕</button>
+          <div style="display:flex; align-items:center; gap:0.6rem; border-bottom:2px solid var(--crimson-primary); padding-bottom:0.6rem; margin-bottom:1rem; padding-right:2.2rem;">
+            <span style="font-size:1.25rem; color:var(--crimson-primary); display:flex; align-items:center; flex-shrink:0;">${SVGIcons.search}</span>
+            <input type="text" id="live-search-input" placeholder="তত্ত্ব, আন্দোলন, প্রবন্ধ বা লেখকের নাম..." style="flex:1; border:none; outline:none; background:transparent; font-size:1.05rem; color:var(--text-primary); min-width:0;">
           </div>
-          <div id="live-search-results" style="max-height:350px; overflow-y:auto; display:flex; flex-direction:column; gap:0.75rem;">
+          <div id="live-search-results" style="max-height:60vh; overflow-y:auto; display:flex; flex-direction:column; gap:0.75rem;">
             <p style="font-size:0.88rem; color:var(--text-muted); text-align:center; padding:2rem 0;">অনুসন্ধান করতে কীওয়ার্ড টাইপ করুন...</p>
           </div>
         </div>
@@ -703,6 +723,15 @@
       </div>
     `;
     document.body.appendChild(div);
+
+    // Close on backdrop click
+    div.querySelectorAll('.theway-modal-backdrop').forEach(modal => {
+      modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+          closeModal(modal.id);
+        }
+      });
+    });
 
     // Live search listener
     const searchInput = document.getElementById('live-search-input');
@@ -864,12 +893,36 @@
 
   function openModal(id) {
     const modal = document.getElementById(id);
-    if (modal) modal.classList.add('open');
+    if (modal) {
+      toggleMobileMenu(false);
+      if (window.scrollX !== 0) window.scrollTo(0, window.scrollY);
+      modal.classList.add('open');
+      document.body.classList.add('mobile-drawer-active');
+      if (id === 'search-modal') {
+        setTimeout(() => {
+          const input = document.getElementById('live-search-input');
+          if (input) {
+            try {
+              input.focus({ preventScroll: true });
+            } catch (e) {
+              input.focus();
+            }
+          }
+        }, 100);
+      }
+    }
   }
 
   function closeModal(id) {
     const modal = document.getElementById(id);
-    if (modal) modal.classList.remove('open');
+    if (modal) {
+      modal.classList.remove('open');
+      const anyOpenModal = document.querySelector('.theway-modal-backdrop.open');
+      const drawerOpen = document.getElementById('mobile-drawer-panel')?.classList.contains('open');
+      if (!anyOpenModal && !drawerOpen) {
+        document.body.classList.remove('mobile-drawer-active');
+      }
+    }
   }
 
   function toggleMobileMenu(forceState) {
@@ -878,6 +931,11 @@
     const menuBtn = document.getElementById('mobile-menu-btn');
     const isOpen = drawer ? drawer.classList.contains('open') : false;
     const shouldOpen = typeof forceState === 'boolean' ? forceState : !isOpen;
+
+    if (shouldOpen) {
+      document.querySelectorAll('.theway-modal-backdrop.open').forEach(m => m.classList.remove('open'));
+      if (window.scrollX !== 0) window.scrollTo(0, window.scrollY);
+    }
 
     if (backdrop) backdrop.classList.toggle('open', shouldOpen);
     if (drawer) drawer.classList.toggle('open', shouldOpen);
@@ -891,13 +949,18 @@
     if (shouldOpen) {
       document.body.classList.add('mobile-drawer-active');
     } else {
-      document.body.classList.remove('mobile-drawer-active');
+      const anyOpenModal = document.querySelector('.theway-modal-backdrop.open');
+      if (!anyOpenModal) {
+        document.body.classList.remove('mobile-drawer-active');
+      }
     }
   }
 
   function closeAllModals() {
     document.querySelectorAll('.theway-modal-backdrop').forEach(m => m.classList.remove('open'));
     toggleMobileMenu(false);
+    document.body.classList.remove('mobile-drawer-active');
+    if (window.scrollX !== 0) window.scrollTo(0, window.scrollY);
   }
 
   // Keyboard shortcut listener (Cmd/Ctrl+K for search, Escape for closing modals/drawers)
