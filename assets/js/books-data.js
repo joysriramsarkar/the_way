@@ -76,6 +76,35 @@
     has_chapters_file: true
   },
   {
+    id: "pather-dabi",
+    slug: "pather-dabi",
+    title_bn: "পথের দাবী (উপন্যাস — সম্পূর্ণ সংস্করণ)",
+    title_en: "Pather Dabi (The Demand of the Road — Sarat Chandra Chattopadhyay)",
+    subtitle_bn: "ব্রিটিশ সাম্রাজ্যবাদবিরোধী বিপ্লবী দল ‘পথের দাবী’, ডাক্তার সব্যসাচী ও অমর মুক্তি সংগ্রাম (১৯২৬ / উইকিসংকলন মুক্ত পাঠাগার)",
+    subtitle_en: "The Banned Anti-Imperialist Masterpiece of Underground Armed Resistance (1926 / 1958)",
+    authors: [
+      {
+        name: "শরৎচন্দ্র চট্টোপাধ্যায় (Sarat Chandra Chattopadhyay)",
+        role: "অপরাজেয় কথাশিল্পী ও ঔপন্যাসিক"
+      }
+    ],
+    year: "১৯২৬",
+    category: "literature",
+    category_name_bn: "বিপ্লবী সাহিত্য ও ধ্রুপদী উপন্যাস",
+    category_name_en: "Revolutionary Literature & Fiction",
+    cover_color: "linear-gradient(135deg, #7c2d12 0%, #b45309 50%, #991b1b 100%)",
+    cover_icon: "🔥",
+    reading_time_mins: 380,
+    pages_count: 31,
+    rating: 5,
+    summary_bn: "বাংলা সাহিত্যের অবিসংবাদিত রাজদ্রোহী বিপ্লবী উপন্যাস। পরাধীন ভারতবর্ষে সশস্ত্র বিপ্লবের মাধ্যমে ব্রিটিশ শাসন উচ্ছেদ করার শপথ নেওয়া এক গুপ্ত বিপ্লবী দল ‘পথের দাবী’, তাদের অবিস্মরণীয় নেতা ডাক্তার সব্যসাচী, অপূর্ব, ভারতী ও সুমিত্রার আত্মত্যাগ ও আদর্শিক দ্বন্দ্বের কালজয়ী মহা-আখ্যান। তীব্র সাম্রাজ্যবাদবিরোধী বিপ্লবী বার্তার কারণে ব্রিটিশ শাসকগোষ্ঠী ১৯২৭ সালের ৪ঠা জানুয়ারি গ্রন্থটি বাজেয়াপ্ত ও নিষিদ্ধ করেছিল।",
+    summary_en: "Sarat Chandra Chattopadhyay’s legendary banned revolutionary masterpiece chronicling Doctor Sabyasachi, the enigmatic leader of the secret anti-colonial insurgent party 'Pather Dabi', fighting for the absolute liberation of the motherland.",
+    famous_quote_bn: "“দেশের স্বাধীনতা মানুষের সবচেয়ে বড় অধিকার। যে জাতি দাসত্ব মেনে নেয়, সে জাতির বেঁচে থাকার কোনো অধিকার নেই। বিপ্লব কোনো অপরাধ নয়, বিপ্লব হলো শৃঙ্খল মুক্তির পরম ধর্ম।”",
+    famous_quote_en: "“Freedom is the supreme right of human existence; revolution against tyranny is not a crime, but the highest moral duty.”",
+    chapters: [],
+    has_chapters_file: true
+  },
+  {
     id: "communist-manifesto",
     slug: "communist-manifesto",
     title_bn: "কমিউনিস্ট পার্টির ইশতেহার",

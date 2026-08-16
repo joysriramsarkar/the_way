@@ -6720,7 +6720,7 @@ function renderAdminBooks(books) {
 
   tbody.innerHTML = books.map(book => {
     const authors = book.authors ? book.authors.map(a => a.name).join(' ও ') : (book.author_bn || 'অজ্ঞাত');
-    const chCount = book.chapters ? book.chapters.length : (book.slug === 'maxim-gorky-mother-novel' ? 36 : 1);
+    const chCount = book.chapters && book.chapters.length > 0 ? book.chapters.length : (book.slug === 'maxim-gorky-mother-novel' ? 36 : (book.slug === 'pather-dabi' ? 31 : (book.pages_count || 1)));
     
     return `
       <tr>
