@@ -16,6 +16,7 @@
   let _client = null;
   function getSupabaseClient() {
     if (_client) return _client;
+    if (!SUPABASE_URL || !SUPABASE_ANON_KEY) return null;
     if (typeof window.supabase !== 'undefined' && typeof window.supabase.createClient === 'function') {
       try {
         _client = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);

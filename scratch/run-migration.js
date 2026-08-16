@@ -58,7 +58,7 @@ async function main() {
     console.log('\nOPTION B — Use the Supabase service key via pg connection:');
     console.log('  Add SUPABASE_DB_URL to .env file');
     console.log('\n  SUPABASE_DB_URL format:');
-    console.log('  postgresql://postgres.gyhkpjjwwiakhpdqatuh:[DB_PASSWORD]@aws-0-ap-southeast-1.pooler.supabase.com:5432/postgres');
+    console.log('  postgresql://postgres.[YOUR_PROJECT_REF]:[DB_PASSWORD]@aws-0-[REGION].pooler.supabase.com:5432/postgres');
     return;
   }
 

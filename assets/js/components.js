@@ -283,8 +283,20 @@
       `;
     }).join('');
 
+    const mobileSectionsHtml = sections.map(sec => {
+      const name = currentLang === 'bn' ? (sec.name || sec.name_en) : (sec.name_en || sec.name);
+      const isSecActive = activeSection === sec.slug;
+      const targetUrl = sec.slug === 'all' ? '/' : (window.location.pathname.includes('section') ? `?sec=${sec.slug}` : `/section.html?sec=${sec.slug}`);
+      return `
+        <a href="${targetUrl}" class="mobile-nav-link ${isSecActive ? 'active' : ''}" onclick="TheWayComponents.toggleMobileMenu(false)">
+          <span>${name}</span>
+        </a>
+      `;
+    }).join('');
+
     const user = getCurrentUser();
     let authControlsHtml = '';
+    let mobileAuthHtml = '';
 
     if (user) {
       const initials = (user.name || user.email || 'U').slice(0, 2).toUpperCase();
@@ -308,6 +320,26 @@
           </button>
         </div>
       `;
+
+      mobileAuthHtml = `
+        <div class="mobile-drawer-user-card">
+          <div class="mobile-user-info">
+            ${user.picture ? `<img loading="lazy" src="${user.picture}" class="header-user-avatar-sm" alt="User">` : `<span class="header-user-avatar-sm">${initials}</span>`}
+            <div class="mobile-user-details">
+              <strong>${user.name || user.email.split('@')[0]}</strong>
+              <span class="header-user-role-tag">${user.role || 'Staff'}</span>
+            </div>
+          </div>
+          <div class="mobile-user-actions">
+            <a href="${destination}" class="btn-auth-header btn-auth-login" style="flex:1; justify-content:center;">
+              ${isAdminRole ? SVGIcons.settings : SVGIcons.user} <span>${destLabel}</span>
+            </a>
+            <button onclick="TheWayComponents.logout()" class="btn-auth-logout" title="${t('logoutBtn')}">
+              ${SVGIcons.logout}
+            </button>
+          </div>
+        </div>
+      `;
     } else {
       authControlsHtml = `
         <div class="header-auth-group">
@@ -319,13 +351,24 @@
           </a>
         </div>
       `;
+
+      mobileAuthHtml = `
+        <div class="mobile-drawer-auth-buttons">
+          <a href="/admin-login.html" class="btn-auth-header btn-auth-login" style="flex:1; justify-content:center;">
+            ${SVGIcons.login} <span>${t('loginBtn')}</span>
+          </a>
+          <a href="/register.html" class="btn-auth-header btn-auth-signup" style="flex:1; justify-content:center;">
+            ${SVGIcons.userPlus} <span>${t('signupBtn')}</span>
+          </a>
+        </div>
+      `;
     }
 
     container.innerHTML = `
       <div class="container">
         <div class="header-main-row">
           <a href="/" class="header-brand" title="The Way Home">
-            <svg viewBox="0 0 460 70" class="brand-logo-svg" fill="none" style="height:52px; width:auto;">
+            <svg viewBox="0 0 460 70" class="brand-logo-svg" fill="none">
               <defs>
                 <linearGradient id="wayCrimsonHdr" x1="0%" y1="0%" x2="100%" y2="100%">
                   <stop offset="0%" stop-color="#e52b3c"/>
@@ -362,17 +405,17 @@
           </a>
 
           <div class="header-controls">
-            <button class="btn-menu-mobile" id="mobile-menu-btn" onclick="TheWayComponents.toggleMobileMenu()" style="display:none; background:none; border:none; font-size:1.5rem; color:var(--text-primary); cursor:pointer; padding:0.2rem;">
-              ${SVGIcons.menu}
+            <button class="btn-search-trigger" id="header-search-btn" onclick="TheWayComponents.openModal('search-modal')" title="Search" aria-label="Search">
+              ${SVGIcons.search} <span class="search-btn-text">${t('searchPlaceholder').slice(0, 16)}...</span>
+              <kbd class="search-btn-kbd" style="font-size:0.65rem; background:rgba(0,0,0,0.06); padding:2px 5px; border-radius:3px; border:1px solid var(--border-color);">⌘K</kbd>
             </button>
-            <button class="btn-search-trigger" id="header-search-btn" onclick="TheWayComponents.openModal('search-modal')">
-              ${SVGIcons.search} <span>${t('searchPlaceholder').slice(0, 16)}...</span>
-              <kbd style="font-size:0.65rem; background:rgba(0,0,0,0.06); padding:2px 5px; border-radius:3px; border:1px solid var(--border-color);">⌘K</kbd>
-            </button>
-            <button class="btn-solid-crimson" id="action-center-btn" onclick="TheWayComponents.openModal('action-modal')">
+            <button class="btn-solid-crimson header-action-btn" id="action-center-btn" onclick="TheWayComponents.openModal('action-modal')">
               ${SVGIcons.fist} <span>${t('joinMovementBtn')}</span>
             </button>
             ${authControlsHtml}
+            <button class="btn-menu-mobile" id="mobile-menu-btn" onclick="TheWayComponents.toggleMobileMenu()" title="Navigation Menu" aria-label="Navigation Menu" aria-expanded="false">
+              ${SVGIcons.menu}
+            </button>
           </div>
         </div>
       </div>
@@ -395,6 +438,69 @@
           </div>
         </div>
       </nav>
+
+      <!-- Mobile Navigation Drawer Overlay & Panel -->
+      <div class="mobile-drawer-backdrop" id="mobile-drawer-backdrop" onclick="TheWayComponents.toggleMobileMenu(false)"></div>
+      <div class="mobile-drawer-panel" id="mobile-drawer-panel" aria-label="Mobile Navigation">
+        <div class="mobile-drawer-header">
+          <div class="mobile-drawer-brand">
+            <span class="mobile-drawer-title">${t('brandName')}</span>
+            <span class="mobile-drawer-sub">${t('brandSub')}</span>
+          </div>
+          <button class="mobile-drawer-close" onclick="TheWayComponents.toggleMobileMenu(false)" aria-label="Close Menu">
+            <svg class="svg-inline-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
+        
+        <div class="mobile-drawer-body">
+          <div class="mobile-drawer-section">
+            <button class="btn-solid-crimson mobile-drawer-action-btn" onclick="TheWayComponents.openModal('action-modal'); TheWayComponents.toggleMobileMenu(false);">
+              ${SVGIcons.fist} <span>${t('joinMovementBtn')}</span>
+            </button>
+          </div>
+
+          <div class="mobile-drawer-section mobile-auth-section">
+            ${mobileAuthHtml}
+          </div>
+
+          <div class="mobile-drawer-nav-group">
+            <span class="mobile-drawer-nav-heading">${currentLang === 'bn' ? 'বিভাগসমূহ' : 'Sections'}</span>
+            <div class="mobile-drawer-links">
+              ${mobileSectionsHtml}
+            </div>
+          </div>
+
+          <div class="mobile-drawer-nav-group">
+            <span class="mobile-drawer-nav-heading">${currentLang === 'bn' ? 'বিশেষ প্ল্যাটফর্ম' : 'Special Platforms'}</span>
+            <div class="mobile-drawer-links">
+              <a href="/books.html" class="mobile-nav-link" style="color:var(--crimson-primary); font-weight:700;" onclick="TheWayComponents.toggleMobileMenu(false)">
+                ${SVGIcons.book} <span>${currentLang === 'bn' ? 'বিপ্লবী পাঠাগার (Classics Library)' : 'Classics Library'}</span>
+              </a>
+              <a href="/events.html" class="mobile-nav-link" style="color:var(--gold-accent); font-weight:700;" onclick="TheWayComponents.toggleMobileMenu(false)">
+                ${SVGIcons.flag} <span>${currentLang === 'bn' ? 'সংহতি ক্যালেন্ডার (Solidarity Events)' : 'Solidarity Events'}</span>
+              </a>
+              <a href="/submit-article.html" class="mobile-nav-link" style="color:#e11d48; font-weight:700;" onclick="TheWayComponents.toggleMobileMenu(false)">
+                ${SVGIcons.quill} <span>${currentLang === 'bn' ? 'লেখা জমা ও সংশোধন' : 'Submit & Revise'}</span>
+              </a>
+            </div>
+          </div>
+
+          <div class="mobile-drawer-settings">
+            <div class="mobile-settings-row">
+              <span>${currentLang === 'bn' ? 'ভাষা / Language' : 'Language'}</span>
+              <button class="lang-selector-btn" onclick="TheWayComponents.openModal('lang-modal'); TheWayComponents.toggleMobileMenu(false);">
+                ${SVGIcons.globe} <span>${currentLang === 'bn' ? 'বাংলা' : currentLang === 'en' ? 'English' : 'Español'}</span> ▾
+              </button>
+            </div>
+            <div class="mobile-settings-row">
+              <span>${currentLang === 'bn' ? 'ডার্ক মোড' : 'Dark Mode'}</span>
+              <button class="theme-toggle-btn" onclick="TheWayComponents.toggleTheme()">
+                ${currentTheme === 'dark' ? SVGIcons.sun : SVGIcons.moon}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
     `;
 
     // Safe drag scroll
@@ -766,13 +872,45 @@
     if (modal) modal.classList.remove('open');
   }
 
-  function toggleMobileMenu() {
+  function toggleMobileMenu(forceState) {
+    const backdrop = document.getElementById('mobile-drawer-backdrop');
+    const drawer = document.getElementById('mobile-drawer-panel');
+    const menuBtn = document.getElementById('mobile-menu-btn');
+    const isOpen = drawer ? drawer.classList.contains('open') : false;
+    const shouldOpen = typeof forceState === 'boolean' ? forceState : !isOpen;
+
+    if (backdrop) backdrop.classList.toggle('open', shouldOpen);
+    if (drawer) drawer.classList.toggle('open', shouldOpen);
+    if (menuBtn) menuBtn.setAttribute('aria-expanded', String(shouldOpen));
+    
+    // Also toggle nav-strip-inner if present
     const nav = document.querySelector(".nav-strip-inner");
-    if (nav) nav.classList.toggle("open");
+    if (nav) nav.classList.toggle("open", shouldOpen);
+
+    // Prevent body scrolling when drawer is active
+    if (shouldOpen) {
+      document.body.classList.add('mobile-drawer-active');
+    } else {
+      document.body.classList.remove('mobile-drawer-active');
+    }
   }
 
   function closeAllModals() {
     document.querySelectorAll('.theway-modal-backdrop').forEach(m => m.classList.remove('open'));
+    toggleMobileMenu(false);
+  }
+
+  // Keyboard shortcut listener (Cmd/Ctrl+K for search, Escape for closing modals/drawers)
+  if (typeof window !== 'undefined') {
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        closeAllModals();
+      }
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        openModal('search-modal');
+      }
+    });
   }
 
   function renderAllComponents() {

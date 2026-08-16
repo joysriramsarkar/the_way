@@ -29,13 +29,6 @@ function loadEnv() {
     }
   });
 
-  // Default Supabase fallbacks for seamless out-of-the-box local testing
-  if (!process.env.SUPABASE_URL) {
-    process.env.SUPABASE_URL = 'https://gyhkpjjwwiakhpdqatuh.supabase.co';
-  }
-  if (!process.env.SUPABASE_ANON_KEY) {
-    process.env.SUPABASE_ANON_KEY = 'sb_publishable_I0VMIhMDmPpuLH0MpEvaKA_c_vDrRSV';
-  }
   if (!process.env.SESSION_SECRET) {
     process.env.SESSION_SECRET = 'theway_dev_session_secret_12345';
   }

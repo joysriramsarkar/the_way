@@ -15,7 +15,7 @@ const {
 } = require('./_lib/db-fallback');
 
 function getSupabase() {
-  const url = process.env.SUPABASE_URL || 'https://gyhkpjjwwiakhpdqatuh.supabase.co';
+  const url = process.env.SUPABASE_URL;
   const key = process.env.SUPABASE_SERVICE_KEY;
   return createClient(url, key);
 }
