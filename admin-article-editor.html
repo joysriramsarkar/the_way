@@ -1147,7 +1147,7 @@ kbd {
 
     <div id="ed-feat-filled" class="ed-feat-preview-wrap" style="display:none;">
       <div class="ed-feat-img-container">
-        <img id="ed-feat-preview-img" src="" alt="Featured image" />
+        <img loading="lazy" id="ed-feat-preview-img" src="" alt="Featured image" />
         <div class="ed-feat-badge">
           <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor" style="vertical-align:-1px;margin-right:4px;"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
           Featured Image
@@ -1202,7 +1202,7 @@ kbd {
           <circle cx="32" cy="25" r="11" fill="#0a528e" opacity=".28"/>
           <ellipse cx="32" cy="53" rx="20" ry="11" fill="#0a528e" opacity=".16"/>
         </svg>
-        <img id="author-photo-img" src="" alt="" style="display:none;width:64px;height:64px;object-fit:cover;border-radius:50%" />
+        <img loading="lazy" id="author-photo-img" src="" alt="" style="display:none;width:64px;height:64px;object-fit:cover;border-radius:50%" />
       </div>
       <div class="bio-fields">
         <div class="bio-f bio-name" contenteditable="true" id="bio-name" data-ph="Author Name"></div>
@@ -1367,7 +1367,7 @@ kbd {
       </button>
       <div class="sd-sec-body">
         <div id="feat-preview" style="display:none">
-          <div class="feat-preview"><img id="feat-img-el" src="" alt="" /></div>
+          <div class="feat-preview"><img loading="lazy" id="feat-img-el" src="" alt="" /></div>
           <div class="feat-actions">
             <button class="feat-act-btn" onclick="trigFeatImg()">Replace</button>
             <button class="feat-act-btn rm" onclick="removeFeatImg()">Remove</button>
@@ -2531,7 +2531,7 @@ function insertImgAtCursor(url) {
   if (_SEL) {
     const sel = getSelection(); sel.removeAllRanges(); sel.addRange(_SEL);
   }
-  const html = `<figure><img src="${url}" alt="" style="width:100%;max-width:100%;border-radius:3px;display:block;margin:0 auto;" /><figcaption contenteditable="true" data-ph="Add caption…"></figcaption></figure><p><br></p>`;
+  const html = `<figure><img loading="lazy" src="${url}" alt="" style="width:100%;max-width:100%;border-radius:3px;display:block;margin:0 auto;" /><figcaption contenteditable="true" data-ph="Add caption…"></figcaption></figure><p><br></p>`;
   document.execCommand('insertHTML', false, html);
   bindImgClicks();
 }

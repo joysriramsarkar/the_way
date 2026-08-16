@@ -170,7 +170,7 @@
           <div class="section-curated-grid">
             <article class="curated-hero-card">
               <a href="/article.html?slug=${heroArt.slug}">
-                <img src="${heroArt.hero_img_url || 'assets/images/img1.png'}" alt="${heroArt.title}">
+                <img loading="lazy" src="${heroArt.hero_img_url || 'assets/images/img1.webp'}" alt="${heroArt.title}">
               </a>
               <div class="curated-hero-body">
                 <h2><a href="/article.html?slug=${heroArt.slug}">${heroArt.title}</a></h2>
@@ -184,7 +184,7 @@
             <div class="curated-list-col">
               ${otherArts.map(a => `
                 <article class="curated-sub-card">
-                  <img src="${a.hero_img_url || 'assets/images/img2.png'}" alt="${a.title}">
+                  <img loading="lazy" src="${a.hero_img_url || 'assets/images/img2.webp'}" alt="${a.title}">
                   <div>
                     <h4 style="font-family:var(--font-bengali-serif); font-size:1rem; margin-bottom:0.3rem;">
                       <a href="/article.html?slug=${a.slug}">${a.title}</a>
@@ -204,7 +204,7 @@
         grid.innerHTML = list.map(art => `
           <article class="standard-article-card">
             <a href="/article.html?slug=${art.slug}" class="card-media-wrapper">
-              <img src="${art.hero_img_url || 'assets/images/img3.png'}" alt="${art.title}">
+              <img loading="lazy" src="${art.hero_img_url || 'assets/images/img3.webp'}" alt="${art.title}">
             </a>
             <div class="card-body-content">
               <span class="card-tag-pill">${art.section_name || art.section}</span>

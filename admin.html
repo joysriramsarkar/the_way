@@ -21,7 +21,7 @@
 
     <div class="sidebar-logo">
       <a href="index.html" class="sidebar-logo-link" title="View main website">
-        <img src="assets/images/logo-icon.svg" alt="The Way" style="width:36px;height:36px;object-fit:contain;flex-shrink:0;border-radius:8px;" onerror="this.src='assets/images/favicon.svg'" />
+        <img loading="lazy" src="assets/images/logo-icon.svg" alt="The Way" style="width:36px;height:36px;object-fit:contain;flex-shrink:0;border-radius:8px;" onerror="this.src='assets/images/favicon.svg'" />
         <div class="sidebar-logo-text">
           <span class="sidebar-logo-title">The Way</span>
           <span class="sidebar-logo-sub">Editorial HQ</span>
@@ -442,7 +442,7 @@
 
               <div class="form-group" style="margin-top:14px;">
                 <label class="form-label" for="hs-favicon-input">Favicon URL / Icon Path (Optional)</label>
-                <input type="text" id="hs-favicon-input" class="form-input" placeholder="favicon.ico or img/favicon.png" />
+                <input type="text" id="hs-favicon-input" class="form-input" placeholder="favicon.ico or img/favicon.webp" />
               </div>
             </div>
 
@@ -1432,7 +1432,7 @@
             <!-- Hero Live Preview Mini-Card -->
             <div id="studio-hero-preview" style="display:none;margin-top:14px;padding:14px;background:#fff;border:1px solid #e2e8f0;border-radius:8px;gap:14px;align-items:center;justify-content:space-between;flex-wrap:wrap;">
               <div style="display:flex;gap:14px;align-items:center;flex:1;min-width:240px;">
-                <img id="studio-hero-prev-img" src="" style="width:100px;height:62px;object-fit:cover;border-radius:6px;border:1px solid #e2e8f0;" />
+                <img loading="lazy" id="studio-hero-prev-img" src="" style="width:100px;height:62px;object-fit:cover;border-radius:6px;border:1px solid #e2e8f0;" />
                 <div style="flex:1;min-width:0;">
                   <div id="studio-hero-prev-title" style="font-weight:700;font-size:13.5px;color:var(--text-primary);line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;"></div>
                   <div id="studio-hero-prev-meta" style="font-size:11.5px;color:var(--text-muted);margin-top:4px;"></div>
@@ -1738,9 +1738,9 @@
         </div>
         <div class="form-group" style="margin-top:14px;">
           <label class="form-label" for="latest-image-input">Thumbnail Image (URL or path)</label>
-          <input type="text" id="latest-image-input" class="form-input" placeholder="e.g. img1.png or https://..." oninput="updateLatestImagePreview()" />
+          <input type="text" id="latest-image-input" class="form-input" placeholder="e.g. img1.webp or https://..." oninput="updateLatestImagePreview()" />
           <div id="latest-image-preview-box" style="margin-top:8px;display:flex;align-items:center;gap:10px;">
-            <img id="latest-image-preview-img" src="img1.png" alt="Preview" style="width:56px;height:40px;object-fit:cover;border-radius:4px;border:1px solid var(--border);" onerror="this.style.display='none'" onload="this.style.display='block'" />
+            <img loading="lazy" id="latest-image-preview-img" src="img1.webp" alt="Preview" style="width:56px;height:40px;object-fit:cover;border-radius:4px;border:1px solid var(--border);" onerror="this.style.display='none'" onload="this.style.display='block'" />
             <span style="font-size:11px;color:var(--text-muted);">Thumbnail preview</span>
           </div>
         </div>
@@ -1824,9 +1824,9 @@
 
         <div class="form-group" id="hp-slot-image-group" style="margin-top:12px;">
           <label class="form-label" for="hp-slot-image-input">Image (URL or image filename)</label>
-          <input type="text" id="hp-slot-image-input" class="form-input" placeholder="e.g. img1.png or https://..." oninput="updateHpSlotImagePreview()" />
+          <input type="text" id="hp-slot-image-input" class="form-input" placeholder="e.g. img1.webp or https://..." oninput="updateHpSlotImagePreview()" />
           <div style="margin-top:8px;display:flex;align-items:center;gap:10px;">
-            <img id="hp-slot-image-preview" src="img1.png" alt="Preview" style="width:68px;height:46px;object-fit:cover;border-radius:4px;border:1px solid var(--border);" onerror="this.style.display='none'" onload="this.style.display='block'" />
+            <img loading="lazy" id="hp-slot-image-preview" src="img1.webp" alt="Preview" style="width:68px;height:46px;object-fit:cover;border-radius:4px;border:1px solid var(--border);" onerror="this.style.display='none'" onload="this.style.display='block'" />
             <span style="font-size:11px;color:var(--text-muted);">Slot image preview</span>
           </div>
         </div>
