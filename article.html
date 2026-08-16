@@ -43,7 +43,7 @@
       <!-- Author & Stats Bar -->
       <div class="article-meta-card">
         <div class="article-author-info">
-          <img src="assets/images/img1.png" alt="Author" class="author-photo-large" id="art-author-photo">
+          <img loading="lazy" src="assets/images/img1.webp" alt="Author" class="author-photo-large" id="art-author-photo">
           <div class="author-names">
             <strong id="art-author-name">দ্য ওয়ে সম্পাদকীয় পর্ষদ</strong>
             <span id="art-author-role">আন্তর্জাতিক ব্যুরো</span>
@@ -73,7 +73,7 @@
 
     <!-- Featured Hero Image -->
     <div class="article-featured-media" id="art-hero-media-wrap">
-      <img src="assets/images/img1.png" alt="Featured Image" id="art-hero-img">
+      <img loading="lazy" src="assets/images/img1.webp" alt="Featured Image" id="art-hero-img">
       <div class="media-caption-box">
         <span id="art-hero-caption">নব্য-সাম্রাজ্যবাদী আগ্রাসনের বিরুদ্ধে মেহনতি জনতার লড়াই।</span>
         <span id="art-hero-credit" style="color:var(--gold-accent);">দ্য ওয়ে আর্কাইভ</span>
@@ -95,7 +95,7 @@
 
     <!-- Author Detailed Bio Card -->
     <div class="author-detailed-box">
-      <img src="assets/images/img1.png" alt="Author Bio Avatar" class="author-bio-avatar" id="author-bio-avatar">
+      <img loading="lazy" src="assets/images/img1.webp" alt="Author Bio Avatar" class="author-bio-avatar" id="author-bio-avatar">
       <div class="author-bio-text">
         <h3 id="author-bio-name">সম্পাদকীয় পর্ষদ (Editorial Collective)</h3>
         <div class="author-title-line" id="author-bio-role">দ্য ওয়ে আন্তর্জাতিক ব্যুরো</div>
@@ -245,7 +245,7 @@
         grid.innerHTML = related.map(a => `
           <article class="standard-article-card">
             <a href="/article.html?slug=${a.slug}" class="card-media-wrapper">
-              <img src="${a.hero_img_url || 'assets/images/img2.png'}" alt="${a.title}">
+              <img loading="lazy" src="${a.hero_img_url || 'assets/images/img2.webp'}" alt="${a.title}">
             </a>
             <div class="card-body-content">
               <span class="card-tag-pill">${a.section_name || a.section}</span>

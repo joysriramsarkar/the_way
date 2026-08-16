@@ -58,7 +58,7 @@
     const leadHtml = `
       <article class="lead-story-card">
         <a href="/article.html?slug=${leadArticle.slug}" class="lead-story-media">
-          <img src="${leadArticle.hero_img_url || 'assets/images/img1.png'}" alt="${leadArticle.hero_img_alt || leadArticle.title}">
+          <img loading="lazy" src="${leadArticle.hero_img_url || 'assets/images/img1.webp'}" alt="${leadArticle.hero_img_alt || leadArticle.title}">
           <span class="lead-section-badge">${leadArticle.section_name || leadArticle.section}</span>
         </a>
         <div class="lead-story-body">
@@ -68,7 +68,7 @@
           <p class="lead-story-deck">${leadArticle.deck || ''}</p>
           <div class="story-meta-row">
             <div class="author-meta">
-              <img src="${leadArticle.author_photo_url || 'assets/images/img1.png'}" alt="${leadArticle.author}" class="author-avatar">
+              <img loading="lazy" src="${leadArticle.author_photo_url || 'assets/images/img1.webp'}" alt="${leadArticle.author}" class="author-avatar">
               <span>${leadArticle.author}</span>
             </div>
             <span>•</span>
@@ -85,7 +85,7 @@
       return `
         <article class="secondary-story-card">
           <a href="/article.html?slug=${art.slug}" class="sec-story-thumb">
-            <img src="${art.hero_img_url || 'assets/images/img2.png'}" alt="${art.title}">
+            <img loading="lazy" src="${art.hero_img_url || 'assets/images/img2.webp'}" alt="${art.title}">
           </a>
           <div class="sec-story-content">
             <span class="sec-badge">${art.section_name || art.section}</span>
@@ -179,7 +179,7 @@
         return `
           <article class="standard-article-card">
             <a href="/article.html?slug=${art.slug}" class="card-media-wrapper">
-              <img src="${art.hero_img_url || 'assets/images/img3.png'}" alt="${art.title}">
+              <img loading="lazy" src="${art.hero_img_url || 'assets/images/img3.webp'}" alt="${art.title}">
             </a>
             <div class="card-body-content">
               <span class="card-tag-pill">${secTitle}</span>

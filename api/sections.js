@@ -66,14 +66,14 @@ module.exports = async function handler(req, res) {
           id: 'latest-1',
           title: "For families in transition, 'not all traditions are equal'",
           href: '/section/community-heritage',
-          imageUrl: 'img1.png',
+          imageUrl: 'img1.webp',
           enabled: true
         },
         {
           id: 'latest-2',
           title: 'The art of the pen: How writing shapes cultural identity',
           href: '/section/culture',
-          imageUrl: 'img3.png',
+          imageUrl: 'img3.webp',
           enabled: true
         }
       ]
@@ -266,7 +266,7 @@ module.exports = async function handler(req, res) {
           articleId: null,
           title: 'Karl Marx and Historical Materialism: Understanding Class Struggle in Modern Capitalism.',
           subtitle: 'An exclusive exploration of family heritage, intellectual tradition, and the enduring power of private knowledge.',
-          imageUrl: 'img1.png',
+          imageUrl: 'img1.webp',
           href: '/section/findings',
           enabled: true
         },
@@ -276,7 +276,7 @@ module.exports = async function handler(req, res) {
             articleId: null,
             title: 'Lenin and the Theory of Imperialism: How Finance Capital Dominates Global Trade',
             description: 'From the Paris Commune to October 1917: Lessons of working-class governance and power',
-            imageUrl: 'img5.png',
+            imageUrl: 'img5.webp',
             tag: 'Heritage Archive',
             href: '/section/community-heritage',
             enabled: true
@@ -286,7 +286,7 @@ module.exports = async function handler(req, res) {
             articleId: null,
             title: 'Stalin’s Problems of Leninism: Preserving the Dictatorship of the Proletariat',
             description: "The family's influence on culture, art, and intellectual discourse runs deeper than most realize",
-            imageUrl: 'img6.png',
+            imageUrl: 'img6.webp',
             tag: '',
             href: '/section/culture',
             enabled: true
@@ -298,7 +298,7 @@ module.exports = async function handler(req, res) {
           id: 'sm-1',
           articleId: null,
           title: 'Mao Zedong and the Cultural Revolution: Ideological Struggle Under Socialism',
-          imageUrl: 'img2.png',
+          imageUrl: 'img2.webp',
           href: '/section/community-heritage',
           enabled: true
         },
@@ -306,7 +306,7 @@ module.exports = async function handler(req, res) {
           id: 'sm-2',
           articleId: null,
           title: 'Why handwritten correspondence is making a private comeback',
-          imageUrl: 'img3.png',
+          imageUrl: 'img3.webp',
           href: '/section/culture',
           enabled: true
         },
@@ -314,7 +314,7 @@ module.exports = async function handler(req, res) {
           id: 'sm-3',
           articleId: null,
           title: 'Engels on the Origin of the Family, Private Property, and the State',
-          imageUrl: 'img4.png',
+          imageUrl: 'img4.webp',
           href: '/section/privacy-values',
           enabled: true
         }
@@ -361,7 +361,7 @@ module.exports = async function handler(req, res) {
           articleId: null,
           title: "Rubies decoded: 'Heritage is just one piece of the puzzle'",
           description: 'Rare archival manifestos shine in new Socialist retrospective',
-          imageUrl: 'img5.png',
+          imageUrl: 'img5.webp',
           href: '/section/community-heritage',
           enabled: true
         }
@@ -376,7 +376,7 @@ module.exports = async function handler(req, res) {
             lead: {
               articleId: null,
               title: "Karl Marx and Friedrich Engels on Scientific Socialism vs Utopianism",
-              imageUrl: 'img2.png',
+              imageUrl: 'img2.webp',
               href: '/section/community-heritage',
               enabled: true
             },
@@ -394,7 +394,7 @@ module.exports = async function handler(req, res) {
             lead: {
               articleId: null,
               title: "Mao Zedong on Culture, Art, and the Proletarian Revolutionary Struggle",
-              imageUrl: 'img1.png',
+              imageUrl: 'img1.webp',
               href: '/section/culture',
               enabled: true
             },
@@ -411,7 +411,7 @@ module.exports = async function handler(req, res) {
             lead: {
               articleId: null,
               title: 'Do you have a private AI secret?',
-              imageUrl: 'img4.png',
+              imageUrl: 'img4.webp',
               href: '/section/privacy-values',
               enabled: true
             },
@@ -428,7 +428,7 @@ module.exports = async function handler(req, res) {
             lead: {
               articleId: null,
               title: 'The Palestinian struggle and the international anti-imperialist solidarity movement',
-              imageUrl: 'img6.png',
+              imageUrl: 'img6.webp',
               href: '/section/nation-world',
               enabled: true
             },
@@ -444,7 +444,7 @@ module.exports = async function handler(req, res) {
             lead: {
               articleId: null,
               title: 'New research shows writing by hand preserves memory and sharpens intellect',
-              imageUrl: 'img3.png',
+              imageUrl: 'img3.webp',
               href: '/section/arts-legacy',
               enabled: true
             },
@@ -461,7 +461,7 @@ module.exports = async function handler(req, res) {
             lead: {
               articleId: null,
               title: 'The labor theory of value: Why workers create all societal wealth',
-              imageUrl: 'img5.png',
+              imageUrl: 'img5.webp',
               href: '/section/work-economy',
               enabled: true
             },

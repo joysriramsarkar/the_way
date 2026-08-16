@@ -55,7 +55,7 @@
 
       const initials = (user.name || user.email || 'U').split(' ').map(function(w){return w[0];}).slice(0,2).join('').toUpperCase();
       const avatarHtml = user.picture
-        ? '<img class="sidebar-user-avatar" src="' + esc(user.picture) + '" alt="' + esc(user.name) + '" onerror="this.outerHTML=\'<span class=\\\'sidebar-user-avatar-initials\\\'>' + esc(initials) + '</span>\'" />'
+        ? '<img loading="lazy" class="sidebar-user-avatar" src="' + esc(user.picture) + '" alt="' + esc(user.name) + '" onerror="this.outerHTML=\'<span class=\\\'sidebar-user-avatar-initials\\\'>' + esc(initials) + '</span>\'" />'
         : '<span class="sidebar-user-avatar-initials">' + esc(initials) + '</span>';
 
       profile.innerHTML =

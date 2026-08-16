@@ -740,7 +740,7 @@ function updateStudioHeroPreview(articleId) {
     return;
   }
   prevBox.style.display = 'flex';
-  if (prevImg) prevImg.src = art.hero_img_url || '/img1.png';
+  if (prevImg) prevImg.src = art.hero_img_url || '/img1.webp';
   if (prevTitle) prevTitle.textContent = art.title || 'Untitled';
   if (prevMeta) prevMeta.textContent = `${art.section || 'General'} • ${art.author || 'Author'} • ${formatDate(art.published_at || art.created_at)}`;
   if (editLink) editLink.href = `admin-article-editor.html?id=${art.id}`;
@@ -786,7 +786,7 @@ function renderStudioArticlesTable(articlesList) {
   tbody.innerHTML = articlesList.map(a => {
     const isPub = a.status === 'published' || !a.status;
     const thumb = a.hero_img_url
-      ? `<img src="${a.hero_img_url}" style="width:52px;height:34px;object-fit:cover;border-radius:4px;border:1px solid #e2e8f0;" />`
+      ? `<img loading="lazy" src="${a.hero_img_url}" style="width:52px;height:34px;object-fit:cover;border-radius:4px;border:1px solid #e2e8f0;" />`
       : `<div style="width:52px;height:34px;background:#e2e8f0;border-radius:4px;"></div>`;
     const artUrl = a.slug ? `/article/${a.slug}` : `/article/${a.id}`;
     return `
@@ -2482,7 +2482,7 @@ function renderArticlesTable(articles) {
       : `<span class="art-status-pill art-status--draft"><svg width="6" height="6" viewBox="0 0 6 6" fill="currentColor"><circle cx="3" cy="3" r="3"/></svg>Draft</span>`;
 
     const thumb = a.hero_img_url
-      ? `<img src="${escapeHtml(a.hero_img_url)}" alt="" class="art-thumb" loading="lazy" />`
+      ? `<img loading="lazy" src="${escapeHtml(a.hero_img_url)}" alt="" class="art-thumb" loading="lazy" />`
       : `<div class="art-thumb-ph"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div>`;
 
     const sectionBadge = a.section
@@ -2787,7 +2787,7 @@ async function _loadArticleTrash() {
   const isAdmin = Boolean(window.THEWAY_USER && window.THEWAY_USER.role === 'Admin');
   tbody.innerHTML = arts.map(a => {
     const thumb = a.hero_img_url
-      ? `<img src="${escapeHtml(a.hero_img_url)}" alt="" class="art-thumb" style="opacity:.75;" loading="lazy"/>`
+      ? `<img loading="lazy" src="${escapeHtml(a.hero_img_url)}" alt="" class="art-thumb" style="opacity:.75;" loading="lazy"/>`
       : `<div class="art-thumb-ph"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div>`;
     const permDeleteBtn = isAdmin
       ? `<button type="button" onclick="permanentDeleteArticleConfirm('${a.id}','${escapeHtml((a.title||'Untitled').replace(/'/g,"\\'"))}')" class="art-action-btn art-action-btn--delete-perm" title="Permanently delete from database (Admin only)">
@@ -2859,14 +2859,14 @@ const DEFAULT_MENU_CONFIG = {
       id: 'latest-1',
       title: "For families in transition, 'not all traditions are equal'",
       href: '/section/community-heritage',
-      imageUrl: 'img1.png',
+      imageUrl: 'img1.webp',
       enabled: true
     },
     {
       id: 'latest-2',
       title: 'The art of the pen: How writing shapes cultural identity',
       href: '/section/culture',
-      imageUrl: 'img3.png',
+      imageUrl: 'img3.webp',
       enabled: true
     }
   ],
@@ -3325,7 +3325,7 @@ function renderLatestList() {
           <button type="button" class="menu-reorder-btn" title="Move Up" ${idx === 0 ? 'disabled style="opacity:0.3;"' : ''} onclick="moveLatestItem('${item.id}', -1)">${MENU_ICONS.up}</button>
           <button type="button" class="menu-reorder-btn" title="Move Down" ${idx === items.length - 1 ? 'disabled style="opacity:0.3;"' : ''} onclick="moveLatestItem('${item.id}', 1)">${MENU_ICONS.down}</button>
         </div>
-        ${item.imageUrl ? `<img src="${escapeHtml(item.imageUrl)}" alt="" class="menu-item-img" onerror="this.style.display='none'" />` : ''}
+        ${item.imageUrl ? `<img loading="lazy" src="${escapeHtml(item.imageUrl)}" alt="" class="menu-item-img" onerror="this.style.display='none'" />` : ''}
         <div class="menu-item-details">
           <div class="menu-item-title">${escapeHtml(item.title || 'Untitled Story')}</div>
           <div class="menu-item-meta">
@@ -3372,7 +3372,7 @@ function openLatestModal(id) {
     editIdInput.value = '';
     headlineInput.value = '';
     hrefInput.value = 'section.html?slug=findings';
-    imageInput.value = 'img1.png';
+    imageInput.value = 'img1.webp';
     enabledInput.checked = true;
   }
   updateLatestImagePreview();
@@ -3384,7 +3384,7 @@ function updateLatestImagePreview() {
   const imgInput = document.getElementById('latest-image-input');
   const imgEl = document.getElementById('latest-image-preview-img');
   if (imgInput && imgEl) {
-    imgEl.src = imgInput.value.trim() || 'img1.png';
+    imgEl.src = imgInput.value.trim() || 'img1.webp';
   }
 }
 
@@ -3565,7 +3565,7 @@ function renderMenuPreview() {
         <div class="menu-preview-col-title">${escapeHtml(latTitle)}</div>
         ${latestArr.map(item => `
           <div class="menu-preview-latest-item">
-            ${item.imageUrl ? `<img src="${escapeHtml(item.imageUrl)}" alt="" class="menu-preview-latest-img" onerror="this.style.display='none'" />` : ''}
+            ${item.imageUrl ? `<img loading="lazy" src="${escapeHtml(item.imageUrl)}" alt="" class="menu-preview-latest-img" onerror="this.style.display='none'" />` : ''}
             <div class="menu-preview-latest-title"><a href="${item.href}" style="color:#f1f5f9;text-decoration:none;">${escapeHtml(item.title)}</a></div>
           </div>
         `).join('')}
@@ -3650,7 +3650,7 @@ const DEFAULT_HOMEPAGE_CONFIG = {
       articleId: null,
       title: 'Karl Marx and Historical Materialism: Understanding Class Struggle in Modern Capitalism.',
       subtitle: 'An exclusive exploration of family heritage, intellectual tradition, and the enduring power of private knowledge.',
-      imageUrl: 'img1.png',
+      imageUrl: 'img1.webp',
       href: '/section/findings',
       enabled: true
     },
@@ -3660,7 +3660,7 @@ const DEFAULT_HOMEPAGE_CONFIG = {
         articleId: null,
         title: 'Lenin and the Theory of Imperialism: How Finance Capital Dominates Global Trade',
         description: 'From the Paris Commune to October 1917: Lessons of working-class governance and power',
-        imageUrl: 'img5.png',
+        imageUrl: 'img5.webp',
         tag: 'Heritage Archive',
         href: '/section/community-heritage',
         enabled: true
@@ -3670,7 +3670,7 @@ const DEFAULT_HOMEPAGE_CONFIG = {
         articleId: null,
         title: 'Stalin’s Problems of Leninism: Preserving the Dictatorship of the Proletariat',
         description: "The family's influence on culture, art, and intellectual discourse runs deeper than most realize",
-        imageUrl: 'img6.png',
+        imageUrl: 'img6.webp',
         tag: '',
         href: '/section/culture',
         enabled: true
@@ -3682,7 +3682,7 @@ const DEFAULT_HOMEPAGE_CONFIG = {
       id: 'sm-1',
       articleId: null,
       title: 'Mao Zedong and the Cultural Revolution: Ideological Struggle Under Socialism',
-      imageUrl: 'img2.png',
+      imageUrl: 'img2.webp',
       href: '/section/community-heritage',
       enabled: true
     },
@@ -3690,7 +3690,7 @@ const DEFAULT_HOMEPAGE_CONFIG = {
       id: 'sm-2',
       articleId: null,
       title: 'Why handwritten correspondence is making a private comeback',
-      imageUrl: 'img3.png',
+      imageUrl: 'img3.webp',
       href: '/section/culture',
       enabled: true
     },
@@ -3698,7 +3698,7 @@ const DEFAULT_HOMEPAGE_CONFIG = {
       id: 'sm-3',
       articleId: null,
       title: 'Engels on the Origin of the Family, Private Property, and the State',
-      imageUrl: 'img4.png',
+      imageUrl: 'img4.webp',
       href: '/section/privacy-values',
       enabled: true
     }
@@ -3745,7 +3745,7 @@ const DEFAULT_HOMEPAGE_CONFIG = {
       articleId: null,
       title: "Rubies decoded: 'Heritage is just one piece of the puzzle'",
       description: 'Rare family gems shine in new TheWay retrospective',
-      imageUrl: 'img5.png',
+      imageUrl: 'img5.webp',
       href: '/section/community-heritage',
       enabled: true
     }
@@ -3760,7 +3760,7 @@ const DEFAULT_HOMEPAGE_CONFIG = {
         lead: {
           articleId: null,
           title: "Don't hold back, the TheWay elders told scholars. It worked.",
-          imageUrl: 'img2.png',
+          imageUrl: 'img2.webp',
           href: '/section/community-heritage',
           enabled: true
         },
@@ -3778,7 +3778,7 @@ const DEFAULT_HOMEPAGE_CONFIG = {
         lead: {
           articleId: null,
           title: "For TheWay women in arts, 'not all cultural diets are equal'",
-          imageUrl: 'img1.png',
+          imageUrl: 'img1.webp',
           href: 'section.html?slug=culture',
           enabled: true
         },
@@ -3795,7 +3795,7 @@ const DEFAULT_HOMEPAGE_CONFIG = {
         lead: {
           articleId: null,
           title: 'Do you have a private AI secret?',
-          imageUrl: 'img4.png',
+          imageUrl: 'img4.webp',
           href: 'section.html?slug=privacy-values',
           enabled: true
         },
@@ -3812,7 +3812,7 @@ const DEFAULT_HOMEPAGE_CONFIG = {
         lead: {
           articleId: null,
           title: 'How the TheWay diaspora is keeping tradition alive in a globalized world',
-          imageUrl: 'img6.png',
+          imageUrl: 'img6.webp',
           href: 'section.html?slug=nation-world',
           enabled: true
         },
@@ -3828,7 +3828,7 @@ const DEFAULT_HOMEPAGE_CONFIG = {
         lead: {
           articleId: null,
           title: 'New research shows writing by hand preserves memory and sharpens intellect',
-          imageUrl: 'img3.png',
+          imageUrl: 'img3.webp',
           href: 'section.html?slug=arts-legacy',
           enabled: true
         },
@@ -3845,7 +3845,7 @@ const DEFAULT_HOMEPAGE_CONFIG = {
         lead: {
           articleId: null,
           title: 'Go-to TheWay professionals redefine private practices in modern economy',
-          imageUrl: 'img5.png',
+          imageUrl: 'img5.webp',
           href: 'section.html?slug=work-economy',
           enabled: true
         },
@@ -4059,7 +4059,7 @@ function renderHomepageVisualCanvas() {
           <div class="hp-slot-badge">Hero Main Story ${heroMain.enabled === false ? '(Disabled)' : ''}</div>
           <div class="hp-slot-edit-hint">${ICONS.pencil} Click to edit</div>
           <div class="hp-canvas-img-wrap hp-canvas-img-wrap--hero">
-            <img src="${escapeHtml(heroMain.imageUrl || 'img1.png')}" alt="" class="hp-canvas-img" onerror="this.src='img1.png'" />
+            <img loading="lazy" src="${escapeHtml(heroMain.imageUrl || 'img1.webp')}" alt="" class="hp-canvas-img" onerror="this.src='img1.webp'" />
           </div>
           <h2 class="hp-canvas-headline hp-canvas-headline--hero">${escapeHtml(heroMain.title || 'Untitled Lead Story')}</h2>
           <p class="hp-canvas-subtitle">${escapeHtml(heroMain.subtitle || '')}</p>
@@ -4073,7 +4073,7 @@ function renderHomepageVisualCanvas() {
               <div class="hp-slot-badge hp-slot-badge--sidebar">Sidebar Story ${sIdx + 1} ${side.enabled === false ? '(Disabled)' : ''}</div>
               <div class="hp-slot-edit-hint">${ICONS.pencil} Click to edit</div>
               <div class="hp-canvas-img-wrap hp-canvas-img-wrap--side">
-                <img src="${escapeHtml(side.imageUrl || 'img5.png')}" alt="" class="hp-canvas-img" onerror="this.src='img5.png'" />
+                <img loading="lazy" src="${escapeHtml(side.imageUrl || 'img5.webp')}" alt="" class="hp-canvas-img" onerror="this.src='img5.webp'" />
               </div>
               <h3 class="hp-canvas-headline" style="font-size:15px;">${escapeHtml(side.title || 'Untitled Sidebar')}</h3>
               <p class="hp-canvas-subtitle" style="font-size:12.5px;">${escapeHtml(side.description || '')}</p>
@@ -4099,7 +4099,7 @@ function renderHomepageVisualCanvas() {
             <div class="hp-slot-badge hp-slot-badge--card">Card ${cIdx + 1} ${card.enabled === false ? '(Disabled)' : ''}</div>
             <div class="hp-slot-edit-hint">${ICONS.pencil} Click to edit</div>
             <div class="hp-canvas-img-wrap">
-              <img src="${escapeHtml(card.imageUrl || 'img2.png')}" alt="" class="hp-canvas-img" onerror="this.src='img2.png'" />
+              <img loading="lazy" src="${escapeHtml(card.imageUrl || 'img2.webp')}" alt="" class="hp-canvas-img" onerror="this.src='img2.webp'" />
             </div>
             <h3 class="hp-canvas-headline" style="font-size:15px;">${escapeHtml(card.title || 'Untitled Card')}</h3>
             <div class="hp-canvas-link-url">${escapeHtml(card.href || '#')}</div>
@@ -4157,7 +4157,7 @@ function renderHomepageVisualCanvas() {
           <div class="hp-slot-badge hp-slot-badge--events">Featured Spotlight ${featured.enabled === false ? '(Disabled)' : ''}</div>
           <div class="hp-slot-edit-hint">${ICONS.pencil} Click to edit</div>
           <div class="hp-canvas-img-wrap" style="height:200px;">
-            <img src="${escapeHtml(featured.imageUrl || 'img5.png')}" alt="" class="hp-canvas-img" onerror="this.src='img5.png'" />
+            <img loading="lazy" src="${escapeHtml(featured.imageUrl || 'img5.webp')}" alt="" class="hp-canvas-img" onerror="this.src='img5.webp'" />
           </div>
           <h3 class="hp-canvas-headline">${escapeHtml(featured.title || 'Untitled Featured Story')}</h3>
           <p class="hp-canvas-subtitle">${escapeHtml(featured.description || '')}</p>
@@ -4186,7 +4186,7 @@ function renderHomepageVisualCanvas() {
               <div class="hp-slot-badge hp-slot-badge--col">Column Lead</div>
               <div class="hp-slot-edit-hint">${ICONS.pencil} Edit</div>
               <div class="hp-canvas-img-wrap" style="height:120px;">
-                <img src="${escapeHtml((col.lead && col.lead.imageUrl) || 'img1.png')}" alt="" class="hp-canvas-img" onerror="this.src='img1.png'" />
+                <img loading="lazy" src="${escapeHtml((col.lead && col.lead.imageUrl) || 'img1.webp')}" alt="" class="hp-canvas-img" onerror="this.src='img1.webp'" />
               </div>
               <h4 class="hp-canvas-headline" style="font-size:14px;">${escapeHtml((col.lead && col.lead.title) || 'Untitled Story')}</h4>
               <div class="hp-canvas-link-url">${escapeHtml((col.lead && col.lead.href) || '#')}</div>
@@ -4230,7 +4230,7 @@ function renderHeroEditor() {
         <button type="button" class="btn btn--primary btn--sm" onclick="openHpSlotModal('hero.main', 'Hero Main Lead Story')">Edit Lead Story</button>
       </div>
       <div style="display:grid;grid-template-columns:120px 1fr;gap:18px;align-items:center;">
-        <img src="${escapeHtml(main.imageUrl || 'img1.png')}" alt="" style="width:120px;height:80px;object-fit:cover;border-radius:6px;border:1px solid var(--border);" onerror="this.src='img1.png'" />
+        <img loading="lazy" src="${escapeHtml(main.imageUrl || 'img1.webp')}" alt="" style="width:120px;height:80px;object-fit:cover;border-radius:6px;border:1px solid var(--border);" onerror="this.src='img1.webp'" />
         <div>
           <h4 style="font-family:'Libre Baskerville',serif;font-size:16px;font-weight:700;margin:0 0 6px;">${escapeHtml(main.title || 'Untitled')}</h4>
           <p style="font-size:13px;color:var(--text-muted);margin:0 0 4px;">${escapeHtml(main.subtitle || '')}</p>
@@ -4249,7 +4249,7 @@ function renderHeroEditor() {
                 <span class="hp-slot-badge hp-slot-badge--sidebar">Sidebar Story ${idx + 1}</span>
                 <span style="font-size:11px;color:${s.enabled !== false ? '#16a34a' : '#94a3b8'};font-weight:600;">${s.enabled !== false ? 'Active' : 'Disabled'}</span>
               </div>
-              <img src="${escapeHtml(s.imageUrl || 'img5.png')}" alt="" style="width:100%;height:110px;object-fit:cover;border-radius:6px;margin-bottom:10px;" onerror="this.src='img5.png'" />
+              <img loading="lazy" src="${escapeHtml(s.imageUrl || 'img5.webp')}" alt="" style="width:100%;height:110px;object-fit:cover;border-radius:6px;margin-bottom:10px;" onerror="this.src='img5.webp'" />
               <h4 style="font-size:14px;font-weight:700;margin:0 0 6px;">${escapeHtml(s.title || 'Untitled')}</h4>
               <p style="font-size:12.5px;color:var(--text-muted);margin:0 0 6px;">${escapeHtml(s.description || '')}</p>
               ${s.tag ? `<span class="hp-canvas-tag">${escapeHtml(s.tag)}</span>` : ''}
@@ -4283,7 +4283,7 @@ function renderCardsEditor() {
                 <span class="hp-slot-badge hp-slot-badge--card">Card ${idx + 1}</span>
                 <span style="font-size:11px;color:${c.enabled !== false ? '#16a34a' : '#94a3b8'};font-weight:600;">${c.enabled !== false ? 'Active' : 'Disabled'}</span>
               </div>
-              <img src="${escapeHtml(c.imageUrl || 'img2.png')}" alt="" style="width:100%;height:130px;object-fit:cover;border-radius:6px;margin-bottom:10px;" onerror="this.src='img2.png'" />
+              <img loading="lazy" src="${escapeHtml(c.imageUrl || 'img2.webp')}" alt="" style="width:100%;height:130px;object-fit:cover;border-radius:6px;margin-bottom:10px;" onerror="this.src='img2.webp'" />
               <h4 style="font-size:14px;font-weight:700;margin:0 0 6px;">${escapeHtml(c.title || 'Untitled')}</h4>
             </div>
             <div style="margin-top:12px;display:flex;justify-content:space-between;align-items:center;">
@@ -4382,7 +4382,7 @@ function renderEventsEditor() {
           <h4 style="font-size:14px;font-weight:700;margin:0;">Featured Spotlight Story</h4>
           <button type="button" class="btn btn--primary btn--sm" onclick="openHpSlotModal('eventsSection.featured', 'Events Featured Spotlight Story')">Edit Spotlight</button>
         </div>
-        <img src="${escapeHtml(featured.imageUrl || 'img5.png')}" alt="" style="width:100%;height:160px;object-fit:cover;border-radius:6px;margin-bottom:12px;" onerror="this.src='img5.png'" />
+        <img loading="lazy" src="${escapeHtml(featured.imageUrl || 'img5.webp')}" alt="" style="width:100%;height:160px;object-fit:cover;border-radius:6px;margin-bottom:12px;" onerror="this.src='img5.webp'" />
         <h4 style="font-family:'Libre Baskerville',serif;font-size:16px;font-weight:700;margin:0 0 6px;">${escapeHtml(featured.title || 'Untitled')}</h4>
         <p style="font-size:13px;color:var(--text-muted);margin:0 0 8px;">${escapeHtml(featured.description || '')}</p>
         <span class="hs-slug-chip">${escapeHtml(featured.href || '#')}</span>
@@ -4675,7 +4675,7 @@ function updateHpSlotImagePreview() {
   const imgInput = document.getElementById('hp-slot-image-input');
   const imgEl = document.getElementById('hp-slot-image-preview');
   if (imgInput && imgEl) {
-    imgEl.src = imgInput.value.trim() || 'img1.png';
+    imgEl.src = imgInput.value.trim() || 'img1.webp';
   }
 }
 
@@ -4706,7 +4706,7 @@ function saveHpSlotModal() {
   else if (path.includes('sidebar') || path.includes('featured')) slotData.description = subtitle;
 
   slotData.href = link || '#';
-  if (!path.includes('subArticles')) slotData.imageUrl = image || 'img1.png';
+  if (!path.includes('subArticles')) slotData.imageUrl = image || 'img1.webp';
   if (path.includes('sidebar')) slotData.tag = tag;
   slotData.enabled = enabled;
 
@@ -6527,7 +6527,7 @@ function renderAdminSubmissionsTable() {
           </div>
         </div>
 
-        <div style="display:flex;align-items:center;gap:8px;">
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
           <button onclick="inspectSubmissionModal('${s.id}')"
             style="background:#f8fafc;border:1px solid #cbd5e1;border-radius:8px;padding:7px 14px;font-size:12.5px;font-weight:600;color:#334155;cursor:pointer;">
             🔍 Inspect & Review
@@ -6601,7 +6601,7 @@ function inspectSubmissionModal(subId) {
 
       <div style="padding:16px 24px;border-top:1px solid #e5e7eb;background:#f8fafc;display:flex;align-items:center;justify-content:space-between;">
         <button onclick="document.getElementById('_sub-inspect-modal').remove()" class="btn btn--secondary" style="padding:8px 18px;">Close</button>
-        <div style="display:flex;gap:10px;">
+        <div style="display:flex;gap:10px;flex-wrap:wrap;">
           <button onclick="submitReviewFromModal('${sub.id}', 'rejected')" style="background:#fee2e2;color:#dc2626;border:1px solid #fecaca;border-radius:8px;padding:9px 18px;font-weight:600;cursor:pointer;">
             ✕ Reject Submission
           </button>

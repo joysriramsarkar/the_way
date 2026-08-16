@@ -790,6 +790,35 @@
   document.getElementById('font-increase-btn').addEventListener('click', () => { if (fz < 1.6) { fz += 0.08; saveFz(); } });
   document.getElementById('font-decrease-btn').addEventListener('click', () => { if (fz > 0.9) { fz -= 0.08; saveFz(); } });
 
+  // For mobile bottom sheet / floating buttons
+  if (window.innerWidth <= 768) {
+    const controls = document.createElement('div');
+    controls.className = 'mobile-bottom-controls';
+
+    const fDec = document.createElement('button');
+    fDec.className = 'btn-ch-nav';
+    fDec.innerHTML = 'A-';
+    fDec.onclick = () => document.getElementById('font-decrease-btn').click();
+
+    const fInc = document.createElement('button');
+    fInc.className = 'btn-ch-nav';
+    fInc.innerHTML = 'A+';
+    fInc.onclick = () => document.getElementById('font-increase-btn').click();
+
+    const tocBtn = document.createElement('button');
+    tocBtn.className = 'btn-ch-nav';
+    tocBtn.innerHTML = 'সূচিপত্র';
+    tocBtn.onclick = () => document.getElementById('toc-drawer').classList.add('open');
+
+    controls.appendChild(fDec);
+    controls.appendChild(tocBtn);
+    controls.appendChild(fInc);
+    document.body.appendChild(controls);
+
+    // add padding to body so content isn't hidden
+    document.body.style.paddingBottom = '60px';
+  }
+
   // Scroll progress
   window.addEventListener('scroll', () => {
     const h = document.documentElement.scrollHeight - window.innerHeight;
@@ -823,7 +852,22 @@
 
     if (!currentBook && window.THE_WAY_BOOKS) {
       const b = window.THE_WAY_BOOKS.getBookById(bookSlug) || window.THE_WAY_BOOKS.getAllBooks()[0];
-      if (b) { isDBMode = false; currentBook = b; currentChapters = b.chapters || []; }
+      if (b) {
+        isDBMode = false;
+        currentBook = b;
+        if (b.has_chapters_file && (!b.chapters || b.chapters.length === 0)) {
+            try {
+               const res = await fetch('/assets/js/books/' + b.id + '.json');
+               if (res.ok) {
+                   const data = await res.json();
+                   b.chapters = data;
+               }
+            } catch(e) {
+               console.warn("Could not load chapters:", e);
+            }
+        }
+        currentChapters = b.chapters || [];
+      }
     }
 
     if (!currentBook) {

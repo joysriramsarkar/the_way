@@ -62,7 +62,7 @@ module.exports = async function handler(req, res) {
   const fullTitle = `${title} — The Way (দ্য ওয়ে)`;
   const desc = article.meta_description || article.deck || 'The Way (দ্য ওয়ে) — Insights, Stories & Heritage.';
   const canonicalUrl = `${baseUrl}/article/${article.slug || ''}`;
-  const imgUrl = article.hero_img_url || `${baseUrl}/img1.png`;
+  const imgUrl = article.hero_img_url || `${baseUrl}/img1.webp`;
   const publishedTime = article.published_at || article.created_at || new Date().toISOString();
   const modifiedTime = article.updated_at || article.published_at || article.created_at || new Date().toISOString();
   const author = article.author || 'The Way (দ্য ওয়ে)';
@@ -89,7 +89,7 @@ module.exports = async function handler(req, res) {
       "name": "The Way (দ্য ওয়ে)",
       "logo": {
         "@type": "ImageObject",
-        "url": `${baseUrl}/logo.png`
+        "url": `${baseUrl}/logo.webp`
       }
     },
     "articleSection": section

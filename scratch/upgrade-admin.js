@@ -14,20 +14,20 @@ const adminHtmlPath = path.join(__dirname, '..', 'admin.html');
 let content = fs.readFileSync(adminHtmlPath, 'utf8');
 
 // 1. Fix Logo
-const oldLogo = `<img src="assets/images/logo.svg" alt="The Way" style="width:34px;height:34px;flex-shrink:0;border-radius:6px;" onerror="this.src='logo.svg'" />
+const oldLogo = `<img loading="lazy" src="assets/images/logo.svg" alt="The Way" style="width:34px;height:34px;flex-shrink:0;border-radius:6px;" onerror="this.src='logo.svg'" />
         <div class="sidebar-logo-text">
           <span class="sidebar-logo-title">The Way</span>
           <span class="sidebar-logo-sub">Admin Panel</span>
         </div>`;
 
-const newLogo = `<img src="assets/images/logo-icon.svg" alt="The Way" style="width:36px;height:36px;object-fit:contain;flex-shrink:0;border-radius:8px;" onerror="this.src='assets/images/favicon.svg'" />
+const newLogo = `<img loading="lazy" src="assets/images/logo-icon.svg" alt="The Way" style="width:36px;height:36px;object-fit:contain;flex-shrink:0;border-radius:8px;" onerror="this.src='assets/images/favicon.svg'" />
         <div class="sidebar-logo-text">
           <span class="sidebar-logo-title">The Way</span>
           <span class="sidebar-logo-sub">Editorial HQ</span>
         </div>`;
 
 if (content.includes('assets/images/logo.svg')) {
-  content = content.replace(/<img src="assets\/images\/logo\.svg"[^>]+>/, `<img src="assets/images/logo-icon.svg" alt="The Way" style="width:36px;height:36px;object-fit:contain;flex-shrink:0;border-radius:8px;" onerror="this.src='assets/images/favicon.svg'" />`);
+  content = content.replace(/<img loading="lazy" src="assets\/images\/logo\.svg"[^>]+>/, `<img loading="lazy" src="assets/images/logo-icon.svg" alt="The Way" style="width:36px;height:36px;object-fit:contain;flex-shrink:0;border-radius:8px;" onerror="this.src='assets/images/favicon.svg'" />`);
   content = content.replace('<span class="sidebar-logo-sub">Admin Panel</span>', '<span class="sidebar-logo-sub">Editorial HQ</span>');
 }
 
