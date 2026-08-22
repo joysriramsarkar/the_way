@@ -1,4 +1,4 @@
-/**
+﻿/**
  * THE WAY (দ্য ওয়ে) — Universal UI Components & Multilingual Engine
  * International Socialist Editorial & Movement Portal
  */
@@ -1011,3 +1011,34 @@
   };
 
 })(typeof window !== 'undefined' ? window : this);
+
+
+// ── Global Anti-Cache Purger ─────────────────────────────────────────
+window.clearSiteCacheAndReload = async function(showFeedback = true) {
+  try {
+    if ('serviceWorker' in navigator) {
+      const registrations = await navigator.serviceWorker.getRegistrations();
+      for (const r of registrations) await r.unregister();
+    }
+    if ('caches' in window) {
+      const keys = await caches.keys();
+      for (const k of keys) await caches.delete(k);
+    }
+    try { sessionStorage.clear(); } catch(e) {}
+    try {
+      localStorage.removeItem('theway_cached_articles');
+      localStorage.removeItem('theway_cached_books');
+      localStorage.removeItem('theway_cached_homepage');
+    } catch(e) {}
+    if (showFeedback && typeof showToast === 'function') {
+      showToast('success', 'ক্যাশে পরিষ্কার হয়েছে। ফ্রেশ ভার্সন লোড হচ্ছে...');
+    }
+    setTimeout(() => {
+      const u = new URL(window.location.href);
+      u.searchParams.set('_nocache', Date.now());
+      window.location.href = u.toString();
+    }, 400);
+  } catch(err) {
+    window.location.reload();
+  }
+};

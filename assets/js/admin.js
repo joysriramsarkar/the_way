@@ -1,4 +1,4 @@
-/* =================================================================
+﻿/* =================================================================
    THE WAY (দ্য ওয়ে) - ADMIN JS
    Sections CRUD - Supabase API - Toast - Modal
 ================================================================= */
@@ -6949,4 +6949,139 @@ async function deleteMovementMember(id) {
       }
     }
   });
+}
+
+
+// ── Anti-Cache Purger & Fast Reload ────────────────────────────────
+window.clearSiteCacheAndReload = async function(showFeedback = true) {
+  try {
+    if ('serviceWorker' in navigator) {
+      const registrations = await navigator.serviceWorker.getRegistrations();
+      for (const r of registrations) await r.unregister();
+    }
+    if ('caches' in window) {
+      const keys = await caches.keys();
+      for (const k of keys) await caches.delete(k);
+    }
+    try { sessionStorage.clear(); } catch(e) {}
+    try {
+      localStorage.removeItem('theway_cached_articles');
+      localStorage.removeItem('theway_cached_books');
+      localStorage.removeItem('theway_cached_homepage');
+    } catch(e) {}
+    if (showFeedback && typeof showToast === 'function') {
+      showToast('success', 'সম্পূর্ণ ক্যাশে পরিষ্কার হয়েছে। ফ্রেশ ভার্সন লোড হচ্ছে...');
+    }
+    setTimeout(() => {
+      const u = new URL(window.location.href);
+      u.searchParams.set('_nocache', Date.now());
+      window.location.href = u.toString();
+    }, 500);
+  } catch(err) {
+    window.location.reload();
+  }
+};
+
+// ── AI OCR Book Importer Functions ──────────────────────────────────
+function openOcrBookImportModal() {
+  const m = document.getElementById('ocr-import-modal');
+  if (m) {
+    m.style.display = 'flex';
+    const ta = document.getElementById('ocr-json-textarea');
+    if (ta) ta.value = '';
+    const st = document.getElementById('ocr-import-status');
+    if (st) st.style.display = 'none';
+  }
+}
+
+function closeOcrBookImportModal() {
+  const m = document.getElementById('ocr-import-modal');
+  if (m) m.style.display = 'none';
+}
+
+function handleOcrJsonFileUpload(event) {
+  const file = event.target.files && event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    const ta = document.getElementById('ocr-json-textarea');
+    if (ta) ta.value = e.target.result;
+  };
+  reader.readAsText(file);
+}
+
+async function submitOcrBookImport() {
+  const ta = document.getElementById('ocr-json-textarea');
+  const btn = document.getElementById('ocr-submit-import-btn');
+  const st = document.getElementById('ocr-import-status');
+
+  if (!ta || !ta.value.trim()) {
+    if (st) {
+      st.style.display = 'block';
+      st.style.background = '#fef2f2';
+      st.style.color = '#dc2626';
+      st.textContent = 'অনুগ্রহ করে OCR টুলের JSON ফাইলটি সিলেক্ট বা পেস্ট করুন।';
+    }
+    return;
+  }
+
+  let payload = null;
+  try {
+    payload = JSON.parse(ta.value.trim());
+  } catch(e) {
+    if (st) {
+      st.style.display = 'block';
+      st.style.background = '#fef2f2';
+      st.style.color = '#dc2626';
+      st.textContent = 'JSON কোডটি সঠিক ফরম্যাটে নেই: ' + e.message;
+    }
+    return;
+  }
+
+  if (btn) {
+    btn.disabled = true;
+    btn.textContent = 'ইম্পোর্ট হচ্ছে...';
+  }
+  if (st) {
+    st.style.display = 'block';
+    st.style.background = '#f0f9ff';
+    st.style.color = '#0284c7';
+    st.textContent = 'বই ও চ্যাপ্টার ডাটাবেসে সেভ হচ্ছে...';
+  }
+
+  try {
+    const res = await fetch('/api/books?action=import', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+
+    const data = await res.json();
+    if (res.ok && data.success) {
+      if (st) {
+        st.style.background = '#f0fdf4';
+        st.style.color = '#16a34a';
+        st.textContent = `✅ ${data.message || 'বই সফলভাবে লাইব্রেরিতে যুক্ত হয়েছে!'}`;
+      }
+      showToast('success', data.message || 'বই সফলভাবে লাইব্রেরিতে যুক্ত হয়েছে!');
+      setTimeout(() => {
+        closeOcrBookImportModal();
+        if (typeof loadAdminBooks === 'function') loadAdminBooks();
+      }, 1500);
+    } else {
+      throw new Error(data.error || 'ইম্পোর্ট ব্যর্থ হয়েছে');
+    }
+  } catch(err) {
+    if (st) {
+      st.style.background = '#fef2f2';
+      st.style.color = '#dc2626';
+      st.textContent = 'ত্রুটি: ' + err.message;
+    }
+    showToast('error', err.message);
+  } finally {
+    if (btn) {
+      btn.disabled = false;
+      btn.textContent = 'লাইব্রেরিতে ইম্পোর্ট ও প্রকাশ করুন';
+    }
+  }
 }

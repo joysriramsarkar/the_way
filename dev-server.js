@@ -1,4 +1,4 @@
-/**
+﻿/**
  * THE WAY (দ্য ওয়ে) — Local Development Server
  * Zero-dependency Node.js server that serves static frontend files & executes /api serverless functions.
  * Run with: node dev-server.js (or npm start)
@@ -42,7 +42,7 @@ const MIME_TYPES = {
   '.js':   'application/javascript; charset=utf-8',
   '.json': 'application/json; charset=utf-8',
   '.svg':  'image/svg+xml',
-  '.webp':  'image/png',
+  '.png':  'image/png',
   '.jpg':  'image/jpeg',
   '.jpeg': 'image/jpeg',
   '.gif':  'image/gif',
@@ -58,6 +58,10 @@ const MIME_TYPES = {
 const server = http.createServer(async (req, res) => {
   const reqUrl = new URL(req.url, `http://localhost:${PORT}`);
   let pathname = reqUrl.pathname || '/';
+
+  // Global anti-cache headers for dynamic & local dev
+  res.setHeader('Pragma', 'no-cache');
+  res.setHeader('Expires', '0');
 
   // ── Handle /sitemap.xml ───────────────────────────────────────────
   if (pathname === '/sitemap.xml') {
@@ -77,6 +81,8 @@ const server = http.createServer(async (req, res) => {
   if (pathname.startsWith('/api/')) {
     const apiName = pathname.replace(/^\/api\//, '').split('/')[0].replace(/\.js$/, '');
     const apiFile = path.join(__dirname, 'api', `${apiName}.js`);
+
+    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0');
 
     if (fs.existsSync(apiFile)) {
       try {
@@ -143,6 +149,8 @@ const server = http.createServer(async (req, res) => {
     pathname = '/admin.html';
   } else if (pathname === '/login' || pathname === '/login/') {
     pathname = '/admin-login.html';
+  } else if (pathname === '/books' || pathname === '/books/') {
+    pathname = '/books.html';
   } else if (pathname === '/') {
     pathname = '/index.html';
   }
@@ -165,6 +173,15 @@ const server = http.createServer(async (req, res) => {
     const ext = path.extname(filePath).toLowerCase();
     const contentType = MIME_TYPES[ext] || 'application/octet-stream';
 
+    // Anti-cache headers for HTML, JS, CSS in dev mode
+    if (ext === '.html') {
+      res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate, max-age=0');
+    } else if (ext === '.css' || ext === '.js') {
+      res.setHeader('Cache-Control', 'no-cache, must-revalidate, max-age=0');
+    } else {
+      res.setHeader('Cache-Control', 'public, max-age=86400');
+    }
+
     res.statusCode = 200;
     res.setHeader('Content-Type', contentType);
     fs.createReadStream(filePath).pipe(res);
@@ -174,8 +191,9 @@ const server = http.createServer(async (req, res) => {
 server.listen(PORT, () => {
   console.log('════════════════════════════════════════════════════════════════');
   console.log(`  ★ THE WAY (দ্য ওয়ে) — Local Development Server`);
-  console.log(`  ★ Portal URL:  http://localhost:${PORT}`);
-  console.log(`  ★ Admin HQ:    http://localhost:${PORT}/admin.html`);
-  console.log(`  ★ Articles:    http://localhost:${PORT}/api/articles?action=list`);
+  console.log(`  ★ Portal URL:    http://localhost:${PORT}`);
+  console.log(`  ★ Admin HQ:      http://localhost:${PORT}/admin.html`);
+  console.log(`  ★ Book Library:  http://localhost:${PORT}/books.html`);
+  console.log(`  ★ Articles API:  http://localhost:${PORT}/api/articles?action=list`);
   console.log('════════════════════════════════════════════════════════════════');
 });
