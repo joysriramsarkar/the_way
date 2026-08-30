@@ -98,10 +98,10 @@ the_way/
 
 ```bash
 # ডিপেন্ডেন্সি ইনস্টল (ঐচ্ছিক)
-npm install
+pnpm install
 
 # লোকাল ডেভেলপমেন্ট সার্ভার চালু করুন
-npm start
+pnpm start
 # অথবা
 node dev-server.js
 ```
