@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="bn">
 <head>
   <meta charset="UTF-8">
@@ -6,523 +6,1083 @@
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate, max-age=0" />
   <meta http-equiv="Pragma" content="no-cache" />
   <meta http-equiv="Expires" content="0" />
-  <script>
-    (function() {
-      if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.getRegistrations().then(function(regs) {
-          for (var i = 0; i < regs.length; i++) regs[i].unregister();
-        });
-      }
-    })();
-  </script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="icon" type="image/svg+xml" href="assets/images/favicon.svg" />
   <link rel="alternate icon" type="image/svg+xml" href="favicon.svg" />
-  <title>বিপ্লবী উন্মুক্ত গ্রন্থাগার ও ধ্রুপদী ওয়েব বই — দ্য ওয়ে (The Way)</title>
-  <meta name="description" content="কমিউনিস্ট ম্যানিফেস্টো, ভগৎ সিংহের 'কেন আমি নাস্তিক', মার্ক্স, এঙ্গেলস ও লেনিনের ধ্রুপদী সাহিত্যের ডিজিটাল উন্মুক্ত ওয়েব বই সংগ্রহ।">
-  
+  <title>লাল পাঠাগার — বিশ্ব কমিউনিস্ট সাহিত্যের মুক্ত সংগ্রহশালা | দ্য ওয়ে (The Way)</title>
+  <meta name="description" content="সারা বিশ্বের কমিউনিস্ট সাহিত্য — জার্মান দর্শন থেকে রুশ উপন্যাস, চীনা প্রবন্ধ থেকে বাংলা কবিতা — এক ঠিকানায়। সম্পূর্ণ উন্মুক্ত ও সরাসরি লিঙ্কসহ।">
+
+  <!-- Core & Constructivist Design System Stylesheets -->
   <link rel="stylesheet" href="assets/css/style.css">
-  <style>
-    .library-hero {
-      background: radial-gradient(circle at top right, rgba(194, 24, 43, 0.25), transparent 70%), linear-gradient(135deg, #130608 0%, #0d1117 100%);
-      color: #fff;
-      padding: 3.5rem 2.5rem;
-      border-radius: var(--radius-lg);
-      margin: 2rem 0 2.5rem;
-      border: 1px solid rgba(194, 24, 43, 0.4);
-      box-shadow: 0 12px 36px rgba(0,0,0,0.3);
-      position: relative;
-      overflow: hidden;
-    }
-    .library-hero::before {
-      content: '☭';
-      position: absolute;
-      right: 20px;
-      bottom: -30px;
-      font-size: 160px;
-      color: rgba(255, 255, 255, 0.03);
-      pointer-events: none;
-      font-family: serif;
-    }
-    .library-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      background: rgba(194, 24, 43, 0.35);
-      border: 1px solid rgba(229, 43, 60, 0.6);
-      color: #ff8b94;
-      font-size: 0.78rem;
-      font-weight: 700;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      padding: 5px 12px;
-      border-radius: var(--radius-full);
-      margin-bottom: 1rem;
-    }
-    .library-hero h1 {
-      font-family: var(--font-bengali-serif);
-      font-size: 2.5rem;
-      font-weight: 800;
-      line-height: 1.2;
-      margin-bottom: 0.8rem;
-    }
-    .library-hero p {
-      font-size: 1.1rem;
-      color: #e5e7eb;
-      max-width: 760px;
-      line-height: 1.65;
-      margin-bottom: 1.8rem;
-    }
+  <link rel="stylesheet" href="assets/css/laal-pathagar.css">
 
-    /* Filter & Search Bar */
-    .library-controls {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 1rem;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 2rem;
-      background: var(--bg-card);
-      padding: 1.2rem;
-      border-radius: var(--radius-md);
-      border: 1px solid var(--border-color);
-      box-shadow: var(--shadow-sm);
-    }
-    .filter-tabs {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.5rem;
-    }
-    .filter-btn {
-      background: var(--bg-body);
-      border: 1px solid var(--border-color);
-      color: var(--text-secondary);
-      font-family: var(--font-bengali-sans);
-      font-size: 0.88rem;
-      font-weight: 600;
-      padding: 6px 14px;
-      border-radius: var(--radius-full);
-      cursor: pointer;
-      transition: all var(--transition-fast);
-    }
-    .filter-btn:hover {
-      border-color: var(--crimson-primary);
-      color: var(--crimson-primary);
-    }
-    .filter-btn.active {
-      background: var(--crimson-primary);
-      border-color: var(--crimson-primary);
-      color: #fff;
-      box-shadow: 0 2px 8px var(--crimson-glow);
-    }
-    .search-box-wrap {
-      position: relative;
-      min-width: 260px;
-    }
-    .search-box-wrap input {
-      width: 100%;
-      padding: 8px 14px 8px 36px;
-      border-radius: var(--radius-full);
-      border: 1px solid var(--border-color);
-      background: var(--bg-body);
-      color: var(--text-primary);
-      font-family: var(--font-bengali-sans);
-      font-size: 0.88rem;
-      outline: none;
-      transition: border-color var(--transition-fast);
-    }
-    .search-box-wrap input:focus {
-      border-color: var(--crimson-primary);
-    }
-    .search-icon {
-      position: absolute;
-      left: 12px;
-      top: 50%;
-      transform: translateY(-50%);
-      font-size: 0.85rem;
-      opacity: 0.6;
-    }
-
-    /* Books Grid */
-    .books-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
-      gap: 2rem;
-      margin-bottom: 4rem;
-    }
-    .book-card {
-      background: var(--bg-card);
-      border: 1px solid var(--border-color);
-      border-radius: var(--radius-lg);
-      overflow: hidden;
-      display: flex;
-      flex-direction: column;
-      box-shadow: var(--shadow-sm);
-      transition: all var(--transition-normal);
-      position: relative;
-    }
-    .book-card:hover {
-      transform: translateY(-5px);
-      box-shadow: var(--shadow-lg);
-      border-color: var(--border-crimson);
-    }
-    .book-header-visual {
-      height: 180px;
-      padding: 1.5rem;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      color: #fff;
-      position: relative;
-      overflow: hidden;
-    }
-    .book-header-visual::after {
-      content: '';
-      position: absolute;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: linear-gradient(to bottom, rgba(0,0,0,0.1), rgba(0,0,0,0.6));
-      pointer-events: none;
-    }
-    .book-tag {
-      align-self: flex-start;
-      background: rgba(0,0,0,0.45);
-      backdrop-filter: blur(4px);
-      padding: 3px 10px;
-      border-radius: var(--radius-full);
-      font-size: 0.75rem;
-      font-weight: 700;
-      border: 1px solid rgba(255,255,255,0.25);
-      z-index: 1;
-    }
-    .book-icon-badge {
-      font-size: 2.2rem;
-      z-index: 1;
-      filter: drop-shadow(0 2px 8px rgba(0,0,0,0.4));
-    }
-    .book-body {
-      padding: 1.5rem;
-      display: flex;
-      flex-direction: column;
-      flex: 1;
-    }
-    .book-title {
-      font-family: var(--font-bengali-serif);
-      font-size: 1.45rem;
-      font-weight: 700;
-      color: var(--text-primary);
-      margin-bottom: 0.35rem;
-      line-height: 1.3;
-    }
-    .book-authors {
-      font-size: 0.88rem;
-      font-weight: 600;
-      color: var(--crimson-primary);
-      margin-bottom: 0.7rem;
-    }
-    .book-summary {
-      font-size: 0.92rem;
-      color: var(--text-secondary);
-      line-height: 1.6;
-      margin-bottom: 1.2rem;
-      flex: 1;
-    }
-    .book-meta-bar {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-      font-size: 0.8rem;
-      color: var(--text-muted);
-      padding-top: 0.8rem;
-      border-top: 1px dashed var(--border-color);
-      margin-bottom: 1.2rem;
-    }
-    .book-action-row {
-      display: flex;
-      gap: 0.8rem;
-    }
-    .btn-read-book {
-      flex: 1;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      background: var(--crimson-primary);
-      color: #fff;
-      text-decoration: none;
-      padding: 10px 16px;
-      border-radius: var(--radius-md);
-      font-weight: 700;
-      font-size: 0.92rem;
-      transition: all var(--transition-fast);
-      box-shadow: 0 2px 8px var(--crimson-glow);
-    }
-    .btn-read-book:hover {
-      background: var(--crimson-light);
-      transform: scale(1.02);
-    }
-    .btn-view-toc {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      background: var(--bg-body);
-      border: 1px solid var(--border-color);
-      color: var(--text-primary);
-      text-decoration: none;
-      padding: 10px 14px;
-      border-radius: var(--radius-md);
-      font-weight: 600;
-      font-size: 0.88rem;
-      transition: all var(--transition-fast);
-    }
-    .btn-view-toc:hover {
-      border-color: var(--border-crimson);
-      color: var(--crimson-primary);
-    }
-
-    /* Library Features Banner */
-    .library-features-strip {
-      background: var(--bg-card);
-      border: 1px solid var(--border-color);
-      border-radius: var(--radius-lg);
-      padding: 2rem;
-      margin-bottom: 4rem;
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-      gap: 2rem;
-    }
-    .feature-item {
-      display: flex;
-      gap: 1rem;
-      align-items: flex-start;
-    }
-    .feature-icon {
-      font-size: 2rem;
-      line-height: 1;
-    }
-    .feature-item h4 {
-      font-family: var(--font-bengali-serif);
-      font-size: 1.1rem;
-      font-weight: 700;
-      margin-bottom: 0.3rem;
-    }
-    .feature-item p {
-      font-size: 0.85rem;
-      color: var(--text-secondary);
-      line-height: 1.5;
-    }
-
-    @media (max-width: 768px) {
-      .books-grid {
-        grid-template-columns: 1fr;
-      }
-      .library-hero {
-        padding: 2rem 1.5rem;
-      }
-      .library-hero h1 {
-        font-size: 1.9rem;
-      }
-    }
-  </style>
+  <!-- JSZip for instant in-browser offline archive compilation -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 </head>
-<body id="top">
+<body id="top" class="lp-page">
 
-  <!-- Ticker Mount -->
+  <!-- Ticker Mount (The Way Global Wire) -->
   <div id="theway-ticker-mount" class="theway-ticker-bar"></div>
 
-  <!-- Header Mount -->
+  <!-- Header Mount (The Way Navigation) -->
   <header id="theway-header-mount" class="theway-header"></header>
 
-  <main class="container">
-    
-    <!-- Hero Banner -->
-    <section class="library-hero">
-      <div class="library-badge"><svg class="svg-inline-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--gold-bright);"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg> উন্মুক্ত মার্ক্সীয় জ্ঞানভাণ্ডার</div>
-      <h1>বিপ্লবী ধ্রুপদী উন্মুক্ত পাঠাগার</h1>
-      <p>
-        মার্ক্স, এঙ্গেলস, লেনিন, শরৎচন্দ্র চট্টোপাধ্যায়, ম্যাক্সিম গোর্কি এবং শহীদ ভগৎ সিংহের অবিস্মরণীয় ঐতিহাসিক তত্ত্ব ও সাহিত্যকর্মগুলোকে সাজানো হয়েছে আধুনিক ইন্টারেক্টিভ ‘ওয়েব বই (Web Books)’ আকারে। কোনো পেওয়াল নেই, কোনো বিজ্ঞাপন নেই—মেহনতি মানুষের সার্বজনীন মুক্ত জ্ঞানচর্চার জন্য সম্পূর্ণ উন্মুক্ত।
-      </p>
-      <div style="display:flex; gap:1rem; flex-wrap:wrap;">
-        <a href="#books-list" class="btn-solid-crimson" style="padding:10px 22px; font-size:0.95rem;">
-          <svg class="svg-inline-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg> বইয়ের তালিকা দেখুন
-        </a>
-        <a href="book-reader.html?book=pather-dabi" class="btn-outline-gold" style="padding:10px 22px; font-size:0.95rem; background:rgba(0,0,0,0.3);">
-          <svg class="svg-inline-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> ‘পথের দাবী’ উপন্যাস পড়ুন
-        </a>
-      </div>
-    </section>
+  <!-- =========================================================================
+       লাল পাঠাগার (LAAL PATHAGAR) — CONSTRUCTIVIST REVOLUTIONARY LIBRARY
+       ========================================================================= -->
 
-    <!-- Controls / Filters -->
-    <div class="library-controls" id="books-list">
-      <div class="filter-tabs" id="category-filter-tabs">
-        <button class="filter-btn active" data-cat="all">সকল বই (৬)</button>
-        <button class="filter-btn" data-cat="literature">বিপ্লবী সাহিত্য ও উপন্যাস</button>
-        <button class="filter-btn" data-cat="manifesto">ঐতিহাসিক ইশতেহার</button>
-        <button class="filter-btn" data-cat="economy">রাজনৈতিক অর্থনীতি</button>
-        <button class="filter-btn" data-cat="state">রাষ্ট্র ও বিপ্লব</button>
-        <button class="filter-btn" data-cat="philosophy">দর্শন ও যুক্তিবাদ</button>
+  <!-- Top Ribbon -->
+  <div class="lp-top-ribbon">
+    <div class="lp-top-ribbon-inner">
+      <span style="display:inline-flex; align-items:center; gap:0.5rem;">
+        <svg viewBox="0 0 100 100" style="width:14px; height:14px; color:var(--lp-red);" fill="currentColor">
+          <path d="M50 2 61.8 36.2 98 36.6 69 58.3 79.4 93 50 72 20.6 93 31 58.3 2 36.6 38.2 36.2Z" />
+        </svg>
+        বিশ্ব শ্রমিক-পাঠকের জন্য মুক্ত সংগ্রহশালা
+      </span>
+      <span style="display:inline-flex; align-items:center; gap:1rem; opacity:0.9;">
+        <span class="hide-mobile">সংস্করণ ২০২৬</span>
+        <span style="color:var(--lp-red); font-weight:800;">১০০% ফ্রি উৎস</span>
+      </span>
+    </div>
+  </div>
+
+  <!-- Giant Constructivist Masthead Hero -->
+  <header class="lp-masthead lp-bg-dots">
+    <div class="lp-grain"></div>
+    <div class="lp-skew-bg hide-mobile" aria-hidden="true"></div>
+    <div class="lp-skew-line hide-mobile" aria-hidden="true"></div>
+
+    <div class="lp-masthead-content">
+      <div style="max-width: 48rem;">
+        <p class="lp-eyebrow">
+          <span class="lp-eyebrow-line"></span>
+          Workers of the world, read!
+        </p>
+
+        <h1 class="lp-main-title">
+          লাল <span>পাঠাগার</span>
+        </h1>
+
+        <p class="lp-subtitle">
+          সারা বিশ্বের কমিউনিস্ট সাহিত্য — 
+          <span class="lp-badge-highlight">যেকোনো ভাষায়</span> — এক ঠিকানায়।
+        </p>
+
+        <p class="lp-desc">
+          জার্মান দর্শন থেকে রুশ উপন্যাস, চীনা প্রবন্ধ থেকে বাংলা কবিতা — 
+          <strong style="color:var(--lp-ink);" id="hero-stats-text">৫৩টি রচনা, ১১টি ভাষা</strong>, প্রতিটির সরাসরি মুক্ত লিঙ্কসহ। খুঁজুন, পড়ুন, আর পুরো সংগ্রহটা নামিয়ে নিন এক ক্লিকে।
+        </p>
+
+        <div class="lp-hero-actions">
+          <a href="#catalog" class="lp-btn-primary lp-lift lp-hard-sm">
+            সংগ্রহ দেখুন
+            <svg viewBox="0 0 24 24" style="width:16px; height:16px;" fill="none" stroke="currentColor" stroke-width="2.5">
+              <path d="M12 4v16m0 0-6-6m6 6 6-6" />
+            </svg>
+          </a>
+          <button id="hero-zip-btn" class="lp-btn-secondary lp-lift lp-hard-sm">
+            <svg viewBox="0 0 24 24" style="width:16px; height:16px;" fill="none" stroke="currentColor" stroke-width="2.2">
+              <path d="M12 3v11m0 0 4-4m-4 4-4-4M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2" />
+            </svg>
+            ZIP ডাউনলোড
+          </button>
+          <span style="font-size:12px; color:var(--lp-ink2);" class="hide-mobile">
+            সম্পূর্ণ সূচি + সরাসরি লিঙ্ক, অফলাইনেও খোলে
+          </span>
+        </div>
       </div>
 
-      <div class="search-box-wrap">
-        <span class="search-icon"><svg class="svg-inline-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span>
-        <input type="text" id="book-search-input" placeholder="বই, লেখক বা বিষয় খুঁজুন...">
+      <!-- Spinning Constructivist Star Emblem -->
+      <div class="lp-spinning-emblem">
+        <svg viewBox="0 0 100 100" class="lp-spinning-star lp-spin-slow" fill="currentColor">
+          <path d="M50 2 61.8 36.2 98 36.6 69 58.3 79.4 93 50 72 20.6 93 31 58.3 2 36.6 38.2 36.2Z" />
+        </svg>
+        <p class="lp-spinning-tag">
+          সর্বহারা ★ ঐক্যবদ্ধ হও
+        </p>
       </div>
     </div>
+  </header>
 
-    <!-- Books Grid -->
-    <div class="books-grid" id="books-grid-container">
+  <!-- Live Statistics Strip -->
+  <section class="lp-stats-strip">
+    <div class="lp-stats-grid">
+      <div class="lp-stat-cell">
+        <span class="lp-stat-num" style="color:var(--lp-red);" id="stat-works">৫৩</span>
+        <span class="lp-stat-label">সংকলিত রচনা</span>
+      </div>
+      <div class="lp-stat-cell">
+        <span class="lp-stat-num" style="color:var(--lp-steel);" id="stat-langs">১১</span>
+        <span class="lp-stat-label">মূল ভাষা</span>
+      </div>
+      <div class="lp-stat-cell">
+        <span class="lp-stat-num" style="color:var(--lp-olive);" id="stat-authors">২৮</span>
+        <span class="lp-stat-label">লেখক ও সংকলন</span>
+      </div>
+      <div class="lp-stat-cell">
+        <span class="lp-stat-num" style="color:var(--lp-gold);" id="stat-links">৮৪</span>
+        <span class="lp-stat-label">মুক্ত সরাসরি লিঙ্ক</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Marquee Quotes Ribbon -->
+  <section class="lp-quotes-marquee-strip">
+    <div class="lp-ticker-track" id="marquee-track">
       <!-- Injected via JavaScript -->
     </div>
+  </section>
 
-    <!-- Features Banner -->
-    <div class="library-features-strip">
-      <div class="feature-item">
-        <div class="feature-icon"><svg class="svg-inline-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:28px;height:28px;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></div>
-        <div>
-          <h4>ডিজিটাল রিডার অভিজ্ঞতা</h4>
-          <p>ফন্ট সাইজ পরিবর্তন, ডার্ক মোড, সেপিয়া পেপার মোড এবং জেন ফুলস্ক্রিন রিডিং সুবিধা।</p>
-        </div>
+  <!-- Language Badges Ribbon -->
+  <div class="lp-reveal">
+    <div class="lp-langs-strip">
+      <span style="color:var(--lp-ink2); margin-right:4px;">মূল ভাষায় যা আছে:</span>
+      <span id="langs-badges-container" style="display:contents;">
+        <!-- Injected via JavaScript -->
+      </span>
+      <span style="margin-left:auto; color:var(--lp-ink2);" class="hide-mobile">
+        ৭টি বিভাগ · marxists.org ★ archive.org ★ gutenberg.org ★ উইকিসোর্স
+      </span>
+    </div>
+  </div>
+
+  <!-- Teaser Highlight Box -->
+  <div class="lp-teaser-container">
+    <div class="lp-reveal">
+      <div class="lp-teaser-box lp-hard">
+        <p style="font-family:var(--lp-font-display); font-weight:800; font-size:15px;">
+          ★ ইশতেহার থেকে <span style="color:var(--lp-red);">ছাড়পত্র</span>, পুঁজি থেকে <span style="color:var(--lp-red);">তেভাগা</span> — সব এক সূচিতে।
+        </p>
+        <p style="font-family:var(--lp-font-body); font-size:13px; color:var(--lp-ink2);">
+          সূচিতে থাকা প্রতিটি বইয়ের পূর্ণ পাঠ সংশ্লিষ্ট মুক্ত আর্কাইভে — লিঙ্ক ধরলেই বই।
+        </p>
       </div>
-      <div class="feature-item">
-        <div class="feature-icon"><svg class="svg-inline-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:28px;height:28px;"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg></div>
-        <div>
-          <h4>ইন্টারেক্টিভ সূচিপত্র</h4>
-          <p>প্রতিটি অধ্যায় দ্রুত ব্রাউজ করা এবং আপনার শেষ পাঠের স্থান স্বয়ংক্রিয় সংরক্ষণ (Auto-resume)।</p>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       CATALOG CONTROLS & STICKY FILTER BAR
+       ========================================================================= -->
+  <section id="catalog" style="scroll-margin-top: 5rem;">
+    <div class="lp-filter-sticky">
+      <div class="lp-filter-inner">
+        
+        <div class="lp-filter-top-row">
+          <!-- Search Box -->
+          <div class="lp-search-wrap">
+            <svg viewBox="0 0 24 24" class="lp-search-icon" fill="none" stroke="currentColor" stroke-width="2.4">
+              <circle cx="10.5" cy="10.5" r="6.5" />
+              <path d="m20 20-4.5-4.5" />
+            </svg>
+            <input type="text" id="lp-search-input" class="lp-search-input" placeholder="বই, লেখক বা শব্দ খুঁজুন — যেমন: পুঁজি, নজরুল, গেরিলা…">
+          </div>
+
+          <!-- Language Selector -->
+          <select id="lp-select-lang" class="lp-select-lang">
+            <option value="all">সব ভাষা</option>
+          </select>
+
+          <!-- Saved List Filter -->
+          <button id="lp-btn-saved" class="lp-btn-saved">
+            <svg viewBox="0 0 100 100" style="width:14px; height:14px;" fill="currentColor">
+              <path d="M50 2 61.8 36.2 98 36.6 69 58.3 79.4 93 50 72 20.6 93 31 58.3 2 36.6 38.2 36.2Z" />
+            </svg>
+            <span id="lp-saved-label">আমার তালিকা</span>
+          </button>
+
+          <!-- ZIP Button -->
+          <button id="lp-btn-zip" class="lp-btn-zip lp-hard-sm lp-lift">
+            <svg viewBox="0 0 24 24" style="width:16px; height:16px;" fill="none" stroke="currentColor" stroke-width="2.2">
+              <path d="M12 3v11m0 0 4-4m-4 4-4-4M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2" />
+            </svg>
+            <span id="zip-btn-label">ZIP নিন</span>
+          </button>
         </div>
-      </div>
-      <div class="feature-item">
-        <div class="feature-icon"><svg class="svg-inline-icon" viewBox="0 0 24 24" fill="currentColor" style="width:28px;height:28px;"><path d="M12 2C10.9 2 10 2.9 10 4V8H9C7.9 8 7 8.9 7 10V12H6C4.9 12 4 12.9 4 14V17C4 19.8 6.2 22 9 22H15C17.8 22 20 19.8 20 17V12C20 10.9 19.1 10 18 10V6C18 4.9 17.1 4 16 4H15V4C15 2.9 14.1 2 13 2H12ZM12 4H13V8H12V4ZM15 6H16V10H15V6ZM10 6V8H9V6H10ZM6 14H7V17H6V14ZM9 10H10V17H9V10ZM12 10H13V17H12V10ZM15 12H16V17H15V12ZM18 12H18.5V17C18.5 18.9 17 20.5 15 20.5H9C7 20.5 5.5 18.9 5.5 17V15.5H7V17C7 17.6 7.4 18 8 18C8.6 18 9 17.6 9 17V15.5H10V17C10 17.6 10.4 18 11 18C11.6 18 12 17.6 12 17V15.5H13V17C13 17.6 13.4 18 14 18C14.6 18 15 17.6 15 17V15.5H16V17C16 17.6 16.4 18 17 18C17.6 18 18 17.6 18 17V12Z"/></svg></div>
-        <div>
-          <h4>১০০% মুক্ত ভাবাদর্শ</h4>
-          <p>বিশ্বের যে কোনো প্রান্ত থেকে যে কোনো ডিভাইসে নিখরচায় উচ্চমানের প্রামাণ্য অনুবাদ পাঠ।</p>
+
+        <!-- Category Chips Row -->
+        <div class="lp-chips-row lp-chip-scroll" id="lp-category-chips">
+          <!-- Injected via JavaScript -->
         </div>
+
       </div>
     </div>
 
-  </main>
+    <!-- Works Grid Grouped by Category -->
+    <div class="lp-catalog-container" id="lp-catalog-mount">
+      <!-- Injected via JavaScript -->
+    </div>
+  </section>
 
-  <!-- Footer Mount -->
+  <!-- =========================================================================
+       REVOLUTIONARY TIMELINE ("বিপ্লবের কালপঞ্জি")
+       ========================================================================= -->
+  <section class="lp-timeline-section">
+    <div class="lp-bg-dots-light" style="position:absolute; inset:0; opacity:0.6;" aria-hidden="true"></div>
+    <div class="lp-grain"></div>
+
+    <div class="lp-timeline-inner">
+      <div class="lp-reveal">
+        <div class="lp-timeline-header-row">
+          <svg viewBox="0 0 100 100" style="width:2rem; height:2rem; color:var(--lp-red);" fill="currentColor">
+            <path d="M50 2 61.8 36.2 98 36.6 69 58.3 79.4 93 50 72 20.6 93 31 58.3 2 36.6 38.2 36.2Z" />
+          </svg>
+          <h2 class="lp-timeline-title">
+            বিপ্লবের <span>কালপঞ্জি</span>
+          </h2>
+        </div>
+        <p class="lp-timeline-desc">
+          ১৮৪৮-এর ইশতেহার থেকে ১৯৬১-এর ফানোঁ — যে বছরগুলোয় এই সাহিত্যের ভিত গড়া হয়েছিল।
+        </p>
+      </div>
+
+      <div class="lp-timeline-tree" id="lp-timeline-mount">
+        <div class="lp-timeline-center-line" aria-hidden="true"></div>
+        <!-- Injected via JavaScript -->
+      </div>
+    </div>
+  </section>
+
+  <!-- =========================================================================
+       POSTCARD QUOTES ("দেয়ালে পেরেক ঠুকে রাখা কথা")
+       ========================================================================= -->
+  <section class="lp-quotes-section lp-bg-dots">
+    <div class="lp-grain"></div>
+
+    <div class="lp-quotes-inner">
+      <div class="lp-reveal">
+        <h2 class="lp-quotes-title">
+          দেয়ালে <span>পেরেক ঠুকে</span> রাখা কথা
+        </h2>
+        <p style="font-family:var(--lp-font-body); color:var(--lp-ink2); font-size:15px; margin-top:0.5rem; max-width:36rem;">
+          সংগ্রহশালার দেয়াল থেকে ছিঁড়ে নিন — এই ছয়টি উক্তি, ছয়টি যুগের।
+        </p>
+      </div>
+
+      <div class="lp-quotes-grid" id="lp-quotes-cards-mount">
+        <!-- Injected via JavaScript -->
+      </div>
+    </div>
+  </section>
+
+  <!-- =========================================================================
+       RICH FOOTER ("পুরো সংগ্রহটা পকেটে নিন")
+       ========================================================================= -->
+  <footer class="lp-footer">
+    <div class="lp-footer-main">
+      <div class="lp-reveal">
+        <h2 class="lp-footer-title">
+          পুরো সংগ্রহটা <span>পকেটে নিন</span>
+        </h2>
+        <p class="lp-footer-desc">
+          এক ক্লিকে নামবে একটি ZIP — ভেতরে ৫৩টি রচনার সম্পূর্ণ সূচি, প্রতিটি বইয়ের আলাদা নোট-ফাইল, আর অফলাইনে-খোলা যায় এমন HTML সূচি। লিঙ্ক ধরলেই সরাসরি বইয়ের পূর্ণ পাঠ।
+        </p>
+        <div class="lp-footer-actions">
+          <button id="footer-zip-btn" class="lp-footer-btn-red lp-lift">
+            ★ ZIP ডাউনলোড করুন
+          </button>
+          <button id="footer-copy-btn" class="lp-footer-btn-dark">
+            সব লিঙ্ক কপি করুন (৮৪)
+          </button>
+        </div>
+      </div>
+
+      <div class="lp-reveal">
+        <h3 style="font-family:var(--lp-font-display); font-weight:800; font-size:1.25rem; margin-bottom:1rem; display:flex; align-items:center; gap:0.5rem;">
+          <svg viewBox="0 0 100 100" style="width:16px; height:16px; color:var(--lp-red);" fill="currentColor">
+            <path d="M50 2 61.8 36.2 98 36.6 69 58.3 79.4 93 50 72 20.6 93 31 58.3 2 36.6 38.2 36.2Z" />
+          </svg>
+          যেখানে বইগুলো থাকে
+        </h3>
+        <ul class="lp-sources-list">
+          <li class="lp-source-item">
+            <a href="https://www.marxists.org" target="_blank" rel="noopener" class="lp-source-link">Marxists Internet Archive ↗</a>
+            <span class="lp-source-note">৪৫+ ভাষায় মার্কসবাদী রচনার বৃহত্তম মুক্ত ভাণ্ডার</span>
+          </li>
+          <li class="lp-source-item">
+            <a href="https://archive.org" target="_blank" rel="noopener" class="lp-source-link">Internet Archive ↗</a>
+            <span class="lp-source-note">বাংলাসহ লক্ষাধিক স্ক্যান-করা বই</span>
+          </li>
+          <li class="lp-source-item">
+            <a href="https://www.gutenberg.org" target="_blank" rel="noopener" class="lp-source-link">Project Gutenberg ↗</a>
+            <span class="lp-source-note">পাবলিক-ডোমেইন ই-বুক</span>
+          </li>
+          <li class="lp-source-item">
+            <a href="https://bn.wikisource.org" target="_blank" rel="noopener" class="lp-source-link">বাংলা উইকিসোর্স ↗</a>
+            <span class="lp-source-note">বাংলা মুক্ত পাঠের ভাণ্ডার</span>
+          </li>
+        </ul>
+        <p style="font-family:var(--lp-font-body); color:rgba(241,234,218,0.45); font-size:11.5px; line-height:1.6; margin-top:1.25rem;">
+          লাল পাঠাগার কোনো বই নিজে হোস্ট করে না — এটি একটি সূচি ও সংযোগ-সেতু। প্রতিটি রচনার পূর্ণ পাঠ ওপরের মুক্ত আর্কাইভগুলোতে সংরক্ষিত, যেখানে সেগুলো আইনত মুক্তভাবে উপলব্ধ।
+        </p>
+      </div>
+    </div>
+
+    <div class="lp-footer-bottom-bar">
+      <div class="lp-footer-bottom-inner">
+        <span style="display:inline-flex; align-items:center; gap:0.5rem;">
+          <svg viewBox="0 0 100 100" style="width:12px; height:12px; color:var(--lp-red);" fill="currentColor">
+            <path d="M50 2 61.8 36.2 98 36.6 69 58.3 79.4 93 50 72 20.6 93 31 58.3 2 36.6 38.2 36.2Z" />
+          </svg>
+          লাল পাঠাগার ★ শ্রমজীবী মানুষের জ্ঞান, সবার জন্য
+        </span>
+        <span>মুক্তভাবে ব্যবহার, অনুলিপি ও বিতরণযোগ্য</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Universal Footer Mount (The Way Global Footer) -->
   <footer id="theway-footer-mount" class="theway-footer"></footer>
 
+  <!-- =========================================================================
+       INTERACTIVE IN-APP READER MODAL DIALOG
+       ========================================================================= -->
+  <div class="lp-reader-overlay" id="lp-reader-modal" role="dialog" aria-modal="true" aria-label="বই পাঠক">
+    <div class="lp-reader-dialog lp-reader-in" id="lp-reader-dialog-box">
+      <!-- Reader Header -->
+      <header class="lp-reader-header">
+        <div class="lp-grain" aria-hidden="true"></div>
+        <svg viewBox="0 0 100 100" class="lp-reader-header-icon lp-spin-slow" fill="currentColor">
+          <path d="M50 2 61.8 36.2 98 36.6 69 58.3 79.4 93 50 72 20.6 93 31 58.3 2 36.6 38.2 36.2Z" />
+        </svg>
+        <div class="lp-reader-header-meta">
+          <p class="lp-reader-cat-tag" id="reader-modal-cat">বিভাগ · ভাষা</p>
+          <h2 class="lp-reader-title" id="reader-modal-title">শিরোনাম</h2>
+          <p class="lp-reader-author" id="reader-modal-author">লেখক · সাল</p>
+        </div>
+        <button class="lp-reader-close-btn" id="reader-modal-close-btn" aria-label="পাঠক বন্ধ করুন">
+          <svg viewBox="0 0 24 24" style="width:16px; height:16px;" fill="none" stroke="currentColor" stroke-width="2.8">
+            <path d="M6 6l12 12M18 6 6 18" />
+          </svg>
+        </button>
+      </header>
+
+      <!-- Reader Toolbar -->
+      <div class="lp-reader-toolbar">
+        <span class="lp-reader-tool-label">অক্ষরের মাপ</span>
+        <button id="reader-font-dec" class="lp-reader-fz-btn">A−</button>
+        <button id="reader-font-inc" class="lp-reader-fz-btn">A+</button>
+        <span style="margin-left:auto; font-family:var(--lp-font-display); font-size:11.5px; font-weight:700; color:var(--lp-ink2);" id="reader-modal-badge-indicator">
+          <!-- Injected via JavaScript -->
+        </span>
+      </div>
+
+      <!-- Reader Body Scroll -->
+      <div class="lp-reader-body-scroll">
+        <p class="lp-reader-section-label">প্রেক্ষাপট</p>
+        <p class="lp-reader-context-text" id="reader-modal-context" style="font-size:19px;">
+          <!-- Injected via JavaScript -->
+        </p>
+
+        <div id="reader-modal-points-section" style="margin-top:2rem;">
+          <p class="lp-reader-section-label">মর্মকথা</p>
+          <ul class="lp-reader-points-list" id="reader-modal-points-list">
+            <!-- Injected via JavaScript -->
+          </ul>
+        </div>
+
+        <div style="margin-top:2.25rem;">
+          <p class="lp-reader-section-label">বাইরে পড়ুন — পূর্ণ পাঠ</p>
+          <div class="lp-reader-links-grid" id="reader-modal-links-grid">
+            <!-- Injected via JavaScript -->
+          </div>
+          <p style="font-family:var(--lp-font-body); font-size:12.5px; font-style:italic; color:var(--lp-ink2); margin-top:1rem;">
+            পূর্ণ পাঠ মূল মুক্ত আর্কাইভে হোস্টকৃত; “প্রেক্ষাপট” ও “মর্মকথা” সংকলকের নিজস্ব ভাষ্য।
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Box -->
+  <div class="lp-toast-box" id="lp-toast" style="display:none;">
+    <div class="lp-toast-inner lp-hard-sm">
+      <svg viewBox="0 0 100 100" style="width:16px; height:16px; color:var(--lp-red); flex-shrink:0;" fill="currentColor">
+        <path d="M50 2 61.8 36.2 98 36.6 69 58.3 79.4 93 50 72 20.6 93 31 58.3 2 36.6 38.2 36.2Z" />
+      </svg>
+      <span id="lp-toast-msg">বার্তা</span>
+    </div>
+  </div>
+
   <!-- Scripts -->
-  <script src="assets/js/books-data.js"></script>
   <script src="assets/js/supabase-config.js"></script>
+  <script src="assets/js/books-data.js"></script>
   <script src="assets/js/components.js"></script>
+
+  <!-- =========================================================================
+       LAAL PATHAGAR APPLICATION ENGINE (VANILLA JS + JSZIP)
+       ========================================================================= -->
   <script>
-    function initBooksLibrary() {
-      const books = (window.THE_WAY_BOOKS && typeof window.THE_WAY_BOOKS.getAllBooks === 'function') 
-        ? window.THE_WAY_BOOKS.getAllBooks() 
-        : [];
-        
-      const grid = document.getElementById('books-grid-container');
-      const tabsContainer = document.getElementById('category-filter-tabs');
-      const categories = (window.THE_WAY_BOOKS && typeof window.THE_WAY_BOOKS.getCategories === 'function')
-        ? window.THE_WAY_BOOKS.getCategories()
-        : [
-            { id: 'all', name_bn: 'সকল ধ্রুপদী বই', name_en: 'All Classics' },
-            { id: 'literature', name_bn: 'বিপ্লবী সাহিত্য ও উপন্যাস', name_en: 'Literature & Novels' },
-            { id: 'economy', name_bn: 'পুঁজি ও রাজনৈতিক অর্থনীতি', name_en: 'Das Kapital & Economy' },
-            { id: 'manifesto', name_bn: 'ঐতিহাসিক ইশতেহার', name_en: 'Manifestos' },
-            { id: 'state', name_bn: 'রাষ্ট্র ও সমাজ বিপ্লব', name_en: 'State & Revolution' },
-            { id: 'philosophy', name_bn: 'দ্বান্দ্বিক বস্তুবাদ ও দর্শন', name_en: 'Dialectics & Philosophy' },
-            { id: 'imperialism', name_bn: 'সাম্রাজ্যবাদ ও বিশ্বরাজনীতি', name_en: 'Imperialism' }
-          ];
+  (function() {
+    'use strict';
 
-      if (tabsContainer) {
-        tabsContainer.innerHTML = categories.map(cat => {
-          const count = cat.id === 'all' 
-            ? books.length 
-            : books.filter(b => b.category === cat.id).length;
-          return `<button class="filter-btn ${cat.id === 'all' ? 'active' : ''}" data-cat="${cat.id}">${cat.name_bn} (${count})</button>`;
-        }).join('');
+    const bnDigits = (n) => String(n).replace(/\d/g, d => "০১২৩৪৫৬৭৮৯"[+d]);
+    const SAVE_KEY = 'lal-pathagar-saved';
+
+    function loadSaved() {
+      try { return JSON.parse(localStorage.getItem(SAVE_KEY) || '[]'); } catch(e) { return []; }
+    }
+
+    let savedIds = loadSaved();
+    let currentCategory = 'all';
+    let currentLang = 'all';
+    let currentQuery = '';
+    let savedOnly = false;
+    let zipBusy = false;
+
+    // Toast Function
+    let toastTimer = null;
+    function showToast(msg) {
+      const toastEl = document.getElementById('lp-toast');
+      const toastMsg = document.getElementById('lp-toast-msg');
+      if (!toastEl || !toastMsg) return;
+      toastMsg.textContent = msg;
+      toastEl.style.display = 'block';
+      toastEl.classList.remove('lp-toast-in');
+      void toastEl.offsetWidth; // trigger reflow
+      toastEl.classList.add('lp-toast-in');
+
+      if (toastTimer) clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => {
+        toastEl.style.display = 'none';
+      }, 3800);
+    }
+
+    // Number count-up animation
+    function animateCountUp(el, target, duration = 1100) {
+      if (!el) return;
+      const t0 = performance.now();
+      function tick(t) {
+        const p = Math.min(1, (t - t0) / duration);
+        const val = Math.round(target * (1 - Math.pow(1 - p, 3)));
+        el.textContent = bnDigits(val);
+        if (p < 1) requestAnimationFrame(tick);
+      }
+      requestAnimationFrame(tick);
+    }
+
+    // Initialize Page Data & Marquee
+    function initStatsAndMarquee() {
+      const data = window.THE_WAY_BOOKS;
+      if (!data) return;
+
+      const works = data.WORKS || [];
+      const stats = data.STATS || { works: works.length, langs: 11, authors: 28, links: 84 };
+      const quotes = data.QUOTES || [];
+      const langs = data.LANGS || [];
+
+      // Hero stats
+      const heroStatsText = document.getElementById('hero-stats-text');
+      if (heroStatsText) {
+        heroStatsText.textContent = `${bnDigits(stats.works)}টি রচনা, ${bnDigits(stats.langs)}টি ভাষা`;
       }
 
-      const filterBtns = document.querySelectorAll('.filter-btn');
-      const searchInput = document.getElementById('book-search-input');
-      let currentCategory = 'all';
-      let searchQuery = '';
+      // Count up stats
+      animateCountUp(document.getElementById('stat-works'), stats.works);
+      animateCountUp(document.getElementById('stat-langs'), stats.langs);
+      animateCountUp(document.getElementById('stat-authors'), stats.authors);
+      animateCountUp(document.getElementById('stat-links'), stats.links);
 
-      function renderBooks() {
-        if (!grid) return;
-        const filtered = books.filter(b => {
-          const matchCat = currentCategory === 'all' || b.category === currentCategory;
-          const matchSearch = !searchQuery || 
-            b.title_bn.toLowerCase().includes(searchQuery) ||
-            b.title_en.toLowerCase().includes(searchQuery) ||
-            b.authors.some(a => a.name.toLowerCase().includes(searchQuery)) ||
-            b.summary_bn.toLowerCase().includes(searchQuery);
-          return matchCat && matchSearch;
-        });
-
-        if (filtered.length === 0) {
-          grid.innerHTML = `
-            <div style="grid-column:1/-1; text-align:center; padding:3rem; background:var(--bg-card); border-radius:var(--radius-lg); border:1px solid var(--border-color);">
-              <div style="font-size:3rem; margin-bottom:1rem;">📚</div>
-              <h3 style="font-family:var(--font-bengali-serif); font-size:1.4rem; margin-bottom:0.5rem;">কোনো বই পাওয়া যায়নি</h3>
-              <p style="color:var(--text-muted); font-size:0.95rem;">অনুগ্রহ করে অন্য শব্দ বা ক্যাটাগরি দিয়ে চেষ্টা করুন।</p>
-            </div>
-          `;
-          return;
+      // Populate Marquee
+      const marqueeTrack = document.getElementById('marquee-track');
+      if (marqueeTrack) {
+        let marqueeHtml = '';
+        for (let loop = 0; loop < 2; loop++) {
+          marqueeHtml += `<div style="display:flex; flex-shrink:0; align-items:center;" ${loop === 1 ? 'aria-hidden="true"' : ''}>`;
+          quotes.forEach(q => {
+            marqueeHtml += `
+              <span class="lp-quote-marquee-item">
+                <svg viewBox="0 0 100 100" style="width:12px; height:12px; color:rgba(241,234,218,0.7); flex-shrink:0;" fill="currentColor">
+                  <path d="M50 2 61.8 36.2 98 36.6 69 58.3 79.4 93 50 72 20.6 93 31 58.3 2 36.6 38.2 36.2Z" />
+                </svg>
+                “${q.text}” <span style="opacity:0.75;">— ${q.by}</span>
+              </span>
+            `;
+          });
+          marqueeHtml += `</div>`;
         }
-
-        grid.innerHTML = filtered.map(book => {
-          const authorsText = book.authors.map(a => a.name).join(' ও ');
-          return `
-            <article class="book-card">
-              <div class="book-header-visual" style="background:${book.cover_color};">
-                <span class="book-tag">${book.category_name_bn} • ${book.year}</span>
-                <div class="book-icon-badge"><svg class="svg-inline-icon" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:24px;height:24px;"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></div>
-              </div>
-              <div class="book-body">
-                <h2 class="book-title">${book.title_bn}</h2>
-                <div class="book-authors">লেখক: ${authorsText}</div>
-                <p class="book-summary">${book.summary_bn}</p>
-                <div class="book-meta-bar">
-                  <span><svg class="svg-inline-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> ${book.reading_time_mins} মিনিট পাঠ</span>
-                  <span><svg class="svg-inline-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg> ${book.chapters.length}টি অধ্যায়</span>
-                  <span><svg class="svg-inline-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg> ${book.pages_count} পৃষ্ঠা</span>
-                </div>
-                <div class="book-action-row">
-                  <a href="book-reader.html?book=${book.slug}" class="btn-read-book">
-                    <svg class="svg-inline-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg> অনলাইনে পড়ুন
-                  </a>
-                  <a href="book-reader.html?book=${book.slug}&view=toc" class="btn-view-toc" title="সূচিপত্র দেখুন">
-                    <svg class="svg-inline-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg> সূচিপত্র
-                  </a>
-                </div>
-              </div>
-            </article>
-          `;
-        }).join('');
+        marqueeTrack.innerHTML = marqueeHtml;
       }
 
-      // Initial Render
-      renderBooks();
+      // Populate Languages Badges
+      const langsContainer = document.getElementById('langs-badges-container');
+      const langSelect = document.getElementById('lp-select-lang');
+      if (langsContainer) {
+        langsContainer.innerHTML = langs.map(l => `<span class="lp-lang-chip">${l}</span>`).join('');
+      }
+      if (langSelect) {
+        langSelect.innerHTML = `<option value="all">সব ভাষা</option>` + langs.map(l => `<option value="${l}">${l}</option>`).join('');
+      }
 
-      // Category Filter Event
-      filterBtns.forEach(btn => {
-        btn.addEventListener('click', () => {
-          filterBtns.forEach(b => b.classList.remove('active'));
-          btn.classList.add('active');
-          currentCategory = btn.getAttribute('data-cat');
-          renderBooks();
+      // Category Chips
+      const catChipsContainer = document.getElementById('lp-category-chips');
+      if (catChipsContainer) {
+        const cats = data.getCategories();
+        let chipsHtml = `
+          <button class="lp-chip-btn ${currentCategory === 'all' ? 'active' : ''}" data-cat="all">
+            সব (${bnDigits(works.length)})
+          </button>
+        `;
+        cats.forEach(c => {
+          const count = works.filter(w => w.cat === c.id).length;
+          chipsHtml += `
+            <button class="lp-chip-btn cat-${c.id} ${currentCategory === c.id ? 'active' : ''}" data-cat="${c.id}">
+              ${c.title} (${bnDigits(count)})
+            </button>
+          `;
+        });
+        catChipsContainer.innerHTML = chipsHtml;
+
+        catChipsContainer.querySelectorAll('.lp-chip-btn').forEach(btn => {
+          btn.addEventListener('click', () => {
+            currentCategory = btn.getAttribute('data-cat');
+            catChipsContainer.querySelectorAll('.lp-chip-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            renderCatalog();
+          });
+        });
+      }
+
+      // Populate Timeline
+      const timelineMount = document.getElementById('lp-timeline-mount');
+      if (timelineMount) {
+        const timelineData = data.TIMELINE || [];
+        timelineMount.innerHTML = `
+          <div class="lp-timeline-center-line" aria-hidden="true"></div>
+          ${timelineData.map((t, i) => {
+            const isRight = i % 2 === 1;
+            return `
+              <div class="lp-timeline-node ${isRight ? 'right-side' : 'left-side'} lp-reveal">
+                <span class="lp-timeline-marker" aria-hidden="true"></span>
+                <div class="lp-timeline-card">
+                  <p class="lp-timeline-year">${t.year}</p>
+                  <p class="lp-timeline-node-title">${t.title}</p>
+                  <p class="lp-timeline-node-note">${t.note}</p>
+                </div>
+              </div>
+            `;
+          }).join('')}
+        `;
+      }
+
+      // Populate Quotes Cards
+      const quotesCardsMount = document.getElementById('lp-quotes-cards-mount');
+      if (quotesCardsMount) {
+        const rotClasses = ['rot-neg2', 'rot-pos1', 'rot-pos2', 'rot-neg1', 'rot-pos1', 'rot-neg2'];
+        const pickedQuotes = quotes.slice(0, 6);
+        quotesCardsMount.innerHTML = pickedQuotes.map((q, i) => `
+          <div class="lp-reveal">
+            <figure class="lp-quote-card lp-lift lp-hard ${rotClasses[i % rotClasses.length]}">
+              <svg viewBox="0 0 100 100" style="width:20px; height:20px; color:var(--lp-red);" fill="currentColor">
+                <path d="M50 2 61.8 36.2 98 36.6 69 58.3 79.4 93 50 72 20.6 93 31 58.3 2 36.6 38.2 36.2Z" />
+              </svg>
+              <blockquote class="lp-quote-text">“${q.text}”</blockquote>
+              <figcaption class="lp-quote-by">— ${q.by}</figcaption>
+            </figure>
+          </div>
+        `).join('');
+      }
+
+      // Update footer links count
+      const footerCopyBtn = document.getElementById('footer-copy-btn');
+      if (footerCopyBtn) {
+        footerCopyBtn.textContent = `সব লিঙ্ক কপি করুন (${bnDigits(stats.links)})`;
+      }
+    }
+
+    // Render Catalog
+    function renderCatalog() {
+      const mount = document.getElementById('lp-catalog-mount');
+      if (!mount || !window.THE_WAY_BOOKS) return;
+
+      const data = window.THE_WAY_BOOKS;
+      const allWorks = data.WORKS || [];
+      const categories = data.getCategories();
+      const q = currentQuery.trim().toLowerCase();
+
+      const filtered = allWorks.filter(w => {
+        if (currentCategory !== 'all' && w.cat !== currentCategory) return false;
+        if (currentLang !== 'all' && w.lang !== currentLang) return false;
+        if (savedOnly && !savedIds.includes(w.id)) return false;
+        if (q) {
+          const hay = `${w.title} ${w.orig} ${w.author} ${w.year} ${w.lang} ${w.desc}`.toLowerCase();
+          if (!hay.includes(q)) return false;
+        }
+        return true;
+      });
+
+      // Update saved count label
+      const savedLabel = document.getElementById('lp-saved-label');
+      if (savedLabel) {
+        savedLabel.textContent = `আমার তালিকা${savedIds.length > 0 ? ` (${bnDigits(savedIds.length)})` : ''}`;
+      }
+
+      if (filtered.length === 0) {
+        mount.innerHTML = `
+          <div style="text-align:center; padding:4rem 1.5rem; border:2px dashed rgba(32,24,18,0.4); background-color:rgba(250,245,231,0.6);">
+            <svg viewBox="0 0 100 100" style="width:40px; height:40px; color:var(--lp-red); margin:0 auto; transform:rotate(12deg);" fill="currentColor">
+              <path d="M50 2 61.8 36.2 98 36.6 69 58.3 79.4 93 50 72 20.6 93 31 58.3 2 36.6 38.2 36.2Z" />
+            </svg>
+            <h3 style="font-family:var(--lp-font-display); font-weight:800; font-size:1.6rem; margin-top:1rem;">কিছু পাওয়া গেল না!</h3>
+            <p style="font-family:var(--lp-font-body); color:var(--lp-ink2); margin-top:0.5rem; font-size:0.95rem;">
+              “পুঁজি”, “নজরুল” বা “গেরিলা” লিখে দেখুন — অথবা ফিল্টার মুছে ফেলুন।
+            </p>
+            <button id="reset-filter-btn" class="lp-btn-primary lp-lift" style="margin-top:1.25rem; font-size:0.88rem; padding:0.5rem 1.25rem;">
+              ফিল্টার মুছুন
+            </button>
+          </div>
+        `;
+        document.getElementById('reset-filter-btn')?.addEventListener('click', () => {
+          currentCategory = 'all';
+          currentLang = 'all';
+          currentQuery = '';
+          savedOnly = false;
+          document.getElementById('lp-search-input').value = '';
+          document.getElementById('lp-select-lang').value = 'all';
+          document.getElementById('lp-btn-saved').classList.remove('active');
+          document.querySelectorAll('.lp-chip-btn').forEach(b => b.classList.toggle('active', b.getAttribute('data-cat') === 'all'));
+          renderCatalog();
+        });
+        return;
+      }
+
+      // Group works by category
+      const grouped = categories.map(c => ({
+        category: c,
+        items: filtered.filter(w => w.cat === c.id)
+      })).filter(g => g.items.length > 0);
+
+      let catalogHtml = '';
+      grouped.forEach(group => {
+        const c = group.category;
+        const items = group.items;
+
+        const catBarColor = c.id === 'marx' ? 'var(--lp-red)' :
+                           c.id === 'lenin' ? 'var(--lp-steel)' :
+                           c.id === 'theory' ? 'var(--lp-gold)' :
+                           c.id === 'liberation' ? 'var(--lp-olive)' :
+                           c.id === 'fiction' ? 'var(--lp-plum)' :
+                           c.id === 'poetry' ? 'var(--lp-teal)' : 'var(--lp-ink)';
+
+        catalogHtml += `
+          <div class="lp-category-section">
+            <div class="lp-reveal">
+              <div class="lp-category-header">
+                <span class="lp-category-number">${c.num}</span>
+                <div class="lp-category-title-wrap">
+                  <h2 class="lp-category-title">${c.title}</h2>
+                  <p class="lp-category-blurb">${c.blurb}</p>
+                </div>
+                <span class="lp-category-count-badge">${bnDigits(items.length)}টি</span>
+              </div>
+              <div class="lp-category-divider">
+                <span class="lp-category-divider-accent" style="background-color:${catBarColor};"></span>
+              </div>
+            </div>
+
+            <div class="lp-works-grid">
+              ${items.map((w, idx) => {
+                const isSaved = savedIds.includes(w.id);
+                const extra = data.getExtra(w.id);
+                return `
+                  <div class="lp-reveal" style="transition-delay:${Math.min(idx, 5) * 60}ms;">
+                    <article class="lp-work-card lp-lift lp-hard-sm">
+                      <span class="lp-card-accent-bar" style="background-color:${catBarColor};" aria-hidden="true"></span>
+                      
+                      <!-- Bookmark Toggle -->
+                      <button class="lp-card-bookmark-btn ${isSaved ? 'saved' : ''}" 
+                              data-work-id="${w.id}" 
+                              title="${isSaved ? 'তালিকা থেকে বাদ দিন' : 'নিজের তালিকায় রাখুন'}" 
+                              aria-label="${isSaved ? 'তালিকা থেকে বাদ দিন' : 'নিজের তালিকায় রাখুন'}">
+                        <svg viewBox="0 0 100 100" style="width:16px; height:16px;" fill="currentColor">
+                          <path d="M50 2 61.8 36.2 98 36.6 69 58.3 79.4 93 50 72 20.6 93 31 58.3 2 36.6 38.2 36.2Z" />
+                        </svg>
+                      </button>
+
+                      <div class="lp-card-top-chips">
+                        <span class="lp-year-chip">${bnDigits(w.year)}</span>
+                        <span class="lp-lang-badge">${w.lang}</span>
+                        ${extra.pdf ? `<span class="lp-pdf-badge" title="সরাসরি PDF আছে">PDF</span>` : ''}
+                        ${extra.html && !extra.pdf ? `<span class="lp-html-badge" title="ওয়েব টেক্সট আছে">HTML</span>` : ''}
+                        <span class="lp-cat-badge" style="background-color:${catBarColor};">${c.title}</span>
+                      </div>
+
+                      <h3 class="lp-card-title btn-open-reader" data-work-id="${w.id}" title="এখানে পড়ুন">
+                        ${w.title}
+                      </h3>
+                      <p class="lp-card-orig">${w.orig || ''}</p>
+                      
+                      <p class="lp-card-author">
+                        <svg viewBox="0 0 24 24" style="width:14px; height:14px; color:var(--lp-red);" fill="currentColor">
+                          <path d="M12 2 14.5 8.5 21 11l-6.5 2.5L12 20l-2.5-6.5L3 11l6.5-2.5Z" />
+                        </svg>
+                        ${w.author}
+                      </p>
+
+                      <p class="lp-card-desc">${w.desc}</p>
+
+                      <!-- Action Row -->
+                      <div class="lp-card-actions-row">
+                        <button class="lp-btn-card-read lp-lift lp-hard-sm btn-open-reader" data-work-id="${w.id}">
+                          <svg viewBox="0 0 100 100" style="width:14px; height:14px;" fill="currentColor">
+                            <path d="M50 2 61.8 36.2 98 36.6 69 58.3 79.4 93 50 72 20.6 93 31 58.3 2 36.6 38.2 36.2Z" />
+                          </svg>
+                          ${extra.read ? 'এখানে পড়ুন' : 'পড়ুন'}
+                        </button>
+                        ${extra.pdf ? `
+                          <a href="${extra.pdf}" target="_blank" rel="noopener noreferrer" class="lp-btn-card-pdf lp-lift lp-hard-sm" title="সরাসরি PDF ডাউনলোড">
+                            <svg viewBox="0 0 24 24" style="width:14px; height:14px;" fill="none" stroke="currentColor" stroke-width="2.2">
+                              <path d="M6 2h8l5 5v15H6z" /><path d="M14 2v5h5" />
+                            </svg>
+                            PDF
+                          </a>
+                        ` : ''}
+                      </div>
+
+                      <!-- External Archive Links -->
+                      <div class="lp-card-links-row">
+                        ${w.links.map(l => `
+                          <a href="${l.url}" target="_blank" rel="noopener noreferrer" class="lp-card-link-item">
+                            ${l.label}
+                            <svg viewBox="0 0 24 24" style="width:12px; height:12px;" fill="none" stroke="currentColor" stroke-width="2.5">
+                              <path d="M7 17 17 7m0 0H8m9 0v9" />
+                            </svg>
+                          </a>
+                        `).join('')}
+                      </div>
+
+                    </article>
+                  </div>
+                `;
+              }).join('')}
+            </div>
+          </div>
+        `;
+      });
+
+      mount.innerHTML = catalogHtml;
+
+      // Attach Bookmark Toggle Listeners
+      mount.querySelectorAll('.lp-card-bookmark-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const wid = btn.getAttribute('data-work-id');
+          if (savedIds.includes(wid)) {
+            savedIds = savedIds.filter(id => id !== wid);
+            showToast('তালিকা থেকে সরানো হয়েছে');
+          } else {
+            savedIds.push(wid);
+            showToast('আমার তালিকায় যোগ করা হয়েছে ★');
+          }
+          localStorage.setItem(SAVE_KEY, JSON.stringify(savedIds));
+          renderCatalog();
         });
       });
 
-      // Search Event
-      if (searchInput) {
-        searchInput.addEventListener('input', (e) => {
-          searchQuery = e.target.value.trim().toLowerCase();
-          renderBooks();
+      // Attach Reader Modal Trigger Listeners
+      mount.querySelectorAll('.btn-open-reader').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const wid = btn.getAttribute('data-work-id');
+          openReaderModal(wid);
         });
+      });
+
+      // Init scroll reveals for newly injected nodes
+      initScrollReveals();
+    }
+
+    // =========================================================================
+    // IN-APP READER MODAL SYSTEM
+    // =========================================================================
+    const FONT_SIZES = [16, 17.5, 19, 21, 23];
+    let currentFzIdx = 2;
+
+    function openReaderModal(workId) {
+      const data = window.THE_WAY_BOOKS;
+      if (!data) return;
+      const work = data.getBookById(workId);
+      if (!work) return;
+
+      const extra = data.getExtra(work.id);
+      const cat = data.getCategories().find(c => c.id === work.cat) || { title: 'বিভাগ' };
+
+      document.getElementById('reader-modal-cat').textContent = `${cat.title} · ${work.lang}`;
+      document.getElementById('reader-modal-title').textContent = work.title;
+      document.getElementById('reader-modal-author').textContent = `${work.author} · ${bnDigits(work.year)}`;
+
+      // Context text
+      const contextEl = document.getElementById('reader-modal-context');
+      contextEl.textContent = extra.read ? extra.read.context : work.desc;
+      contextEl.style.fontSize = `${FONT_SIZES[currentFzIdx]}px`;
+
+      // Indicator badge
+      const indicatorEl = document.getElementById('reader-modal-badge-indicator');
+      if (indicatorEl) {
+        if (extra.pdf) {
+          indicatorEl.innerHTML = `<span style="color:var(--lp-red);">★</span> সরাসরি PDF যুক্ত`;
+        } else if (extra.html) {
+          indicatorEl.innerHTML = `<span style="color:var(--lp-red);">★</span> ওয়েব টেক্সট যুক্ত`;
+        } else {
+          indicatorEl.textContent = `পূর্ণ পাঠ নিচের লিঙ্কে ↓`;
+        }
+      }
+
+      // Points section
+      const pointsSection = document.getElementById('reader-modal-points-section');
+      const pointsList = document.getElementById('reader-modal-points-list');
+      if (extra.read && extra.read.points && extra.read.points.length > 0) {
+        pointsSection.style.display = 'block';
+        pointsList.innerHTML = extra.read.points.map(p => `
+          <li class="lp-reader-point-item">
+            <svg viewBox="0 0 100 100" class="lp-reader-point-icon" fill="currentColor">
+              <path d="M50 2 61.8 36.2 98 36.6 69 58.3 79.4 93 50 72 20.6 93 31 58.3 2 36.6 38.2 36.2Z" />
+            </svg>
+            <span class="lp-reader-point-text" style="font-family:var(--lp-font-body); line-height:1.6; font-size:${FONT_SIZES[currentFzIdx] - 1}px;">${p}</span>
+          </li>
+        `).join('');
+      } else {
+        pointsSection.style.display = 'none';
+      }
+
+      // Links grid
+      const linksGrid = document.getElementById('reader-modal-links-grid');
+      const allLinks = [
+        ...(extra.pdf ? [{ label: 'সরাসরি PDF', url: extra.pdf, kind: 'pdf' }] : []),
+        ...(extra.html ? [{ label: 'ওয়েব টেক্সট (পূর্ণ পাঠ)', url: extra.html, kind: 'web' }] : []),
+        ...(extra.ebook ? [{ label: 'আর্কাইভ স্ক্যান', url: extra.ebook, kind: 'link' }] : []),
+        ...work.links.map(l => ({ label: l.label, url: l.url, kind: 'link' }))
+      ];
+
+      linksGrid.innerHTML = allLinks.map(l => `
+        <a href="${l.url}" target="_blank" rel="noopener noreferrer" class="lp-reader-link-card ${l.kind}-kind lp-lift lp-hard-sm">
+          <span>${l.kind === 'pdf' ? '📄 ' : ''}${l.label}</span>
+          <svg viewBox="0 0 24 24" style="width:14px; height:14px;" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path d="M7 17 17 7m0 0H8m9 0v9" />
+          </svg>
+        </a>
+      `).join('');
+
+      const modal = document.getElementById('lp-reader-modal');
+      modal.classList.add('active');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeReaderModal() {
+      const modal = document.getElementById('lp-reader-modal');
+      modal.classList.remove('active');
+      document.body.style.overflow = '';
+    }
+
+    // Reader Font Sizing
+    document.getElementById('reader-font-dec')?.addEventListener('click', () => {
+      if (currentFzIdx > 0) {
+        currentFzIdx--;
+        document.getElementById('reader-modal-context').style.fontSize = `${FONT_SIZES[currentFzIdx]}px`;
+        document.querySelectorAll('.lp-reader-point-text').forEach(el => el.style.fontSize = `${FONT_SIZES[currentFzIdx] - 1}px`);
+      }
+    });
+
+    document.getElementById('reader-font-inc')?.addEventListener('click', () => {
+      if (currentFzIdx < FONT_SIZES.length - 1) {
+        currentFzIdx++;
+        document.getElementById('reader-modal-context').style.fontSize = `${FONT_SIZES[currentFzIdx]}px`;
+        document.querySelectorAll('.lp-reader-point-text').forEach(el => el.style.fontSize = `${FONT_SIZES[currentFzIdx] - 1}px`);
+      }
+    });
+
+    document.getElementById('reader-modal-close-btn')?.addEventListener('click', closeReaderModal);
+    document.getElementById('lp-reader-modal')?.addEventListener('click', (e) => {
+      if (e.target.id === 'lp-reader-modal') closeReaderModal();
+    });
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closeReaderModal();
+    });
+
+    // =========================================================================
+    // JSZIP EXPORT ENGINE
+    // =========================================================================
+    async function downloadLibraryZip() {
+      if (zipBusy) return;
+      if (typeof JSZip === 'undefined') {
+        showToast('JSZip লাইব্রেরি লোড হচ্ছে, অনুগ্রহ করে অপেক্ষা করুন...');
+        return;
+      }
+
+      zipBusy = true;
+      const data = window.THE_WAY_BOOKS;
+      const works = data.WORKS || [];
+      const cats = data.getCategories();
+      const stats = data.STATS;
+
+      // Update button state
+      const zipBtnLabel = document.getElementById('zip-btn-label');
+      const heroZipBtn = document.getElementById('hero-zip-btn');
+      const footerZipBtn = document.getElementById('footer-zip-btn');
+      if (zipBtnLabel) zipBtnLabel.textContent = 'তৈরি হচ্ছে…';
+      if (heroZipBtn) heroZipBtn.setAttribute('disabled', 'true');
+      if (footerZipBtn) footerZipBtn.setAttribute('disabled', 'true');
+
+      try {
+        const zip = new JSZip();
+        const RULE = "────────────────────────────────────────";
+
+        // Readme
+        zip.file("README.md", `# ★ লাল পাঠাগার — ZIP সংগ্রহ\n\nসারা বিশ্বের কমিউনিস্ট সাহিত্যের মুক্ত সংগ্রহশালা।\n\nএই সংকলনে ${stats.works}টি রচনা, ${stats.langs}টি ভাষা, ${stats.links}টি মুক্ত লিঙ্ক রয়েছে।\n\n★ শ্রমজীবী মানুষের জ্ঞান, সবার জন্য।\n`);
+
+        // Index txt
+        let indexTxt = `★ লাল পাঠাগার — বিশ্ব কমিউনিস্ট সাহিত্যের সম্পূর্ণ সূচি ★\nসংকলিত বই/লেখক : ${stats.works} | ভাষা : ${stats.langs} | মুক্ত লিঙ্ক : ${stats.links}\n${RULE}\n\n`;
+        cats.forEach(c => {
+          indexTxt += `▼ ${c.num} — ${c.title} (${c.blurb})\n${RULE}\n`;
+          const cWorks = works.filter(w => w.cat === c.id);
+          cWorks.forEach((w, i) => {
+            const x = data.getExtra(w.id);
+            indexTxt += `${String(i + 1).padStart(2, '0')}. ${w.title} — ${w.author} (${w.year}, ${w.lang})\n`;
+            w.links.forEach(l => indexTxt += `     ${l.label}: ${l.url}\n`);
+            if (x.pdf) indexTxt += `     সরাসরি PDF: ${x.pdf}\n`;
+            if (x.html) indexTxt += `     ওয়েব টেক্সট: ${x.html}\n`;
+            if (x.ebook) indexTxt += `     আর্কাইভ: ${x.ebook}\n`;
+          });
+          indexTxt += '\n';
+        });
+        zip.file("সম্পূর্ণ-সূচি.txt", indexTxt);
+
+        // Folders with individual dossiers
+        cats.forEach(c => {
+          const folder = zip.folder(`সংগ্রহ/${c.num}-${c.title}`);
+          if (!folder) return;
+          const cWorks = works.filter(w => w.cat === c.id);
+          cWorks.forEach((w, i) => {
+            const x = data.getExtra(w.id);
+            let wTxt = `★ ${w.title}\n   মূল শিরোনাম : ${w.orig || '—'}\n   লেখক        : ${w.author}\n   প্রথম প্রকাশ  : ${w.year}\n   মূল ভাষা     : ${w.lang}\n\n   ${w.desc}\n\n   সরাসরি লিঙ্ক:\n`;
+            w.links.forEach(l => wTxt += `   • ${l.label} — ${l.url}\n`);
+            if (x.pdf) wTxt += `   • সরাসরি PDF — ${x.pdf}\n`;
+            if (x.html) wTxt += `   • ওয়েব টেক্সট — ${x.html}\n`;
+            if (x.ebook) wTxt += `   • আর্কাইভ স্ক্যান — ${x.ebook}\n`;
+            if (x.read) {
+              wTxt += `\n   প্রেক্ষাপট:\n   ${x.read.context}\n\n   মর্মকথা:\n`;
+              x.read.points.forEach(p => wTxt += `   • ${p}\n`);
+            }
+            folder.file(`${String(i + 1).padStart(2, '0')}-${w.id}.txt`, wTxt);
+          });
+        });
+
+        // Generate Blob
+        const blob = await zip.generateAsync({ type: 'blob', compression: 'DEFLATE' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'laal-pathagar-sangraha.zip';
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        setTimeout(() => URL.revokeObjectURL(url), 4000);
+        showToast('★ সংগ্রহ তৈরি — ডাউনলোড শুরু হয়েছে!');
+      } catch (err) {
+        showToast('দুঃখিত, ZIP তৈরি করা গেল না — আবার চেষ্টা করুন।');
+      } finally {
+        zipBusy = false;
+        if (zipBtnLabel) zipBtnLabel.textContent = 'ZIP নিন';
+        if (heroZipBtn) heroZipBtn.removeAttribute('disabled');
+        if (footerZipBtn) footerZipBtn.removeAttribute('disabled');
       }
     }
 
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', initBooksLibrary);
-    } else {
-      initBooksLibrary();
+    // Copy All Links
+    async function copyAllLinks() {
+      const data = window.THE_WAY_BOOKS;
+      if (!data) return;
+      const works = data.WORKS || [];
+      const list = works.map(w => {
+        const x = data.getExtra(w.id);
+        const extra = [
+          ...(x.pdf ? [`  সরাসরি PDF: ${x.pdf}`] : []),
+          ...(x.html ? [`  ওয়েব টেক্সট: ${x.html}`] : []),
+          ...(x.ebook ? [`  আর্কাইভ: ${x.ebook}`] : []),
+        ];
+        return `${w.title} — ${w.author} (${w.year})\n${[...w.links.map(l => `  ${l.label}: ${l.url}`), ...extra].join('\n')}`;
+      }).join('\n\n');
+
+      try {
+        await navigator.clipboard.writeText(list);
+        showToast('সব লিঙ্ক (PDF সহ) ক্লিপবোর্ডে কপি হয়েছে ★');
+      } catch {
+        showToast('কপি করা গেল না — ব্রাউজার অনুমতি দেয়নি।');
+      }
     }
+
+    // Scroll Reveal Observer
+    function initScrollReveals() {
+      const reveals = document.querySelectorAll('.lp-reveal:not(.lp-reveal-in)');
+      if (!('IntersectionObserver' in window)) {
+        reveals.forEach(el => el.classList.add('lp-reveal-in'));
+        return;
+      }
+      const io = new IntersectionObserver((entries) => {
+        entries.forEach(e => {
+          if (e.isIntersecting) {
+            e.target.classList.add('lp-reveal-in');
+            io.unobserve(e.target);
+          }
+        });
+      }, { threshold: 0.1, rootMargin: '0px 0px -30px 0px' });
+
+      reveals.forEach(el => io.observe(el));
+    }
+
+    // Event Listeners Setup
+    function setupEvents() {
+      // Search
+      const searchInput = document.getElementById('lp-search-input');
+      if (searchInput) {
+        searchInput.addEventListener('input', (e) => {
+          currentQuery = e.target.value;
+          renderCatalog();
+        });
+      }
+
+      // Language Select
+      const langSelect = document.getElementById('lp-select-lang');
+      if (langSelect) {
+        langSelect.addEventListener('change', (e) => {
+          currentLang = e.target.value;
+          renderCatalog();
+        });
+      }
+
+      // Saved List Toggle
+      const savedBtn = document.getElementById('lp-btn-saved');
+      if (savedBtn) {
+        savedBtn.addEventListener('click', () => {
+          savedOnly = !savedOnly;
+          savedBtn.classList.toggle('active', savedOnly);
+          renderCatalog();
+        });
+      }
+
+      // ZIP Buttons
+      document.getElementById('hero-zip-btn')?.addEventListener('click', downloadLibraryZip);
+      document.getElementById('lp-btn-zip')?.addEventListener('click', downloadLibraryZip);
+      document.getElementById('footer-zip-btn')?.addEventListener('click', downloadLibraryZip);
+
+      // Copy Links Button
+      document.getElementById('footer-copy-btn')?.addEventListener('click', copyAllLinks);
+    }
+
+    // Initialization
+    function init() {
+      initStatsAndMarquee();
+      setupEvents();
+      renderCatalog();
+      initScrollReveals();
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', init);
+    } else {
+      init();
+    }
+
+  })();
   </script>
 </body>
 </html>
-

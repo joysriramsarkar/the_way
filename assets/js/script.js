@@ -220,36 +220,50 @@
 
     const lang = window.TheWayComponents ? window.TheWayComponents.getLanguage() : 'bn';
     const books = window.THE_WAY_BOOKS.getAllBooks().slice(0, 3);
+    const toBn = window.TheWayComponents ? window.TheWayComponents.toBengaliDigits : (n) => n;
 
-    const cardsHtml = books.map(book => `
-      <article class="standard-article-card" style="border-top: 3px solid var(--crimson-primary);">
-        <div style="background:${book.cover_color}; height:140px; padding:1.2rem; color:#fff; display:flex; justify-content:space-between; align-items:flex-start; border-radius:var(--radius-sm) var(--radius-sm) 0 0;">
-          <span style="background:rgba(0,0,0,0.4); padding:3px 8px; border-radius:var(--radius-full); font-size:0.75rem; font-weight:700;">${book.category_name_bn}</span>
-          <span style="display:inline-flex; align-items:center; justify-content:center; width:36px; height:36px; background:rgba(255,255,255,0.18); border-radius:8px;">
-            ${ICONS.book}
-          </span>
-        </div>
-        <div class="card-body-content">
-          <span class="card-tag-pill" style="color:var(--crimson-primary);">${book.year}</span>
-          <h3 class="card-heading">
-            <a href="/book-reader.html?book=${book.slug}">${book.title_bn}</a>
-          </h3>
-          <p class="card-excerpt">${book.summary_bn}</p>
-          <div class="card-footer-meta" style="margin-top:auto; padding-top:0.8rem; border-top:1px dashed var(--border-color);">
-            <span>${ICONS.quill} ${book.authors.map(a=>a.name).join(' ও ')}</span>
-            <a href="/book-reader.html?book=${book.slug}" style="color:var(--crimson-primary); font-weight:700; text-decoration:none;">পড়ুন →</a>
+    const cardsHtml = books.map(book => {
+      const extra = window.THE_WAY_BOOKS.getExtra ? window.THE_WAY_BOOKS.getExtra(book.id) : {};
+      const catTitle = book.cat === 'marx' ? 'মার্কস–এঙ্গেলস' :
+                       book.cat === 'lenin' ? 'লেনিন ও রুশ বিপ্লব' :
+                       book.cat === 'fiction' ? 'উপন্যাস ও সাহিত্য' : 'ধ্রুপদী সাহিত্য';
+      const catColor = book.cat === 'marx' ? 'var(--crimson-primary)' :
+                       book.cat === 'lenin' ? '#274b8f' :
+                       book.cat === 'fiction' ? '#7c4063' : '#b9862a';
+
+      return `
+        <article class="standard-article-card" style="border: 2px solid #201812; box-shadow: 4px 4px 0 #201812; background: #faf5e7; display: flex; flex-direction: column;">
+          <div style="background: ${catColor}; padding: 0.85rem 1.2rem; color: #fff; display: flex; justify-content: space-between; align-items: center;">
+            <span style="font-size: 0.75rem; font-weight: 700; letter-spacing: 0.05em;">${catTitle}</span>
+            <span style="font-family: 'Oswald', sans-serif; font-size: 0.85rem; font-weight: 700; background: rgba(0,0,0,0.3); padding: 2px 8px; border-radius: 4px;">${toBn(book.year)}</span>
           </div>
-        </div>
-      </article>
-    `).join('');
+          <div class="card-body-content" style="padding: 1.25rem; display: flex; flex-direction: column; flex: 1;">
+            <span style="font-size: 0.75rem; font-weight: 700; color: #5d5140; margin-bottom: 0.25rem;">মূল ভাষা: ${book.lang}</span>
+            <h3 class="card-heading" style="font-family: 'Anek Bangla', 'Noto Serif Bengali', serif; font-weight: 800; font-size: 1.25rem; margin-bottom: 0.5rem; line-height: 1.3;">
+              <a href="/books.html" style="color: #201812; text-decoration: none;">${book.title}</a>
+            </h3>
+            <p class="card-excerpt" style="font-size: 0.85rem; line-height: 1.6; color: #5d5140; margin-bottom: 1rem; flex: 1;">${book.desc}</p>
+            <div class="card-footer-meta" style="margin-top: auto; padding-top: 0.75rem; border-top: 1px dashed rgba(32,24,18,0.25); display: flex; align-items: center; justify-content: space-between;">
+              <span style="font-weight: 700; font-size: 0.82rem; color: #201812;">${ICONS.quill} ${book.author}</span>
+              <a href="/books.html" style="background: var(--crimson-primary); color: #fff; font-weight: 700; font-size: 0.78rem; padding: 4px 10px; border-radius: 4px; text-decoration: none;">পড়ুন ★</a>
+            </div>
+          </div>
+        </article>
+      `;
+    }).join('');
 
     booksMount.innerHTML = `
       <div class="section-header-row">
         <div>
-          <h2 class="section-title-large">${ICONS.book} বিপ্লবী ধ্রুপদী পাঠাগার (Marxist Classics)</h2>
-          <p style="font-size:0.92rem; color:var(--text-secondary); margin-top:0.2rem;">কমিউনিস্ট ম্যানিফেস্টো, ম্যাক্সিম গোর্কির মা ও মার্ক্সীয় তত্ত্বের ডিজিটাল উন্মুক্ত রূপ</p>
+          <h2 class="section-title-large" style="display: flex; align-items: center; gap: 0.5rem;">
+            <svg viewBox="0 0 100 100" style="width: 22px; height: 22px; color: var(--crimson-primary);" fill="currentColor">
+              <path d="M50 2 61.8 36.2 98 36.6 69 58.3 79.4 93 50 72 20.6 93 31 58.3 2 36.6 38.2 36.2Z" />
+            </svg>
+            লাল পাঠাগার (Laal Pathagar) — মুক্ত ধ্রুপদী সংগ্রহশালা
+          </h2>
+          <p style="font-size: 0.92rem; color: var(--text-secondary); margin-top: 0.2rem;">কমিউনিস্ট ইশতেহার, দাস ক্যাপিটাল, ম্যাক্সিম গোর্কির মা ও বৈপ্লবিক সাহিত্যের ডিজিটাল মুক্ত ভাণ্ডার</p>
         </div>
-        <a href="/books.html" class="section-view-all-link" style="color:var(--crimson-primary);">
+        <a href="/books.html" class="section-view-all-link" style="color: var(--crimson-primary); font-weight: 700;">
           ${lang === 'bn' ? 'সকল বই দেখুন' : 'Explore All Books'} →
         </a>
       </div>

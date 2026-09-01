@@ -1,422 +1,1236 @@
 /**
- * THE WAY (দ্য ওয়ে) — Revolutionary Classics & Marxist-Leninist Literature Library
- * Curated Web Books with Full Chapters, Historical Context, and Dialectical Analyses
- * Featuring Karl Marx's Das Kapital (Full 8-Part Edition), Maxim Gorky's Mother (Novel), 
- * Communist Manifesto, Lenin, Stalin (Problems of Leninism), Mao Zedong, Engels, and Bhagat Singh.
+ * THE WAY (দ্য ওয়ে) — লাল পাঠাগার (Laal Pathagar)
+ * Revolutionary Classics & Marxist-Leninist Literature Library Dataset
+ * Complete 53+ Works across 7 Categories with Direct PDFs, Context, and Web Links
  */
 
 (function(window) {
   'use strict';
 
-  const REVOLUTIONARY_BOOKS = [
-  {
-    id: "das-kapital",
-    slug: "das-kapital-volume-1",
-    title_bn: "পুঁজি (১ম খণ্ড) — পুঁজিবাদী উৎপাদন প্রক্রিয়া (সম্পূর্ণ সংস্করণ)",
-    title_en: "Das Kapital, Volume I: Capitalist Production (Complete Edition)",
-    subtitle_bn: "রাজনৈতিক অর্থনীতির সমালোচনার ঐতিহাসিক রূপরেখা, পণ্য, উদ্বৃত্ত মূল্য ও আদিম পুঞ্জীভবন (১৮৬৭)",
-    subtitle_en: "A Critical Analysis of Capitalist Production by Karl Marx — Complete 8 Parts (1867)",
-    authors: [
-      {
-        name: "কার্ল মার্ক্স (Karl Marx)",
-        role: "রাজনৈতিক অর্থনীতিবিদ ও দার্শনিক"
-      },
-      {
-        name: "ফ্রিডরিখ এঙ্গেলস (Friedrich Engels)",
-        role: "সম্পাদক ও প্রকাশক (১৮৮৭ ইংরেজি সংস্করণ)"
-      }
-    ],
-    year: "১৮৬৭",
-    category: "economy",
-    category_name_bn: "রাজনৈতিক অর্থনীতি ও পুঁজিবাদ ব্যবচ্ছেদ",
-    category_name_en: "Political Economy & Das Kapital",
-    cover_color: "linear-gradient(135deg, #78350f 0%, #9a3412 50%, #c2182b 100%)",
-    cover_icon: "⚙️",
-    reading_time_mins: 180,
-    pages_count: 864,
-    rating: 5,
-    summary_bn: "মানব ইতিহাসের সর্বশ্রেষ্ঠ অর্থনৈতিক ও বৈজ্ঞানিক গ্রন্থ। কার্ল মার্ক্স ১৮৬৭ সালে লন্ডনে বসে পুঁজিবাদের অভ্যন্তরীণ নিয়ম, শ্রমমূল্য তত্ত্ব, উদ্বৃত্ত শ্রম আত্মসাৎ এবং রক্ত ও আগুনের মাধ্যমে পুঁজির আদিম পুঞ্জীভবনের সম্পূর্ণ বিজ্ঞান উন্মোচন করেন। ৮টি পর্ব ও ৩৩টি অধ্যায়ের সম্পূর্ণ বিশ্লেষণ।",
-    summary_en: "Marx’s magnum opus: the definitive critique of bourgeois political economy, the law of value, surplus value, organic composition of capital, capitalist accumulation, and the inevitable historical expropriation of the expropriators.",
-    famous_quote_bn: "“পুঁজি যখন পৃথিবীতে আসে, তখন তার জন্ম হয় সর্বাঙ্গ দিয়ে রক্ত ও কাদা ঝরিয়ে, প্রতিটি লোমকূপ থেকে দুর্গন্ধ ছড়িয়ে।”",
-    famous_quote_en: "“Capital comes dripping from head to foot, from every pore, with blood and dirt.”",
-    chapters: [],
-    has_chapters_file: true
-  },
-  {
-    id: "gorky-mother",
-    slug: "maxim-gorky-mother-novel",
-    title_bn: "মা (উপন্যাস — সম্পূর্ণ সংস্করণ)",
-    title_en: "Mother (Novel — Complete 2-Part Edition by Maxim Gorky)",
-    subtitle_bn: "বলশেভিক মেহনতি মানুষের জাগরণ, মা পেলেগেয়া নিলোভনা ও পাভেলের অমর সংগ্রাম (অনুবাদ: বিমল সেন / উইকিসংকলন মুক্ত পাঠাগার)",
-    subtitle_en: "The Epic Socialist Masterpiece of Proletarian Awakening Translated by Bimal Sen (1906 / 1950)",
-    authors: [
-      {
-        name: "ম্যাক্সিম গোর্কি (Maxim Gorky)",
-        role: "বিশ্বখ্যাত বিপ্লবী সাহিত্যিক ও নাট্যকার"
-      },
-      {
-        name: "বিমল সেন (Bimal Sen)",
-        role: "বঙ্গানুবাদক (কলকাতা, ১৯৫০ / উইকিসংকলন)"
-      }
-    ],
-    year: "১৯০৬",
-    category: "literature",
-    category_name_bn: "বিপ্লবী সাহিত্য ও ধ্রুপদী উপন্যাস",
-    category_name_en: "Revolutionary Literature & Fiction",
-    cover_color: "linear-gradient(135deg, #831843 0%, #be185d 50%, #c2182b 100%)",
-    cover_icon: "🥀",
-    reading_time_mins: 240,
-    pages_count: 412,
-    rating: 5,
-    summary_bn: "বিশ্ব সাহিত্যের অবিসংবাদিত সমাজতান্ত্রিক মহা-উপন্যাস। ১৯০৫ সালের প্রথম রুশ বিপ্লবের অগ্নিগর্ভ পটভূমিতে সরমোভো কারখানার দাসত্ব থেকে শুরু করে এক অশিক্ষিত শ্রমিকের মায়ের (পেলেগেয়া নিলোভনা ভ্লাসোভা) নির্ভীক বিপ্লবী কমরেডে রূপান্তর, মে দিবসের রক্তিম পতাকা মিছিল, আদালতের কাঠগড়ায় পাভেলের ঐতিহাসিক জবানবন্দি এবং রেলস্টেশনের অন্তিম আত্মদানের অমর পূর্ণাঙ্গ আখ্যান।",
-    summary_en: "Maxim Gorky’s world-historic novel capturing the political awakening of the Russian working class through the transformation of a frightened factory worker’s mother into a fearless vanguard revolutionary.",
-    famous_quote_bn: "“সত্যের আলো একবার মানুষের মনে জ্বলে উঠলে কোনো পুলিশ, চাবুক বা কারাগার দিয়ে তাকে আর নেভানো যায় না। আমাদের রক্তে জন্ম নেবে কোটি কোটি নতুন মুক্তিকামী মানুষ!”",
-    famous_quote_en: "“Truth cannot be drowned in seas of blood! The soul once awakened can never be enslaved again!”",
-    chapters: [],
-    has_chapters_file: true
-  },
-  {
-    id: "pather-dabi",
-    slug: "pather-dabi",
-    title_bn: "পথের দাবী (উপন্যাস — সম্পূর্ণ সংস্করণ)",
-    title_en: "Pather Dabi (The Demand of the Road — Sarat Chandra Chattopadhyay)",
-    subtitle_bn: "ব্রিটিশ সাম্রাজ্যবাদবিরোধী বিপ্লবী দল ‘পথের দাবী’, ডাক্তার সব্যসাচী ও অমর মুক্তি সংগ্রাম (১৯২৬ / উইকিসংকলন মুক্ত পাঠাগার)",
-    subtitle_en: "The Banned Anti-Imperialist Masterpiece of Underground Armed Resistance (1926 / 1958)",
-    authors: [
-      {
-        name: "শরৎচন্দ্র চট্টোপাধ্যায় (Sarat Chandra Chattopadhyay)",
-        role: "অপরাজেয় কথাশিল্পী ও ঔপন্যাসিক"
-      }
-    ],
-    year: "১৯২৬",
-    category: "literature",
-    category_name_bn: "বিপ্লবী সাহিত্য ও ধ্রুপদী উপন্যাস",
-    category_name_en: "Revolutionary Literature & Fiction",
-    cover_color: "linear-gradient(135deg, #7c2d12 0%, #b45309 50%, #991b1b 100%)",
-    cover_icon: "🔥",
-    reading_time_mins: 380,
-    pages_count: 31,
-    rating: 5,
-    summary_bn: "বাংলা সাহিত্যের অবিসংবাদিত রাজদ্রোহী বিপ্লবী উপন্যাস। পরাধীন ভারতবর্ষে সশস্ত্র বিপ্লবের মাধ্যমে ব্রিটিশ শাসন উচ্ছেদ করার শপথ নেওয়া এক গুপ্ত বিপ্লবী দল ‘পথের দাবী’, তাদের অবিস্মরণীয় নেতা ডাক্তার সব্যসাচী, অপূর্ব, ভারতী ও সুমিত্রার আত্মত্যাগ ও আদর্শিক দ্বন্দ্বের কালজয়ী মহা-আখ্যান। তীব্র সাম্রাজ্যবাদবিরোধী বিপ্লবী বার্তার কারণে ব্রিটিশ শাসকগোষ্ঠী ১৯২৭ সালের ৪ঠা জানুয়ারি গ্রন্থটি বাজেয়াপ্ত ও নিষিদ্ধ করেছিল।",
-    summary_en: "Sarat Chandra Chattopadhyay’s legendary banned revolutionary masterpiece chronicling Doctor Sabyasachi, the enigmatic leader of the secret anti-colonial insurgent party 'Pather Dabi', fighting for the absolute liberation of the motherland.",
-    famous_quote_bn: "“দেশের স্বাধীনতা মানুষের সবচেয়ে বড় অধিকার। যে জাতি দাসত্ব মেনে নেয়, সে জাতির বেঁচে থাকার কোনো অধিকার নেই। বিপ্লব কোনো অপরাধ নয়, বিপ্লব হলো শৃঙ্খল মুক্তির পরম ধর্ম।”",
-    famous_quote_en: "“Freedom is the supreme right of human existence; revolution against tyranny is not a crime, but the highest moral duty.”",
-    chapters: [],
-    has_chapters_file: true
-  },
-  {
-    id: "communist-manifesto",
-    slug: "communist-manifesto",
-    title_bn: "কমিউনিস্ট পার্টির ইশতেহার",
-    title_en: "Manifesto of the Communist Party",
-    subtitle_bn: "একবিংশ শতাব্দীর সর্বহারা ও মেহনতি মানুষের চিরন্তন মুক্তির ঐতিহাসিক ঘোষণাপত্র (১৮৪৮)",
-    subtitle_en: "The Historic Charter for the Emancipation of the Working Class (1848)",
-    authors: [
-      {
-        name: "কার্ল মার্ক্স (Karl Marx)",
-        role: "তাত্ত্বিক ও রাজনৈতিক অর্থনীতিবিদ"
-      },
-      {
-        name: "ফ্রিডরিখ এঙ্গেলস (Friedrich Engels)",
-        role: "দার্শনিক ও মার্ক্সবাদের সহ-প্রতিষ্ঠাতা"
-      }
-    ],
-    year: "১৮৪৮",
-    category: "manifesto",
-    category_name_bn: "ঐতিহাসিক ইশতেহার ও রণনীতি",
-    category_name_en: "Historical Manifesto & Strategy",
-    cover_color: "linear-gradient(135deg, #8b0e1b 0%, #c2182b 60%, #e52b3c 100%)",
-    cover_icon: "🚩",
-    reading_time_mins: 45,
-    pages_count: 68,
-    rating: 5,
-    summary_bn: "মানব ইতিহাসের সবচেয়ে প্রভাবশালী সমাজতান্ত্রিক দলিল। পুঁজিবাদী শোষণের বৈজ্ঞানিক উন্মোচন, শ্রেণি সংগ্রামের অনিবার্যতা এবং মেহনতি মানুষের নেতৃত্বে শোষণমুক্ত কমিউনিস্ট সমাজ গঠনের রণকৌশল।",
-    summary_en: "The foundational text of scientific socialism detailing the materialist conception of history, class struggle, and the historic mission of the proletariat.",
-    famous_quote_bn: "“জগতের সকল দেশের মেহনতি মানুষ এক হও! তোমাদের হারানোর কিছু নেই শুধু শৃঙ্খল ছাড়া, আর জয় করার জন্য রয়েছে গোটা পৃথিবী।”",
-    famous_quote_en: "“Workers of the world, unite! You have nothing to lose but your chains. They have a world to win.”",
-    chapters: [],
-    has_chapters_file: true
-  },
-  {
-    id: "problems-of-leninism",
-    slug: "problems-of-leninism",
-    title_bn: "লেনিনবাদের সমস্যাবলি",
-    title_en: "Problems of Leninism",
-    subtitle_bn: "সাম্রাজ্যবাদের যুগে লেনিনবাদের সারবত্তা, এক দেশে সমাজতন্ত্রের রূপরেখা ও প্রলেতারীয় একনায়কত্ব (১৯২৬)",
-    subtitle_en: "Foundational Theory of Socialist Construction, Party Cadres & The Dictatorship of the Proletariat (1926)",
-    authors: [
-      {
-        name: "জোসেফ স্ট্যালিন (J. V. Stalin)",
-        role: "সোভিয়েত সমাজতান্ত্রিক বিপ্লবের রূপকার ও তাত্ত্বিক"
-      }
-    ],
-    year: "১৯২৬",
-    category: "state",
-    category_name_bn: "লেনিনবাদ ও সমাজতান্ত্রিক রূপান্তর",
-    category_name_en: "Leninism & Socialist Construction",
-    cover_color: "linear-gradient(135deg, #991b1b 0%, #b91c1c 50%, #d97706 100%)",
-    cover_icon: "⭐",
-    reading_time_mins: 55,
-    pages_count: 94,
-    rating: 5,
-    summary_bn: "স্ট্যালিনের সবচেয়ে কালজয়ী তাত্ত্বিক গ্রন্থ। লেনিনবাদ কী, সাম্রাজ্যবাদের যুগে আন্তর্জাতিক সর্বহারা বিপ্লবের কৌশল, কৃষক ও শ্রমিকের মৈত্রী, এবং পুঁজিবাদী ঘেরাওয়ের মুখে এক দেশে সমাজতান্ত্রিক অর্থনীতি নির্মাণের বৈজ্ঞানিক দিকনির্দেশনা।",
-    summary_en: "Stalin’s masterwork systematizing Marxist-Leninist science, the class alliances between workers and peasants, the dictatorship of the proletariat, and the building of socialism in the Soviet Union.",
-    famous_quote_bn: "“লেনিনবাদ হলো সাম্রাজ্যবাদ ও সর্বহারা বিপ্লবের যুগের মার্ক্সবাদ। আরও সুনির্দিষ্টভাবে: লেনিনবাদ হলো সামগ্রিকভাবে সর্বহারা বিপ্লবের তত্ত্ব ও রণকৌশল, এবং প্রলেতারীয় একনায়কত্বের তত্ত্ব ও রণকৌশল।”",
-    famous_quote_en: "“Leninism is Marxism of the era of imperialism and of the proletarian revolution. To be more exact: Leninism is the theory and tactics of the proletarian revolution in general, the theory and tactics of the dictatorship of the proletariat in particular.”",
-    chapters: [],
-    has_chapters_file: true
-  },
-  {
-    id: "cultural-revolution",
-    slug: "cultural-revolution-and-class-struggle",
-    title_bn: "মহান সর্বহারা সাংস্কৃতিক বিপ্লব ও ভাবাদর্শগত সংগ্রাম",
-    title_en: "The Great Proletarian Cultural Revolution",
-    subtitle_bn: "সমাজতান্ত্রিক সমাজে বুর্জোয়া পুনরুজ্জীবনের বিরুদ্ধে অব্যাহত বিপ্লবের রণনীতি ও দ্বন্দ্বতত্ত্ব (১৯৬৬)",
-    subtitle_en: "Ideological Class Struggle Under Socialism & Continuing the Revolution (1966)",
-    authors: [
-      {
-        name: "মাও সেতুং (Mao Zedong)",
-        role: "চীনা বিপ্লবের মহানায়ক ও মার্ক্সবাদী তাত্ত্বিক"
-      }
-    ],
-    year: "১৯৬৬",
-    category: "philosophy",
-    category_name_bn: "সাংস্কৃতিক বিপ্লব ও দ্বন্দ্বতত্ত্ব",
-    category_name_en: "Cultural Revolution & Dialectics",
-    cover_color: "linear-gradient(135deg, #b91c1c 0%, #dc2626 50%, #f59e0b 100%)",
-    cover_icon: "☀️",
-    reading_time_mins: 50,
-    pages_count: 82,
-    rating: 5,
-    summary_bn: "সমাজতন্ত্র প্রতিষ্ঠার পরও কেন সমাজে শ্রেণি সংগ্রাম শেষ হয় না এবং কেন আমলাতন্ত্র ও সংস্কৃতির ভেতরে লুকিয়ে থাকা বুর্জোয়া ভাবাদর্শের বিরুদ্ধে গণমানুষের সার্বক্ষণিক সাংস্কৃতিক বিপ্লব প্রয়োজন—মাও সেতুং-এর ঐতিহাসিক চিন্তন।",
-    summary_en: "Mao’s fundamental contribution analyzing why class struggle persists under the socialist transition, the emergence of bureaucratic capitalist-roaders, and mass mobilization to preserve proletarian power.",
-    famous_quote_bn: "“সমাজতান্ত্রিক সমাজ হলো এক দীর্ঘ ঐতিহাসিক কালপর্ব। এই কালপর্ব জুড়ে শ্রেণি, শ্রেণিদ্বন্দ্ব ও শ্রেণি সংগ্রাম টিকে থাকে, টিকে থাকে সমাজতন্ত্র ও পুঁজিবাদের মধ্যকার দুটি পথের লড়াই।”",
-    famous_quote_en: "“Socialist society covers a considerably long historical period. In this period, classes, class contradictions and class struggle continue, the struggle between the socialist road and the capitalist road continues.”",
-    chapters: [],
-    has_chapters_file: true
-  },
-  {
-    id: "state-and-revolution",
-    slug: "state-and-revolution",
-    title_bn: "রাষ্ট্র ও বিপ্লব",
-    title_en: "The State and Revolution",
-    subtitle_bn: "শ্রেণি সমাজ, রাষ্ট্রযন্ত্রের নিপীড়নমূলক চরিত্র ও রাষ্ট্রের বিলোপসাধন (১৯১৭)",
-    subtitle_en: "Marxist Theory of the State & The Tasks of the Proletariat in Revolution (1917)",
-    authors: [
-      {
-        name: "ভ্লাদিমির ইলিচ লেনিন (V. I. Lenin)",
-        role: "বলশেভিক বিপ্লবের মহান নেতা ও তাত্ত্বিক"
-      }
-    ],
-    year: "১৯১৭",
-    category: "state",
-    category_name_bn: "রাষ্ট্র ও বিপ্লব",
-    category_name_en: "State & Revolution",
-    cover_color: "linear-gradient(135deg, #991b1b 0%, #dc2626 60%, #b91c1c 100%)",
-    cover_icon: "🏛️",
-    reading_time_mins: 50,
-    pages_count: 76,
-    rating: 5,
-    summary_bn: "১৯১৭ সালের মহান অক্টোবর সমাজতান্ত্রিক বিপ্লবের প্রাক্কালে রচিত। বুর্জোয়া আমলাতান্ত্রিক ও সামরিক রাষ্ট্রযন্ত্রকে কেন সংস্কার নয় বরং চূর্ণ করতে হবে এবং শ্রেণিহীন কমিউনিস্ট সমাজে কীভাবে রাষ্ট্রের বিলোপ ঘটবে তার অকাট্য তত্ত্ব।",
-    summary_en: "Lenin’s essential masterpiece on the class nature of the capitalist state apparatus, the lessons of the Paris Commune, and the transition toward a stateless communist society.",
-    famous_quote_bn: "“যতদিন রাষ্ট্র আছে ততদিন কোনো স্বাধীনতা নেই। যখন স্বাধীনতা থাকবে, তখন কোনো রাষ্ট্র থাকবে না।”",
-    famous_quote_en: "“So long as the state exists there is no freedom. When there is freedom, there will be no state.”",
-    chapters: [],
-    has_chapters_file: true
-  },
-  {
-    id: "origin-of-family",
-    slug: "origin-of-the-family-private-property-and-the-state",
-    title_bn: "পরিবার, ব্যক্তিগত মালিকানা ও রাষ্ট্রের উৎপত্তি",
-    title_en: "The Origin of the Family, Private Property and the State",
-    subtitle_bn: "ঐতিহাসিক বস্তুবাদের আলোকে আদিম সাম্যবাদ থেকে শ্রেণি সমাজের উন্মেষ ও নারীর ঐতিহাসিক পরাজয় (১৮৮৪)",
-    subtitle_en: "Historical Materialist Analysis of Kinship, Class Formation & The State (1884)",
-    authors: [
-      {
-        name: "ফ্রিডরিখ এঙ্গেলস (Friedrich Engels)",
-        role: "দার্শনিক ও সমাজবিজ্ঞানী"
-      }
-    ],
-    year: "১৮৮৪",
-    category: "philosophy",
-    category_name_bn: "দর্শন ও নৃবিজ্ঞান",
-    category_name_en: "Philosophy & Anthropology",
-    cover_color: "linear-gradient(135deg, #065f46 0%, #047857 60%, #c2182b 100%)",
-    cover_icon: "🌿",
-    reading_time_mins: 45,
-    pages_count: 72,
-    rating: 4.9,
-    summary_bn: "এঙ্গেলসের কালজয়ী নৃবৈজ্ঞানিক ও ঐতিহাসিক গবেষণা। কীভাবে আদিম সাম্যবাদী সমাজে নারী নেতৃত্ব দিয়েছিল, কীভাবে উদ্বৃত্ত উৎপাদন ও ব্যক্তিগত সম্পত্তির উদ্ভবের ফলে পিতৃতন্ত্র কায়েম হলো এবং শ্রেণি শোষণের পাহারাদার হিসেবে রাষ্ট্রের জন্ম হলো।",
-    summary_en: "Engels’ brilliant treatise showing how the development of private wealth shattered egalitarian tribal society, instituting the historic defeat of the female sex and creating the state.",
-    famous_quote_bn: "“ব্যক্তিগত সম্পত্তির উদ্ভব ছিল নারী জাতির বিশ্ব-ঐতিহাসিক পরাজয়।”",
-    famous_quote_en: "“The overthrow of mother-right was the world historical defeat of the female sex.”",
-    chapters: [],
-    has_chapters_file: true
-  },
-  {
-    id: "imperialism-highest-stage",
-    slug: "imperialism-highest-stage",
-    title_bn: "সাম্রাজ্যবাদ: পুঁজিবাদের সর্বোচ্চ পর্যায়",
-    title_en: "Imperialism: The Highest Stage of Capitalism",
-    subtitle_bn: "একচেটিয়া পুঁজি, লগ্নী পুঁজির প্রভুত্ব ও বৈশ্বিক উপনিবেশবাদী লুণ্ঠন (১৯১৬)",
-    subtitle_en: "Monopoly Finance Capital & The Scramble for Global Hegemony (1916)",
-    authors: [
-      {
-        name: "ভ্লাদিমির ইলিচ লেনিন (V. I. Lenin)",
-        role: "রাজনৈতিক অর্থনীতিবিদ ও বিপ্লবী নেতা"
-      }
-    ],
-    year: "১৯১৬",
-    category: "imperialism",
-    category_name_bn: "সাম্রাজ্যবাদ ও বিশ্ব-রাজনীতি",
-    category_name_en: "Imperialism & Geopolitics",
-    cover_color: "linear-gradient(135deg, #1e1b4b 0%, #312e81 60%, #c2182b 100%)",
-    cover_icon: "🌐",
-    reading_time_mins: 45,
-    pages_count: 64,
-    rating: 5,
-    summary_bn: "প্রথম বিশ্বযুদ্ধের প্রেক্ষাপটে লেনিনের যুগান্তকারী রচনা। কীভাবে অবাধ প্রতিযোগিতা একচেটিয়া কারবারে পরিণত হয়, ব্যাংক পুঁজি ও শিল্প পুঁজি মিলে লগ্নী পুঁজির জন্ম দেয় এবং বিশ্বকে ভাগাভাগি করার জন্য সাম্রাজ্যবাদী যুদ্ধ অবশ্যম্ভাবী হয়ে ওঠে।",
-    summary_en: "Lenin’s essential diagnosis of 20th-century global capitalism: the fusion of bank and industrial capital into financial oligarchy and imperialist conflict.",
-    famous_quote_bn: "“সাম্রাজ্যবাদ হলো সেই পুঁজিবাদ যা এমন এক বিকাশ স্তরে পৌঁছেছে যেখানে একচেটিয়া কারবার ও লগ্নী পুঁজির প্রাধান্য প্রতিষ্ঠিত হয়েছে।”",
-    famous_quote_en: "“Imperialism is capitalism at that stage of development at which the dominance of monopolies and finance capital is established.”",
-    chapters: [],
-    has_chapters_file: true
-  },
-  {
-    id: "dialectical-materialism",
-    slug: "dialectical-and-historical-materialism",
-    title_bn: "দ্বান্দ্বিক ও ঐতিহাসিক বস্তুবাদ",
-    title_en: "Dialectical and Historical Materialism",
-    subtitle_bn: "মার্ক্সবাদী-লেনিনবাদী দর্শনের বিশ্বদর্শন, প্রকৃতির দ্বন্দ্ব ও সমাজের বিকাশধারা (১৯৩৮)",
-    subtitle_en: "The Philosophical Foundations of Marxism-Leninism (1938)",
-    authors: [
-      {
-        name: "জোসেফ স্ট্যালিন (J. V. Stalin)",
-        role: "তাত্ত্বিক ও সোভিয়েত রাষ্ট্রনেতা"
-      }
-    ],
-    year: "১৯৩৮",
-    category: "philosophy",
-    category_name_bn: "দ্বান্দ্বিক বস্তুবাদ ও দর্শন",
-    category_name_en: "Dialectical Materialism & Philosophy",
-    cover_color: "linear-gradient(135deg, #1e3a5f 0%, #0f172a 60%, #c2182b 100%)",
-    cover_icon: "⚡",
-    reading_time_mins: 40,
-    pages_count: 56,
-    rating: 5,
-    summary_bn: "মার্ক্সবাদী দর্শনের সবচেয়ে সহজবোধ্য এবং সুশৃঙ্খল উপস্থাপনা। হেগেলের দ্বন্দ্ববাদ থেকে মার্ক্সীয় দ্বন্দ্ববাদের পার্থক্য, প্রকৃতির চারটি বৈশিষ্ট্য এবং সমাজের উৎপাদন পদ্ধতির ভিত্তিতে মানব ইতিহাসের উত্তরণ।",
-    summary_en: "Stalin’s lucid exposition of dialectics as the method of knowing reality and historical materialism as the application of dialectical principles to social development.",
-    famous_quote_bn: "“প্রকৃতি কোনো অনড় ও বিচ্ছিন্ন বস্তুর স্তূপ নয়; প্রকৃতি হলো সার্বক্ষণিক গতি, পরিবর্তন ও পুনর্নবীকরণের এক অবিচ্ছেদ্য সামগ্রিকতা।”",
-    famous_quote_en: "“Nature is not a state of rest and immobility, stagnation and immutability, but a state of continuous movement and change, of continuous renewal and development.”",
-    chapters: [],
-    has_chapters_file: true
-  },
-  {
-    id: "on-practice",
-    slug: "on-practice-knowledge-and-action",
-    title_bn: "বাস্তব অনুশীলন প্রসঙ্গ",
-    title_en: "On Practice: On the Relation Between Knowledge and Practice",
-    subtitle_bn: "জ্ঞান ও অনুশীলনের দ্বান্দ্বিক সম্পর্ক — বাস্তব কাজের মধ্য দিয়ে সত্য আবিষ্কার ও সত্য যাচাই (১৯৩৭)",
-    subtitle_en: "The Dialectical-Materialist Theory of the Unity of Knowing and Doing (1937)",
-    authors: [
-      {
-        name: "মাও সেতুং (Mao Zedong)",
-        role: "দার্শনিক ও বিপ্লবী সংগঠক"
-      }
-    ],
-    year: "১৯৩৭",
-    category: "philosophy",
-    category_name_bn: "জ্ঞানতত্ত্ব ও অনুশীলন",
-    category_name_en: "Epistemology & Practice",
-    cover_color: "linear-gradient(135deg, #065f46 0%, #1e3a5f 60%, #c2182b 100%)",
-    cover_icon: "🔍",
-    reading_time_mins: 35,
-    pages_count: 44,
-    rating: 4.9,
-    summary_bn: "পুঁথিগত অন্ধ বিশ্বাস ও গোঁড়ামির বিরুদ্ধে বাস্তব অনুশীলনের দর্শন। মানুষ কীভাবে ইন্দ্রিয়গ্রাহ্য জ্ঞান থেকে যৌক্তিক জ্ঞানে পৌঁছায় এবং কেন বৈপ্লবিক অনুশীলনই সত্য যাচাইয়ের একমাত্র মাপকাঠি।",
-    summary_en: "Mao’s treatise on Marxist epistemology: practice is the sole criterion of truth, connecting perception to rational cognition to revolutionary transformation.",
-    famous_quote_bn: "“আপনি যদি নাশপাতির স্বাদ জানতে চান, তবে আপনাকে গাছ থেকে নাশপাতি পেড়ে মুখে পুরে চিবিয়ে দেখতে হবে।”",
-    famous_quote_en: "“If you want to know the taste of a pear, you must change the pear by eating it yourself.”",
-    chapters: [],
-    has_chapters_file: true
-  },
-  {
-    id: "why-i-am-an-atheist",
-    slug: "why-i-am-an-atheist",
-    title_bn: "কেন আমি নাস্তিক",
-    title_en: "Why I Am an Atheist",
-    subtitle_bn: "লাহোর সেন্ট্রাল জেলের ফাঁসির মঞ্চ থেকে অমর বিপ্লবী শহীদের যুক্তি ও আত্মত্যাগের দলিল (১৯৩০)",
-    subtitle_en: "The Immortal Philosophical Manifesto Written in Lahore Central Jail (1930)",
-    authors: [
-      {
-        name: "শহীদ ভগৎ সিংহ (Bhagat Singh)",
-        role: "বিপ্লবী মহানায়ক ও যুক্তিবাদী তাত্ত্বিক"
-      }
-    ],
-    year: "১৯৩০",
-    category: "philosophy",
-    category_name_bn: "বিপ্লবী দর্শন ও যুক্তিবাদ",
-    category_name_en: "Revolutionary Philosophy & Reason",
-    cover_color: "linear-gradient(135deg, #1e293b 0%, #334155 60%, #c2182b 100%)",
-    cover_icon: "✊",
-    reading_time_mins: 35,
-    pages_count: 42,
-    rating: 5,
-    summary_bn: "১৯৩০ সালের অক্টোবর মাসে লাহোর কেন্দ্রীয় কারাগারে ফাঁসির প্রতীক্ষায় থাকা অবস্থায় রচিত। ভগৎ সিংহ দেখিয়েছেন তাঁর নাস্তিকতা কোনো অহংকার নয়, বরং বস্তুনিষ্ঠ মার্ক্সীয় পাঠ, বিজ্ঞানচেতনা এবং মেহনতি মানুষের প্রতি গভীর ভালোবাসা থেকে জন্ম নেওয়া আপসহীন যুক্তিবাদ।",
-    summary_en: "Written in Lahore Central Jail in 1930, Bhagat Singh explains why his rejection of religion is rooted in critical Marxist thinking, humanism, and revolutionary commitment rather than vanity.",
-    famous_quote_bn: "“যেকোনো মানুষ যে প্রগতির পক্ষে দাঁড়ায়, তাকে অতীতের প্রতিটি সনাতন বিশ্বাসের তীব্র সমালোচনা করতে হবে, অবিশ্বাস করতে হবে এবং তাকে চ্যালেঞ্জ ছুড়ে দিতে হবে।”",
-    famous_quote_en: "“Any man who stands for progress has to criticize, disbelieve and challenge every item of the old faith.”",
-    chapters: [],
-    has_chapters_file: true
-  },
-  {
-    id: "crime-and-punishment",
-    slug: "dostoevsky-crime-and-punishment",
-    title_bn: "অপরাধ ও শাস্তি (উপন্যাস — সম্পূর্ণ সংস্করণ)",
-    title_en: "Crime and Punishment (Novel by Fyodor Dostoevsky)",
-    subtitle_bn: "সেন্ট পিটার্সবার্গের বস্তি, রদিয়ন রাসকোলনিকভ, সোনিয়া মারমেলাদোভা ও মানবিক মুক্তির অমর আখ্যান (১৮৬৬)",
-    subtitle_en: "The Psychological & Philosophical Masterpiece on Alienation, Guilt and Redemption (1866)",
-    authors: [
-      {
-        name: "ফিওদর দস্তয়ভস্কি (Fyodor Dostoevsky)",
-        role: "বিশ্বখ্যাত রুশ ঔপন্যাসিক ও মনস্তাত্ত্বিক দার্শনিক"
-      },
-      {
-        name: "অনুবাদ ও সম্পাদনা: দ্য ওয়ে অনুবাদ কালেক্টিভ",
-        role: "বাংলা ভাষান্তর ও বিশ্লেষণ"
-      }
-    ],
-    year: "১৮৬৬",
-    category: "literature",
-    category_name_bn: "বিপ্লবী সাহিত্য ও ধ্রুপদী উপন্যাস",
-    category_name_en: "Revolutionary Literature & Fiction",
-    cover_color: "linear-gradient(135deg, #18090c 0%, #450a0a 50%, #991b1b 100%)",
-    cover_icon: "⚖️",
-    reading_time_mins: 280,
-    pages_count: 540,
-    rating: 5,
-    summary_bn: "ফিওদর দস্তয়ভস্কির সর্বকালের অন্যতম শ্রেষ্ঠ উপন্যাস। চরম দারিদ্র্য ও মানসিক দ্বন্দ্বে জর্জরিত সেন্ট পিটার্সবার্গের আইনের ছাত্র রদিয়ন রাসকোলনিকভ নিজেকে নেপোলিয়নের মতো 'অসাধারণ মানুষ' ভেবে এক রক্তচোষা বৃদ্ধা সুদখোর মহাজনকে হত্যার সিদ্ধান্ত নেয়। কিন্তু হত্যার পরেই শুরু হয় তার অবচেতন মন, বিবেক এবং সমাজব্যবস্থার সাথে এক তীব্র মনস্তাত্ত্বিক ও অস্তিত্ববাদী যুদ্ধ। নিস্বার্থ সোনিয়ার আত্মত্যাগ ও ভালোবাসার স্পর্শে অবশেষে তার আত্মিক পুনর্জাগরণ ঘটে।",
-    summary_en: "Dostoevsky’s psychological titan exploring alienation, the illusion of the 'extraordinary man' above moral law, and the path to spiritual redemption through Sonya Marmeladov’s unconditional love and sacrifice.",
-    famous_quote_bn: "“আমরা সকলেই অন্ধকারে ঘুরপাক খাই, কিন্তু অন্ধকারকে জয় করার শক্তি লুকিয়ে থাকে মানবপ্রেম ও আত্মত্যাগের ভেতরে।”",
-    famous_quote_en: "“It takes something more than intelligence to act intelligently.”",
-    chapters: [],
-    has_chapters_file: true
-  }
-];
+  const CATEGORIES = [
+    {
+      id: "marx",
+      num: "০১",
+      title: "মার্কস–এঙ্গেলস",
+      blurb: "ভিত্তিপ্রস্তর — ইশতেহার থেকে পুঁজি",
+      chip: "bg-red text-paper",
+      bar: "bg-red",
+    },
+    {
+      id: "lenin",
+      num: "০২",
+      title: "লেনিন ও রুশ বিপ্লব",
+      blurb: "পার্টি, সাম্রাজ্যবাদ, রাষ্ট্র",
+      chip: "bg-steel text-paper",
+      bar: "bg-steel",
+    },
+    {
+      id: "theory",
+      num: "০৩",
+      title: "তত্ত্ব ও বিতর্ক",
+      blurb: "লুক্সেমবুর্গ থেকে গ্রামশি — সংশোধন, বিপ্লব, আধিপত্য",
+      chip: "bg-gold text-paper",
+      bar: "bg-gold",
+    },
+    {
+      id: "liberation",
+      num: "০৪",
+      title: "মুক্তিসংগ্রামের লেখা",
+      blurb: "চীন, ভিয়েতনাম, কিউবা, আলজেরিয়া, ভারত",
+      chip: "bg-olive text-paper",
+      bar: "bg-olive",
+    },
+    {
+      id: "fiction",
+      num: "০৫",
+      title: "উপন্যাস ও সাক্ষ্য-সাহিত্য",
+      blurb: "গোর্কি, লন্ডন, রিড — গল্পে বিপ্লবের শতাব্দী",
+      chip: "bg-plum text-paper",
+      bar: "bg-plum",
+    },
+    {
+      id: "poetry",
+      num: "০৬",
+      title: "কবিতা ও নাটক",
+      blurb: "মায়াভস্কি, নেরুদা, নজরুল, সুকান্ত",
+      chip: "bg-teal text-paper",
+      bar: "bg-teal",
+    },
+    {
+      id: "bangla",
+      num: "০৭",
+      title: "বাংলা মার্কসবাদ",
+      blurb: "ইশতেহারের বাংলা থেকে তিতাশ, তেভাগা",
+      chip: "bg-ink text-paper",
+      bar: "bg-ink",
+    },
+  ];
 
-  // Expose to window
+  const WORKS = [
+    // ————— ০১ মার্কস–এঙ্গেলস —————
+    {
+      id: "manifest",
+      cat: "marx",
+      title: "কমিউনিস্ট ইশতেহার",
+      orig: "Manifest der Kommunistischen Partei",
+      author: "কার্ল মার্কস ও ফ্রিডরিখ এঙ্গেলস",
+      year: "1848",
+      lang: "জার্মান",
+      desc: "“ইউরোপে এক ভূত ঘুরে বেড়াচ্ছে” — ২৩ পাতার এই ঘোষণাপত্র দিয়েই শুরু আধুনিক কমিউনিস্ট আন্দোলন; শ্রেণিসংগ্রামের ইতিহাসের সঙ্ক্ষিপ্ততম রূপরেখা।",
+      links: [
+        { label: "English", url: "https://www.marxists.org/archive/marx/works/1848/communist-manifesto/" },
+        { label: "মূল জার্মান", url: "https://www.marxists.org/deutsch/archiv/marx-engels/1848/manifest/" },
+        { label: "বাংলা অনুবাদ", url: "https://www.marxists.org/bengali/" },
+      ],
+    },
+    {
+      id: "capital1",
+      cat: "marx",
+      title: "পুঁজি, ১ম খণ্ড",
+      orig: "Das Kapital, Band I",
+      author: "কার্ল মার্কস",
+      year: "1867",
+      lang: "জার্মান",
+      desc: "পণ্য, উদ্বৃত্ত-মূল্য ও শোষণের বিশ্ববিখ্যাত বিশ্লেষণ — আধুনিক অর্থনীতির ভিত নাড়িয়ে দেওয়া গ্রন্থ।",
+      links: [{ label: "সম্পূর্ণ পড়ুন", url: "https://www.marxists.org/archive/marx/works/1867-c1/" }],
+    },
+    {
+      id: "capital2",
+      cat: "marx",
+      title: "পুঁজি, ২য় খণ্ড",
+      orig: "Das Kapital, Band II",
+      author: "কার্ল মার্কস (সম্পাদনা: এঙ্গেলস)",
+      year: "1885",
+      lang: "জার্মান",
+      desc: "পুঁজির প্রচলন ও পুনরুৎপাদনের তত্ত্ব — মার্কসের পাণ্ডুলিপি থেকে এঙ্গেলসের সম্পাদনায় প্রকাশ।",
+      links: [{ label: "সম্পূর্ণ পড়ুন", url: "https://www.marxists.org/archive/marx/works/1885-c2/" }],
+    },
+    {
+      id: "capital3",
+      cat: "marx",
+      title: "পুঁজি, ৩য় খণ্ড",
+      orig: "Das Kapital, Band III",
+      author: "কার্ল মার্কস (সম্পাদনা: এঙ্গেলস)",
+      year: "1894",
+      lang: "জার্মান",
+      desc: "মুনাফা, সুদ ও ভূমি-খাজনা — শোষণের চূড়ান্ত হিসাব কীভাবে বাজারের পর্দার আড়ালে চলে।",
+      links: [{ label: "সম্পূর্ণ পড়ুন", url: "https://www.marxists.org/archive/marx/works/1894-c3/" }],
+    },
+    {
+      id: "theses",
+      cat: "marx",
+      title: "ফয়েরবাখ সম্পর্কে এগারোটি অভিমত",
+      orig: "Thesen über Feuerbach",
+      author: "কার্ল মার্কস",
+      year: "1845",
+      lang: "জার্মান",
+      desc: "“দার্শনিকরা এ পর্যন্ত জগতকে কেবল ব্যাখ্যা করেছেন; আসল কথা তা বদলে ফেলা” — এক পাতার নোটে ঐতিহাসিক বস্তুবাদের বীজ।",
+      links: [{ label: "সম্পূর্ণ পড়ুন", url: "https://www.marxists.org/archive/marx/works/1845/theses/" }],
+    },
+    {
+      id: "ideology",
+      cat: "marx",
+      title: "জার্মান ভাবাদর্শ",
+      orig: "Die deutsche Ideologie",
+      author: "মার্কস ও এঙ্গেলস",
+      year: "1846",
+      lang: "জার্মান",
+      desc: "বস্তুবাদী ইতিহাস-দর্শনের প্রথম পূর্ণাঙ্গ প্রতিষ্ঠা — “চেতনা নয়, জীবনই চেতনাকে নির্ধারণ করে।”",
+      links: [{ label: "সম্পূর্ণ পড়ুন", url: "https://www.marxists.org/archive/marx/works/1845/german-ideology/" }],
+    },
+    {
+      id: "poverty",
+      cat: "marx",
+      title: "দর্শনের দারিদ্র্য",
+      orig: "Misère de la philosophie",
+      author: "কার্ল মার্কস",
+      year: "1847",
+      lang: "ফরাসি",
+      desc: "প্রুধনের অর্থনীতির জবাবে মার্কসের তীক্ষ্ণ প্রথম অর্থনৈতিক গ্রন্থ।",
+      links: [{ label: "সম্পূর্ণ পড়ুন", url: "https://www.marxists.org/archive/marx/works/1847/poverty-philosophy/" }],
+    },
+    {
+      id: "working-class",
+      cat: "marx",
+      title: "ইংল্যান্ডে শ্রমজীবী শ্রেণীর অবস্থা",
+      orig: "Die Lage der arbeitenden Klasse in England",
+      author: "ফ্রিডরিখ এঙ্গেলস",
+      year: "1845",
+      lang: "জার্মান",
+      desc: "ম্যানচেস্টারের কারখানা-গলির প্রত্যক্ষ তদন্ত — শ্রমিক দুর্দশার প্রথম বৈজ্ঞানিক দলিল।",
+      links: [{ label: "সম্পূর্ণ পড়ুন", url: "https://www.marxists.org/archive/marx/works/1845/condition-working-class/" }],
+    },
+    {
+      id: "wage",
+      cat: "marx",
+      title: "বেতন-শ্রম ও পুঁজি",
+      orig: "Lohnarbeit und Kapital",
+      author: "কার্ল মার্কস",
+      year: "1849",
+      lang: "জার্মান",
+      desc: "শ্রমিকের শ্রম আর মালিকের মুনাফার সম্পর্কের সবচেয়ে সহজ পাঠ।",
+      links: [{ label: "সম্পূর্ণ পড়ুন", url: "https://www.marxists.org/archive/marx/works/1847/wage-labour/" }],
+    },
+    {
+      id: "value",
+      cat: "marx",
+      title: "মূল্য, দাম ও মুনাফা",
+      orig: "Value, Price and Profit",
+      author: "কার্ল মার্কস",
+      year: "1865",
+      lang: "ইংরেজি",
+      desc: "প্রথম আন্তর্জাতিকের কর্মীদের জন্য মার্কসের নিজের হাতে লেখা জনপ্রিয় ব্যাখ্যা।",
+      links: [{ label: "সম্পূর্ণ পড়ুন", url: "https://www.marxists.org/archive/marx/works/1865/value-price-profit/" }],
+    },
+    {
+      id: "utopian",
+      cat: "marx",
+      title: "ইউটোপীয় ও বৈজ্ঞানিক সমাজতন্ত্র",
+      orig: "Socialisme utopique et socialisme scientifique",
+      author: "ফ্রিডরিখ এঙ্গেলস",
+      year: "1880",
+      lang: "ফরাসি",
+      desc: "স্বপ্নের সমাজতন্ত্র থেকে বিজ্ঞানের সমাজতন্ত্রে উত্তরণের পথনির্দেশ — সবচেয়ে বহুলপঠিত মার্কসবাদী ভূমিকা।",
+      links: [{ label: "সম্পূর্ণ পড়ুন", url: "https://www.marxists.org/archive/marx/works/1880/soc-utop/" }],
+    },
+    {
+      id: "origin",
+      cat: "marx",
+      title: "পরিবার, ব্যক্তিগত সম্পত্তি ও রাষ্ট্রের উৎপত্তি",
+      orig: "Der Ursprung der Familie, des Privateigentums und des Staats",
+      author: "ফ্রিডরিখ এঙ্গেলস",
+      year: "1884",
+      lang: "জার্মান",
+      desc: "নারীর অধীনতার শিকড় খোঁজে সম্পত্তির ইতিহাসে — মার্কসবাদী নারীবাদের ভিত্তিগ্রন্থ।",
+      links: [{ label: "সম্পূর্ণ পড়ুন", url: "https://www.marxists.org/archive/marx/works/1884/origin-family/" }],
+    },
+    {
+      id: "gotha",
+      cat: "marx",
+      title: "গৌতা কর্মসূচীর সমালোচনা",
+      orig: "Kritik des Gothaer Programms",
+      author: "কার্ল মার্কস",
+      year: "1875",
+      lang: "জার্মান",
+      desc: "“প্রত্যেকের কাছ থেকে তার সামর্থ্য, প্রত্যেককে তার প্রয়োজন মতো” — কমিউনিস্ট সমাজের দুই পর্যায়ের প্রথম খসড়া।",
+      links: [{ label: "সম্পূর্ণ পড়ুন", url: "https://www.marxists.org/archive/marx/works/1875/gotha/" }],
+    },
+    {
+      id: "civilwar",
+      cat: "marx",
+      title: "ফ্রান্সে গৃহযুদ্ধ",
+      orig: "The Civil War in France",
+      author: "কার্ল মার্কস",
+      year: "1871",
+      lang: "ইংরেজি",
+      desc: "প্যারিস কমিউনের রক্তাক্ত ৭২ দিনের অভিজ্ঞতা থেকে শ্রমিক-রাষ্ট্রের প্রথম পাঠ।",
+      links: [{ label: "সম্পূর্ণ পড়ুন", url: "https://www.marxists.org/archive/marx/works/1871/civil-war-france/" }],
+    },
+    {
+      id: "antiduhring",
+      cat: "marx",
+      title: "অ্যান্টি-ডুরিং",
+      orig: "Herrn Eugen Dührings Umwälzung der Wissenschaft",
+      author: "ফ্রিডরিখ এঙ্গেলস",
+      year: "1878",
+      lang: "জার্মান",
+      desc: "মার্কসবাদের দর্শন, অর্থনীতি ও সমাজতন্ত্র — তিন অংশের বিশ্বকোষীয় বিবরণ।",
+      links: [{ label: "সম্পূর্ণ পড়ুন", url: "https://www.marxists.org/archive/marx/works/1877/anti-duhring/" }],
+    },
+
+    // ————— ০২ লেনিন ও রুশ বিপ্লব —————
+    {
+      id: "staterev",
+      cat: "lenin",
+      title: "রাষ্ট্র ও বিপ্লব",
+      orig: "Государство и революция",
+      author: "ভ. ই. লেনিন",
+      year: "1917",
+      lang: "রুশ",
+      desc: "রাষ্ট্রের শ্রেণীচরিত্রের প্রখর তাত্ত্বিক দলিল — অক্টোবরের ঠিক আগের মুহূর্তে, লুকিয়ে থেকে লেখা।",
+      links: [{ label: "সম্পূর্ণ পড়ুন", url: "https://www.marxists.org/archive/lenin/works/1917/staterev/" }],
+    },
+    {
+      id: "imperialism",
+      cat: "lenin",
+      title: "সাম্রাজ্যবাদ: পুঁজিবাদের সর্বোচ্চ স্তর",
+      orig: "Империализм, как высшая стадия капитализма",
+      author: "ভ. ই. লেনিন",
+      year: "1916",
+      lang: "রুশ",
+      desc: "একচেটি পুঁজি, আর্থিক অভিজাততন্ত্র ও বিশ্ব-বিভাজনের ধ্রুপদি বিশ্লেষণ — আজও প্রাসঙ্গিক।",
+      links: [{ label: "সম্পূর্ণ পড়ুন", url: "https://www.marxists.org/archive/lenin/works/1916/imp-hsc/" }],
+    },
+    {
+      id: "witbd",
+      cat: "lenin",
+      title: "কী করা করণীয়?",
+      orig: "Что делать?",
+      author: "ভ. ই. লেনিন",
+      year: "1902",
+      lang: "রুশ",
+      desc: "পেশাদার বিপ্লবীদের সংঘবদ্ধ দলের ধারণা — বিংশ শতাব্দীর কমিউনিস্ট পার্টিগুলোর জন্মদলিল।",
+      links: [{ label: "সম্পূর্ণ পড়ুন", url: "https://www.marxists.org/archive/lenin/works/1901/witbd/" }],
+    },
+    {
+      id: "april",
+      cat: "lenin",
+      title: "এপ্রিল অভিমত",
+      orig: "Апрельские тезисы",
+      author: "ভ. ই. লেনিন",
+      year: "1917",
+      lang: "রুশ",
+      desc: "“সব ক্ষমতা সোভিয়েতের হাতে” — ফেব্রুয়ারি থেকে অক্টোবরে যাওয়ার দশ দফা সঙ্কেত।",
+      links: [{ label: "সম্পূর্ণ পড়ুন", url: "https://www.marxists.org/archive/lenin/works/1917/apr/" }],
+    },
+    {
+      id: "lwc",
+      cat: "lenin",
+      title: "বামপন্থা: কমিউনিজমের শিশুসুলভ রোগ",
+      orig: "Детская болезнь «левизны» в коммунизме",
+      author: "ভ. ই. লেনিন",
+      year: "1920",
+      lang: "রুশ",
+      desc: "কৌশল, আপস ও গণসংগঠনে কাজের পাঠ — তৃতীয় আন্তর্জাতিকের নির্ধারিত পাঠ্য।",
+      links: [{ label: "সম্পূর্ণ পড়ুন", url: "https://www.marxists.org/archive/lenin/works/1920/lwc/" }],
+    },
+    {
+      id: "twotactics",
+      cat: "lenin",
+      title: "দুই কৌশল",
+      orig: "Две тактики социал-демократии в демократической революции",
+      author: "ভ. ই. লেনিন",
+      year: "1905",
+      lang: "রুশ",
+      desc: "১৯০৫-এর বিপ্লবের প্রশ্নে বোলশেভিক ও মেনশেভিক কৌশলের ধ্রুপদি লড়াই।",
+      links: [{ label: "সম্পূর্ণ পড়ুন", url: "https://www.marxists.org/archive/lenin/works/1905/two-tactics/" }],
+    },
+    {
+      id: "devel",
+      cat: "lenin",
+      title: "রুশিয়ায় পুঁজিবাদের বিকাশ",
+      orig: "Развитие капитализма в России",
+      author: "ভ. ই. লেনিন",
+      year: "1899",
+      lang: "রুশ",
+      desc: "নারোদনিকদের বিরুদ্ধে রুশ গ্রামাঞ্চলের বিশাল শ্রেণী-জরিপ — পরিসংখ্যানে লেখা বিতর্ক।",
+      links: [{ label: "সম্পূর্ণ পড়ুন", url: "https://www.marxists.org/archive/lenin/works/1899/devel/" }],
+    },
+    {
+      id: "mec",
+      cat: "lenin",
+      title: "বস্তুবাদ ও অভিজ্ঞতাসমালোচনা",
+      orig: "Материализм и эмпириокритицизм",
+      author: "ভ. ই. লেনিন",
+      year: "1908",
+      lang: "রুশ",
+      desc: "মার্কসবাদী জ্ঞানতত্ত্ব ও প্রতিফলন-তত্ত্বের প্রতিরক্ষা — দর্শনের রণাঙ্গনে লেনিন।",
+      links: [{ label: "সম্পূর্ণ পড়ুন", url: "https://www.marxists.org/archive/lenin/works/1908/mec/" }],
+    },
+    {
+      id: "kautsky-rev",
+      cat: "lenin",
+      title: "প্রলেতারীয় বিপ্লব ও ধর্মত্যাগী কাউৎস্কি",
+      orig: "Пролетарская революция и ренегат Каутский",
+      author: "ভ. ই. লেনিন",
+      year: "1918",
+      lang: "রুশ",
+      desc: "বুর্জোয়া বনাম প্রলেতারীয় গণতন্ত্র — বিপ্লবের পরপরই লেখা তীব্র তাত্ত্বিক লড়াই।",
+      links: [{ label: "সম্পূর্ণ পড়ুন", url: "https://www.marxists.org/archive/lenin/works/1918/proletarian-revolution/" }],
+    },
+    {
+      id: "lenin-works",
+      cat: "lenin",
+      title: "লেনিন নির্বাচিত রচনাবলি (৪৫ খণ্ড)",
+      orig: "Полное собрание сочинений",
+      author: "ভ. ই. লেনিন",
+      year: "১৮৯৩–১৯২৩",
+      lang: "বহুভাষিক",
+      desc: "প্রবন্ধ, চিঠি, ভাষণ, খসড়া — লেনিনের সম্পূর্ণ রচনার মুক্ত ইংরেজি সংগ্রহ, এক ইনডেক্সে।",
+      links: [{ label: "সম্পূর্ণ সংগ্রহ", url: "https://www.marxists.org/archive/lenin/works/" }],
+    },
+
+    // ————— ০৩ তত্ত্ব ও বিতর্ক —————
+    {
+      id: "reform",
+      cat: "theory",
+      title: "সংস্কার না বিপ্লব?",
+      orig: "Sozialreform oder Revolution?",
+      author: "রোজা লুক্সেমবুর্গ",
+      year: "1899",
+      lang: "জার্মান",
+      desc: "বের্নস্টাইনের সংশোধনবাদের বিরুদ্ধে লুক্সেমবুর্গের বজ্রনির্ঘোষ — সমাজতন্ত্রের লক্ষ্য রক্ষার লড়াই।",
+      links: [{ label: "সম্পূর্ণ পড়ুন", url: "https://www.marxists.org/archive/luxemburg/1900/reform-revolution/" }],
+    },
+    {
+      id: "accum",
+      cat: "theory",
+      title: "পুঁজির সঞ্চয়",
+      orig: "Die Akkumulation des Kapitals",
+      author: "রোজা লুক্সেমবুর্গ",
+      year: "1913",
+      lang: "জার্মান",
+      desc: "সাম্রাজ্যবাদের অর্থনৈতিক শিকড় নিয়ে মার্কসীয় অর্থনীতির সাহসী সম্প্রসারণ।",
+      links: [{ label: "সম্পূর্ণ পড়ুন", url: "https://www.marxists.org/archive/luxemburg/1913/accumulation-capital/" }],
+    },
+    {
+      id: "mass-strike",
+      cat: "theory",
+      title: "গণধর্মঘট, দল ও ট্রেড ইউনিয়ন",
+      orig: "Massenstreik, Partei und Gewerkschaften",
+      author: "রোজা লুক্সেমবুর্গ",
+      year: "1906",
+      lang: "জার্মান",
+      desc: "১৯০৫-এর রুশ বিপ্লবের অভিজ্ঞতায় স্বতঃস্ফূর্ত গণআন্দোলনের তত্ত্ব।",
+      links: [{ label: "সম্পূর্ণ পড়ুন", url: "https://www.marxists.org/archive/luxemburg/1906/mass-strike/" }],
+    },
+    {
+      id: "permrev",
+      cat: "theory",
+      title: "স্থায়ী বিপ্লব",
+      orig: "Перманентная революция",
+      author: "লেভ ত্রোৎস্কি",
+      year: "1930",
+      lang: "রুশ",
+      desc: "পিছিয়ে-পড়া দেশে গণতান্ত্রিক থেকে সমাজতান্ত্রিক বিপ্লবে অবিচ্ছিন্ন উত্তরণের তত্ত্ব।",
+      links: [{ label: "সম্পূর্ণ পড়ুন", url: "https://www.marxists.org/archive/trotsky/1930/permrev/" }],
+    },
+    {
+      id: "revbet",
+      cat: "theory",
+      title: "বিশ্বাসঘাতকতার শিকার বিপ্লব",
+      orig: "Преданная революция",
+      author: "লেভ ত্রোৎস্কি",
+      year: "1936",
+      lang: "রুশ",
+      desc: "সোভিয়েত আমলাতন্ত্রের সমালোচনা — বাম বিরোধী ধারার কেন্দ্রীয় গ্রন্থ।",
+      links: [{ label: "সম্পূর্ণ পড়ুন", url: "https://www.marxists.org/archive/trotsky/1936/revbet/" }],
+    },
+    {
+      id: "hrr",
+      cat: "theory",
+      title: "রুশ বিপ্লবের ইতিহাস",
+      orig: "История русской революции",
+      author: "লেভ ত্রোৎস্কি",
+      year: "1930",
+      lang: "রুশ",
+      desc: "১৯১৭-এর ঘটনাপ্রবাহের ভেতর থেকে লেখা মহাকাব্যিক ইতিহাস — নির্বাসনের কেল্লায়।",
+      links: [{ label: "সম্পূর্ণ পড়ুন", url: "https://www.marxists.org/archive/trotsky/1930/hrr/" }],
+    },
+    {
+      id: "gramsci",
+      cat: "theory",
+      title: "কারাগারের খাতা",
+      orig: "Quaderni del carcere",
+      author: "আন্তোনিও গ্রামশি",
+      year: "১৯২৯–৩৫",
+      lang: "ইতালীয়",
+      desc: "ফ্যাসিস্ট কারাগারে লেখা ৩৩টি খাতা — “আধিপত্য” (hegemony) ধারণার জন্ম, পশ্চিমা মার্কসবাদের স্তম্ভ।",
+      links: [{ label: "নির্বাচিত অংশ", url: "https://www.marxists.org/archive/gramsci/prison-notebooks/" }],
+    },
+    {
+      id: "bukharin",
+      cat: "theory",
+      title: "সাম্রাজ্যবাদ ও বিশ্ব অর্থনীতি",
+      orig: "Империализм и мировое хозяйство",
+      author: "নিকোলাই বুখারিন",
+      year: "1915",
+      lang: "রুশ",
+      desc: "বিশ্বপুঁজিবাদের একক ব্যবস্থা হিসেবে সাম্রাজ্যবাদের তত্ত্ব — লেনিনের বইয়েরও পূর্বসূরি।",
+      links: [{ label: "সম্পূর্ণ পড়ুন", url: "https://www.marxists.org/archive/bukharin/works/1915/imperialism/" }],
+    },
+    {
+      id: "kollontai",
+      cat: "theory",
+      title: "নারী-প্রশ্নের সামাজিক ভিত্তি",
+      orig: "Социальные основы женского вопроса",
+      author: "আলেক্সান্দ্রা কোলোন্তাই",
+      year: "1909",
+      lang: "রুশ",
+      desc: "নারীমুক্তি ও সমাজতন্ত্রের অবিচ্ছেদ্য সম্পর্ক — মার্কসবাদী নারীবাদের প্রথম স্তম্ভগুলোর একটি।",
+      links: [{ label: "সম্পূর্ণ পড়ুন", url: "https://www.marxists.org/archive/kollonta/1909/social-basis.htm" }],
+    },
+    {
+      id: "klassenkampf",
+      cat: "theory",
+      title: "শ্রেণীসংগ্রাম",
+      orig: "Der Klassenkampf (Erfurter Programm)",
+      author: "কার্ল কাউৎস্কি",
+      year: "1892",
+      lang: "জার্মান",
+      desc: "এরফুর্ট কর্মসূচির ব্যাখ্যা — দ্বিতীয় আন্তর্জাতিকের যুগে সবচেয়ে বহুলপঠিত মার্কসবাদী পাঠ্য।",
+      links: [{ label: "সম্পূর্ণ পড়ুন", url: "https://www.marxists.org/archive/kautsky/1892/erfurt/" }],
+    },
+    {
+      id: "lukacs",
+      cat: "theory",
+      title: "ইতিহাস ও শ্রেণীসচেতনতা",
+      orig: "Geschichte und Klassenbewusstsein",
+      author: "জর্জ লুকাচ",
+      year: "1923",
+      lang: "জার্মান",
+      desc: "পুনর্বিভাজন ও প্রলেতারিয়েতের সচেতনতা — পশ্চিমা মার্কসবাদের সূচনাবিন্দু।",
+      links: [{ label: "লুকাচ আর্কাইভ", url: "https://www.marxists.org/archive/lukacs/" }],
+    },
+
+    // ————— ০৪ মুক্তিসংগ্রামের লেখা —————
+    {
+      id: "mao-sw",
+      cat: "liberation",
+      title: "মাও সেতুং নির্বাচিত রচনা (৫ খণ্ড)",
+      orig: "毛泽东选集",
+      author: "মাও সেতুং",
+      year: "১৯২৬–৫৭",
+      lang: "চীনা",
+      desc: "অনুশীলন, দ্বন্দ্ব, গণরেখা, দীর্ঘস্থায়ী গণযুদ্ধ — চীনা বিপ্লবের সম্পূর্ণ তাত্ত্বিক ভাণ্ডার।",
+      links: [{ label: "নির্বাচিত রচনা", url: "https://www.marxists.org/reference/archive/mao/selected-works/" }],
+    },
+    {
+      id: "mao-archive",
+      cat: "liberation",
+      title: "মাও আর্কাইভ সূচি",
+      orig: "Mao Zedong Reference Archive",
+      author: "মাও সেতুং",
+      year: "সম্পূর্ণ সংগ্রহ",
+      lang: "বহুভাষিক",
+      desc: "লাল বই (উদ্ধৃতিসংগ্রহ) থেকে কবিতা — মাও-সম্পর্কিত সব মুক্ত ইংরেজি পাঠের দরজা।",
+      links: [{ label: "সম্পূর্ণ সূচি", url: "https://www.marxists.org/reference/archive/mao/" }],
+    },
+    {
+      id: "ho-works",
+      cat: "liberation",
+      title: "হো চি মিন রচনাবলি",
+      orig: "Hồ Chí Minh toàn tập",
+      author: "হো চি মিন",
+      year: "১৯২০–৬৯",
+      lang: "ভিয়েতনামীয়",
+      desc: "উপনিবেশবিরোধী সংগ্রাম থেকে ভিয়েতনামের পথ — চাচা হো-র নির্বাচিত লেখা ও ভাষণ।",
+      links: [{ label: "রচনাবলি", url: "https://www.marxists.org/reference/archive/ho-chi-minh/" }],
+    },
+    {
+      id: "ho-decl",
+      cat: "liberation",
+      title: "ভিয়েতনামের স্বাধীনতার ঘোষণাপত্র",
+      orig: "Tuyên ngôn Độc lập",
+      author: "হো চি মিন",
+      year: "1945",
+      lang: "ভিয়েতনামীয়",
+      desc: "যুক্তরাষ্ট্রের স্বাধীনতার ঘোষণা উদ্ধৃত করে শুরু — সাম্রাজ্যবাদের মুখোমুখি এক জাতির আত্মঘোষণা।",
+      links: [{ label: "ঘোষণাপত্র", url: "https://www.marxists.org/reference/archive/ho-chi-minh/works/1945/declaration-independence.htm" }],
+    },
+    {
+      id: "che-guerrilla",
+      cat: "liberation",
+      title: "গেরিলা যুদ্ধ",
+      orig: "La Guerra de Guerrillas",
+      author: "চে গেভারা",
+      year: "1960",
+      lang: "স্পেনীয়",
+      desc: "কিউবার অভিজ্ঞতা থেকে গেরিলা যুদ্ধের ম্যানুয়াল — তৃতীয় বিশ্বের মুক্তিসংগ্রামের হাতে-হাতে পাঠ্য।",
+      links: [{ label: "সম্পূর্ণ পড়ুন", url: "https://www.marxists.org/archive/guevara/1960/guerrilla/" }],
+    },
+    {
+      id: "che-man",
+      cat: "liberation",
+      title: "সমাজতন্ত্র ও মানুষ",
+      orig: "El socialismo y el hombre en Cuba",
+      author: "চে গেভারা",
+      year: "1965",
+      lang: "স্পেনীয়",
+      desc: "“নতুন মানুষ” গড়ার প্রশ্নে খোলা চিঠি — বিপ্লবের নৈতিক দিগন্ত।",
+      links: [{ label: "চিঠিটি পড়ুন", url: "https://www.marxists.org/archive/guevara/1965/man/" }],
+    },
+    {
+      id: "fanon",
+      cat: "liberation",
+      title: "পৃথিবীর নিপীড়িত মানুষ",
+      orig: "Les Damnés de la Terre",
+      author: "ফ্রানৎস ফানোঁ",
+      year: "1961",
+      lang: "ফরাসি",
+      desc: "ঔপনিবেশিক মানসিকতার গভীর বিশ্লেষণ — মুক্তির মনস্তত্ত্বের ধ্রুপদি গ্রন্থ, সার্ত্রের ভূমিকাসহ।",
+      links: [{ label: "সম্পূর্ণ পড়ুন", url: "https://www.marxists.org/subject/africa/fanon/wretched-of-the-earth/index.htm" }],
+    },
+    {
+      id: "castro",
+      cat: "liberation",
+      title: "ইতিহাস আমাকে নির্দোষ সাব্যস্ত করবে",
+      orig: "La historia me absolverá",
+      author: "ফিদেল কাস্ত্রো",
+      year: "1953",
+      lang: "স্পেনীয়",
+      desc: "মোঙ্কাদা আক্রমণের পরে আদালতে কাস্ত্রোর ঐতিহাসিক আত্মপক্ষ-সমর্থন — কিউবার বিপ্লবের ইশতেহার।",
+      links: [{ label: "ভাষণটি পড়ুন", url: "https://www.marxists.org/history/cuba/archive/castro/1953/10/16.htm" }],
+    },
+    {
+      id: "luxun",
+      cat: "liberation",
+      title: "পাগলের ডায়েরি",
+      orig: "狂人日记",
+      author: "লু শুন",
+      year: "1918",
+      lang: "চীনা",
+      desc: "আধুনিক চীনা সাহিত্যের প্রথম গল্প — “খাদক সমাজের” বিরুদ্ধে পুরোনো চীনের জাগরণের চিৎকার।",
+      links: [{ label: "লু শুন আর্কাইভ", url: "https://www.marxists.org/archive/lu-xun/" }],
+    },
+    {
+      id: "bhagat",
+      cat: "liberation",
+      title: "কেন আমি নাস্তিক",
+      orig: "Why I Am an Atheist",
+      author: "ভগৎ সিং",
+      year: "1930",
+      lang: "ইংরেজি",
+      desc: "ফাঁসির সেলে লেখা দার্শনিক জবানবন্দি — ভারতের বিপ্লবী বাম ধারার অমর দলিল।",
+      links: [
+        { label: "প্রবন্ধটি পড়ুন", url: "https://www.marxists.org/archive/bhagat-singh/1930/why-atheist.htm" },
+        { label: "ভগৎ সিং আর্কাইভ", url: "https://www.marxists.org/archive/bhagat-singh/" },
+      ],
+    },
+
+    // ————— ০৫ উপন্যাস ও সাক্ষ্য-সাহিত্য —————
+    {
+      id: "gorky-mother",
+      cat: "fiction",
+      title: "মা",
+      orig: "Мать",
+      author: "মাক্সিম গোর্কি",
+      year: "1906",
+      lang: "রুশ",
+      desc: "পিলাগেয়া নিলোভ্নার জাগরণ — সমাজতান্ত্রিক বাস্তবতার প্রথম মহান উপন্যাস।",
+      links: [{ label: "সম্পূর্ণ পড়ুন", url: "https://www.marxists.org/archive/gorky-maxim/1906/mother/" }],
+    },
+    {
+      id: "ostrovsky",
+      cat: "fiction",
+      title: "ইস্পাত কীভাবে ঝালানো হলো",
+      orig: "Как закалялась сталь",
+      author: "নিকোলাই অস্ত্রোভস্কি",
+      year: "1934",
+      lang: "রুশ",
+      desc: "পাবেল করচাগিনের জীবন — সোভিয়েত যুগের সবচেয়ে প্রভাবশালী উপন্যাস, চীন থেকে কিউবা পর্যন্ত প্রজন্ম জাগানো বই।",
+      links: [{ label: "সম্পূর্ণ পড়ুন", url: "https://www.marxists.org/archive/ostrovsky/steeltmp/" }],
+    },
+    {
+      id: "fadeyev",
+      cat: "fiction",
+      title: "তরুণ গার্ড",
+      orig: "Молодая гвардия",
+      author: "আলেক্সান্দ্র ফাদেয়েভ",
+      year: "1945",
+      lang: "রুশ",
+      desc: "নাৎসি-দখলকৃত ডনবাসে তরুণ ভূগর্ভস্থ প্রতিরোধের কাহিনি — সত্য ঘটনা অবলম্বনে।",
+      links: [{ label: "ফাদেয়েভ আর্কাইভ", url: "https://www.marxists.org/archive/fadeyev/" }],
+    },
+    {
+      id: "sholokhov",
+      cat: "fiction",
+      title: "শান্ত ডন নদী",
+      orig: "Тихий Дон",
+      author: "মিখাইল শোলোখভ",
+      year: "১৯২৮–৪০",
+      lang: "রুশ",
+      desc: "কসাক গ্রিগরি মেলিখভের মহাকাব্য — বিপ্লব ও গৃহযুদ্ধের রক্তাক্ত প্রহর, নোবেলজয়ী উপন্যাস।",
+      links: [{ label: "Archive.org-এ খুঁজুন", url: "https://archive.org/search?query=and+quiet+flows+the+don" }],
+    },
+    {
+      id: "iron-heel",
+      cat: "fiction",
+      title: "লৌহ জঁতা",
+      orig: "The Iron Heel",
+      author: "জ্যাক লন্ডন",
+      year: "1908",
+      lang: "ইংরেজি",
+      desc: "অলিগার্কির ভবিষ্যৎ-ফ্যাসিস্ট আমেরিকার ভবিষ্যদ্বাণী — ইংরেজি সাহিত্যের প্রথম মার্কসবাদী-ঘেঁষা ডিস্টোপিয়া।",
+      links: [{ label: "Gutenberg-এ পড়ুন", url: "https://www.gutenberg.org/ebooks/1164" }],
+    },
+    {
+      id: "jungle",
+      cat: "fiction",
+      title: "জঙ্গল",
+      orig: "The Jungle",
+      author: "আপটন সিনক্লেয়ার",
+      year: "1906",
+      lang: "ইংরেজি",
+      desc: "শিকাগোর মাংস-কারখানার নোংরা সত্য — শ্রমিকের দুর্দশা লিখতে গিয়ে জাগিয়ে দিলেন গোটা আমেরিকা।",
+      links: [{ label: "Gutenberg-এ পড়ুন", url: "https://www.gutenberg.org/ebooks/140" }],
+    },
+    {
+      id: "seventh-cross",
+      cat: "fiction",
+      title: "সপ্তম ক্রুশ",
+      orig: "Das siebte Kreuz",
+      author: "আনা জেগার্স",
+      year: "1942",
+      lang: "জার্মান",
+      desc: "কনসেনট্রেশন ক্যাম্প থেকে পালানো সাতজনের গল্প — নির্বাসনে লেখা অ্যান্টিফ্যাসিস্ট ধ্রুপদি।",
+      links: [{ label: "Archive.org-এ খুঁজুন", url: "https://archive.org/search?query=the+seventh+cross+anna+seggers" }],
+    },
+    {
+      id: "spartacus",
+      cat: "fiction",
+      title: "স্পার্টাকাস",
+      orig: "Spartacus",
+      author: "হাওয়ার্ড ফাস্ট",
+      year: "1951",
+      lang: "ইংরেজি",
+      desc: "রোমের দাস-বিদ্রোহের মহাকাব্য — মার্কিন “কালো তালিকা”র অন্ধকারে লেখা, নিজের পয়সায় ছাপা।",
+      links: [{ label: "Archive.org-এ খুঁজুন", url: "https://archive.org/search?query=spartacus+howard+fast" }],
+    },
+    {
+      id: "red-star",
+      cat: "fiction",
+      title: "রেড স্টার ওভার চায়না",
+      orig: "Red Star Over China",
+      author: "এডগার স্নো",
+      year: "1937",
+      lang: "ইংরেজি",
+      desc: "ইয়েনআনে মাও ও লাল ফৌজের ভেতরে প্রথম প্রতিবেদন — বিশ্বকে চীনা বিপ্লব চেনানো বই।",
+      links: [{ label: "Archive.org-এ খুঁজুন", url: "https://archive.org/search?query=red+star+over+china" }],
+    },
+    {
+      id: "tendays",
+      cat: "fiction",
+      title: "দশ দিন যা দুনিয়া কাঁপিয়ে দিল",
+      orig: "Ten Days that Shook the World",
+      author: "জন রিড",
+      year: "1919",
+      lang: "ইংরেজি",
+      desc: "অক্টোবর বিপ্লবের প্রত্যক্ষদর্শী প্রতিবেদন — লেনিন নিজেই লিখেছিলেন ভূমিকা।",
+      links: [{ label: "সম্পূর্ণ পড়ুন", url: "https://www.marxists.org/archive/reed/1919/ten-days/ten-days.htm" }],
+    },
+    {
+      id: "serge",
+      cat: "fiction",
+      title: "এক বিপ্লবীর স্মৃতিকথা",
+      orig: "Mémoires d'un révolutionnaire",
+      author: "ভিক্তর সের্জ",
+      year: "1943",
+      lang: "ফরাসি",
+      desc: "বোলশেভিক থেকে বিসংবাদী — বিংশ শতাব্দীর সবচেয়ে সৎ বিপ্লবী আত্মজীবনী।",
+      links: [{ label: "সের্জ আর্কাইভ", url: "https://www.marxists.org/archive/serge/" }],
+    },
+    {
+      id: "pather-dabi",
+      cat: "fiction",
+      title: "পথের দাবী",
+      orig: "—",
+      author: "শরৎচন্দ্র চট্টোপাধ্যায়",
+      year: "1926",
+      lang: "বাংলা",
+      desc: "ব্রিটিশ সাম্রাজ্যবাদবিরোধী বিপ্লবী দল ‘পথের দাবী’, ডাক্তার সব্যসাচী ও অমর মুক্তি সংগ্রামের রাজদ্রোহী নিষিদ্ধ উপন্যাস।",
+      links: [{ label: "উইকিসংকলনে পড়ুন", url: "https://bn.wikisource.org/wiki/পথের_দাবী" }],
+    },
+
+    // ————— ০৬ কবিতা ও নাটক —————
+    {
+      id: "mayakovsky",
+      cat: "poetry",
+      title: "মায়াভস্কির কবিতা",
+      orig: "Стихотворения",
+      author: "ভ্লাদিমির মায়াভস্কি",
+      year: "১৯১২–৩০",
+      lang: "রুশ",
+      desc: "“শুনুন, কমরেড মাউজার!” — বিপ্লবের ঢাক, ভবিষ্যতবাদী ছন্দে লেখা প্লাকাত-কবিতা।",
+      links: [{ label: "কবিতাসমগ্র", url: "https://www.marxists.org/archive/mayakovsky/works/" }],
+    },
+    {
+      id: "hikmet",
+      cat: "poetry",
+      title: "নাজিম হিকমতের কবিতা",
+      orig: "Şiirler",
+      author: "নাজিম হিকমত",
+      year: "১৯২১–৬৩",
+      lang: "তুর্কি",
+      desc: "“সবচেয়ে সুন্দর দিনটি এখনো আসেনি” — কারাগারে তেরো বছর কাটানো কবির অপরাজেয় আশা।",
+      links: [{ label: "কবিতাসমগ্র", url: "https://www.marxists.org/archive/hikmet/" }],
+    },
+    {
+      id: "neruda",
+      cat: "poetry",
+      title: "কান্তো জেনেরাল",
+      orig: "Canto General",
+      author: "পাবলো নেরুদা",
+      year: "1950",
+      lang: "স্পেনীয়",
+      desc: "লাতিন আমেরিকার মাটি, খনি ও শোষিত মানুষের মহাকাব্য — পাহাড়ের আড়ালে লুকিয়ে লেখা নিষিদ্ধ বই।",
+      links: [{ label: "সম্পূর্ণ পড়ুন", url: "https://www.marxists.org/archive/neruda/canto-general/" }],
+    },
+    {
+      id: "brecht",
+      cat: "poetry",
+      title: "ব্রেখটের কবিতা ও নাটক",
+      orig: "Gedichte und Stücke",
+      author: "বেরটোল্ট ব্রেখট",
+      year: "১৯২২–৫৬",
+      lang: "জার্মান",
+      desc: "“প্রথমে পেট, তারপর নীতি” — এপিক থিয়েটার আর তীক্ষ্ণ শ্লেষে বুর্জোয়া সভ্যতার বিচার।",
+      links: [{ label: "ব্রেখট আর্কাইভ", url: "https://www.marxists.org/archive/brecht/" }],
+    },
+    {
+      id: "vallejo",
+      cat: "poetry",
+      title: "স্পেন, এই পাত্র আমায় সরিয়ে নাও",
+      orig: "España, aparta de mí este cáliz",
+      author: "সেসার ভায়েহো",
+      year: "1939",
+      lang: "স্পেনীয়",
+      desc: "স্পেনের গৃহযুদ্ধের শহীদদের জন্য পেরুর কবির বিলাপ — প্রতিরোধের শ্রেষ্ঠ কাব্যগ্রন্থগুলোর একটি।",
+      links: [{ label: "ভায়েহো আর্কাইভ", url: "https://www.marxists.org/archive/vallejo/" }],
+    },
+    {
+      id: "samyabadi",
+      cat: "poetry",
+      title: "সাম্যবাদী",
+      orig: "—",
+      author: "কাজী নজরুল ইসলাম",
+      year: "1924",
+      lang: "বাংলা",
+      desc: "“আমি সাম্যের গান গাই” — বাংলা কবিতায় সাম্যবাদের প্রথম জাগ্রত সুর।",
+      links: [{ label: "উইকিসোর্সে পড়ুন", url: "https://bn.wikisource.org/wiki/সাম্যবাদী" }],
+    },
+    {
+      id: "chharpatra",
+      cat: "poetry",
+      title: "ছাড়পত্র",
+      orig: "—",
+      author: "সুকান্ত ভট্টাচার্য",
+      year: "1948",
+      lang: "বাংলা",
+      desc: "“ক্ষুধার রাজ্যে পৃথিবী গদ্যময়” — একুশ বছর বয়সে মৃত কিশোর কবির ফেলে যাওয়া আগুন।",
+      links: [{ label: "উইকিসোর্সে পড়ুন", url: "https://bn.wikisource.org/wiki/ছাড়পত্র" }],
+    },
+    {
+      id: "padatik",
+      cat: "poetry",
+      title: "পদাতিক",
+      orig: "—",
+      author: "সুভাষ মুখোপাধ্যায়",
+      year: "1940",
+      lang: "বাংলা",
+      desc: "ফ্যাসিবিরোধী আন্দোলনের পায়ের আওয়াজ — বাংলা কমিউনিস্ট কবিতার দিকনির্ণয়ক সংকলন।",
+      links: [{ label: "Archive.org-এ খুঁজুন", url: "https://archive.org/search?query=padatik+subhash+mukhopadhyay" }],
+    },
+
+    // ————— ০৭ বাংলা মার্কসবাদ —————
+    {
+      id: "bengali-archive",
+      cat: "bangla",
+      title: "বাংলায় মার্কস–এঙ্গেলস–লেনিন",
+      orig: "marxists.org বাংলা বিভাগ",
+      author: "বহু লেখক ও অনুবাদক",
+      year: "চলমান প্রকল্প",
+      lang: "বাংলা",
+      desc: "ইশতেহার, রাষ্ট্র ও বিপ্লব-সহ মৌলিক গ্রন্থগুলোর বাংলা অনুবাদ — এক ঠিকানায়।",
+      links: [{ label: "বাংলা বিভাগ", url: "https://www.marxists.org/bengali/" }],
+    },
+    {
+      id: "muzaffar",
+      cat: "bangla",
+      title: "জননেতা মুজাফফর আহমদ: জীবন-সংগ্রাম",
+      orig: "—",
+      author: "কমরেড মুজাফফর আহমদ",
+      year: "১৯৭০-এর দশক",
+      lang: "বাংলা",
+      desc: "কানপুর ষড়যন্ত্র মামলার আসামি থেকে বাংলাদেশে কমিউনিস্ট আন্দোলনের পথিকৃৎ — আত্মজীবনী।",
+      links: [{ label: "Archive.org-এ খুঁজুন", url: "https://archive.org/search?query=muzaffar+ahmad+jananeta" }],
+    },
+    {
+      id: "moni-singh",
+      cat: "bangla",
+      title: "আমার জীবন আমার সময়",
+      orig: "—",
+      author: "মণি সিং",
+      year: "১৯৯০",
+      lang: "বাংলা",
+      desc: "নেত্রকোনা থেকে ভাষা আন্দোলন — বাংলাদেশের কমিউনিস্ট আন্দোলনের জীবন্ত ইতিহাস।",
+      links: [{ label: "Archive.org-এ খুঁজুন", url: "https://archive.org/search?query=moni+singh+smritikatha" }],
+    },
+    {
+      id: "putul",
+      cat: "bangla",
+      title: "পুতুলনাচের ইতিকথা",
+      orig: "—",
+      author: "মানিক বন্দ্যোপাধ্যায়",
+      year: "1936",
+      lang: "বাংলা",
+      desc: "কুসুম, শশী ও মতিলাল — গ্রামবাংলার অবক্ষয় আর মুক্তির আকাঙ্ক্ষার অমর উপন্যাস।",
+      links: [{ label: "Archive.org-এ খুঁজুন", url: "https://archive.org/search?query=putulnacher+itikatha" }],
+    },
+    {
+      id: "titash",
+      cat: "bangla",
+      title: "তিতাশ একটি নদীর নাম",
+      orig: "—",
+      author: "অদ্বৈত মল্লবর্মণ",
+      year: "1956",
+      lang: "বাংলা",
+      desc: "মাঝি-জীবনের মহাকাব্য — নদীর মরণ আর নিম্নবর্ণের মানুষের বেঁচে থাকার সংগ্রাম।",
+      links: [{ label: "Archive.org-এ খুঁজুন", url: "https://archive.org/search?query=titash+ekti+nadir+nam" }],
+    },
+    {
+      id: "tebhaga",
+      cat: "bangla",
+      title: "তেভাগা আন্দোলন: দলিল ও স্মৃতিকথা",
+      orig: "—",
+      author: "সম্পাদিত সংকলন",
+      year: "১৯৪৬–৫০",
+      lang: "বাংলা",
+      desc: "বাঁশদ্রোহ থেকে নাচোল — বাংলার কৃষক-সংগ্রামের প্রত্যক্ষ দলিল ও স্মৃতিকথা।",
+      links: [{ label: "Archive.org-এ খুঁজুন", url: "https://archive.org/search?query=tebhaga+andolan" }],
+    },
+    {
+      id: "bangla-marxist",
+      cat: "bangla",
+      title: "বাংলা মার্কসবাদী বইয়ের ভাণ্ডার",
+      orig: "archive.org সংগ্রহ",
+      author: "বহু লেখক",
+      year: "চলমান",
+      lang: "বাংলা",
+      desc: "শ্রমিক আন্দোলন, বাম সাহিত্য ও রাজনীতির বাংলা বইয়ের বিশাল মুক্ত সংগ্রহ।",
+      links: [{ label: "সংগ্রহটি দেখুন", url: "https://archive.org/search?query=bengali+marxist" }],
+    },
+  ];
+
+  const EXTRA = {
+    /* ---------- মার্কস–এঙ্গেলস ---------- */
+    manifest: {
+      pdf: "https://www.marxists.org/archive/marx/works/download/pdf/Manifesto.pdf",
+      read: {
+        context:
+          "১৮৪৮ সালের ইউরোপীয় বিপ্লবের ঠিক আগে, ২৯ বছরের মার্কস আর ২৭ বছরের এঙ্গেলস কমিউনিস্ট লীগের জন্য লেখেন এই ছোট্ট ইশতেহার। এটি কোনো দলীয় কর্মসূচি নয় — এটি সমগ্র মানবতার প্রতি এক ডাক, যার প্রতিধ্বনি আজও প্রতিটি লিখিত ভাষায় পৌঁছে গেছে।",
+        points: [
+          "এ পর্যন্ত সব সমাজের ইতিহাসই শ্রেণীসংগ্রামের ইতিহাস — নিপীড়িত আর নিপীড়কের লড়াইয়ের।",
+          "বুর্জোয়া সমাজ শ্রেণীবৈষম্য মোছেনি; শুধু পুরোনো শ্রেণীর জায়গায় নতুন শ্রেণী বসিয়েছে।",
+          "শ্রমিকশ্রেণীর দাবি বেঁচে থাকার নয় — উৎপাদনের কর্তৃত্ব নিজের হাতে নেওয়ার।",
+          "ইশতেহারের শেষ লাইনই বিশ্বজোড়া আহ্বান: “সব দেশের শ্রমিকেরা, ঐক্যবদ্ধ হও!”",
+        ],
+      },
+    },
+    capital1: {
+      pdf: "https://www.marxists.org/archive/marx/works/download/pdf/Capital-Volume-I.pdf",
+      read: {
+        context:
+          "“আধুনিক সমাজের গতির সূত্র উদ্ঘাটন” করতে মার্কস ব্রিটিশ মিউজিয়ামের পাঠকক্ষে কাটিয়েছেন দশকের পর দশক। ১৮৬৭-এ প্রকাশিত প্রথম খণ্ড শুরু হয় পণ্য দিয়ে — পুঁজিবাদের ক্ষুদ্রতম কোষ — আর দেখিয়ে দেয়, শ্রমিকের শ্রম থেকেই কীভাবে উৎপাদিত হয় উদ্বৃত্ত মূল্য।",
+        points: [
+          "শ্রমিক শ্রম বিক্রি করে না, বিক্রি করে শ্রমশক্তি; মজুরি সেই শ্রমশক্তির দাম।",
+          "উদ্বৃত্ত মূল্য: শ্রমিক যে মূল্য তৈরি করে তার যে অংশ সে ফেরত পায় না — পুঁজিপতির মুনাফার উৎস এটাই।",
+          "কার্যদিবস এক যুদ্ধক্ষেত্র: পুঁজি তাকে বাড়াতে চায়, শ্রমিকশ্রেণী সীমিত করতে।",
+          "এক মেরুতে পুঁজির সঞ্চয়, অন্য মেরুতে দারিদ্র্যের সঞ্চয় — একই প্রক্রিয়ার দুই পিঠ।",
+        ],
+      },
+    },
+    ideology: {
+      pdf: "https://www.marxists.org/archive/marx/works/download/pdf/German-Ideology.pdf",
+    },
+    wage: {
+      pdf: "https://www.marxists.org/archive/marx/works/download/pdf/Wage-Labour-and-Capital.pdf",
+      read: {
+        context:
+          "১৮৪৭ সালে ব্রাসেলসের জার্মান শ্রমিক সমিতিতে দেওয়া মার্কসের বক্তৃতার পাঠ এটি। শোষণের জটিল হিসাব সাধারণ শ্রমিকের বোধগম্য ভাষায় বোঝাতে লেখা — তাই এটি মার্কসীয় অর্থনীতির সেরা প্রবেশদ্বারগুলোর একটি।",
+        points: [
+          "মজুরি শ্রমিকের প্রাপ্য ভাগ নয় — ‘শ্রমশক্তি’ নামের বিশেষ পণ্যটির দাম।",
+          "পুঁজির বৃদ্ধি আর বেতন-শ্রমের বৃদ্ধি একই শিকলের দুই প্রান্ত।",
+          "পুঁজি ও বেতন-শ্রমের স্বার্থ সম্পূর্ণ বিপরীত — ব্যবস্থার ভেতরে ‘ন্যায্য মজুরি’ সম্ভব নয়।",
+        ],
+      },
+    },
+    "working-class": {
+      pdf: "https://www.gutenberg.org/cache/epub/17306/pg17306-images.pdf",
+      html: "https://www.gutenberg.org/cache/epub/17306/pg17306.html",
+    },
+    utopian: {
+      pdf: "https://www.marxists.org/archive/marx/works/download/pdf/soc_utop.pdf",
+      read: {
+        context:
+          "১৮৮০ সালে লেখা এঙ্গেলসের এই পুস্তিকাটি ইউটোপীয় আর বৈজ্ঞানিক সমাজতন্ত্রের পার্থক্যের সবচেয়ে পরিষ্কার ভূমিকা। দেখানো হয়, মার্কসের তিনটি আবিষ্কার — ঐতিহাসিক বস্তুবাদ, উদ্বৃত্ত মূল্য ও শ্রেণীসংগ্রাম — কীভাবে সমাজতন্ত্রকে স্বপ্ন থেকে বিজ্ঞানে পরিণত করেছিল।",
+        points: [
+          "সাঁ-সিমোঁ, ফুরিয়ে আর ওয়েন পুঁজিবাদের দোষ বুঝেছিলেন, কিন্তু উত্তরণের পথ দেখাতে পারেননি।",
+          "সমাজতন্ত্র চিরন্তন ন্যায়ের বাস্তবায়ন নয় — উৎপাদন-সম্পর্ক ও উৎপাদিকা শক্তির দ্বন্দ্বের অনিবার্য ফল।",
+          "প্রয়োজনের রাজ্য থেকে স্বাধীনতার রাজ্যে লাফ — এটাই বিপ্লবের অর্থ।",
+        ],
+      },
+    },
+    origin: {
+      pdf: "https://www.marxists.org/archive/marx/works/download/pdf/Origin-of-the-Family.pdf",
+      read: {
+        context:
+          "লুইস মর্গানের নৃতাত্ত্বিক গবেষণা আর মার্কসের নোটের ভিত্তিতে ১৮৮৪ সালে এঙ্গেলস লেখেন এই বই। দেখানো হয় — পরিবার, ব্যক্তিগত সম্পত্তি ও রাষ্ট্র চিরন্তন প্রতিষ্ঠান নয়, ইতিহাসেরই সৃষ্টি; তাই ইতিহাস দিয়েই বদলানো সম্ভব।",
+        points: [
+          "“নারীজাতির বিশ্ব-ঐতিহাসিক পরাজয়” — ব্যক্তিগত সম্পত্তির সঙ্গেই পিতৃতন্ত্রের জন্ম।",
+          "রাষ্ট্র সমাজের বাইরে থেকে আসেনি; শ্রেণীদ্বন্দ্ব সামলাতে সমাজের ভেতর থেকেই জন্মেছে।",
+          "আদিম সাম্যবাদে স্থায়ী সেনাবাহিনী বা কারাগার ছিল না — কারণ শ্রেণীই ছিল না।",
+        ],
+      },
+    },
+    antiduhring: {
+      pdf: "https://www.marxists.org/archive/marx/works/download/pdf/Anti-Duhring.pdf",
+    },
+
+    /* ---------- লেনিন ---------- */
+    staterev: {
+      pdf: "https://www.marxists.org/archive/lenin/works/download/pdf/state-and-revolution.pdf",
+      read: {
+        context:
+          "১৯১৭ সালের গ্রীষ্মে, অক্টোবর বিপ্লবের ঠিক আগে, আত্মগোপন করে বসে লেনিন লেখেন এই বই। মার্কস ও এঙ্গেলসের রাষ্ট্র-বিষয়ক বক্তব্য একে একে সাজিয়ে তিনি দেখান — বিপ্লবের কাজ পুরোনো রাষ্ট্রযন্ত্র দখল নয়, ভেঙে ফেলা।",
+        points: [
+          "রাষ্ট্র শ্রেণীশাসনের অঙ্গ — একটি শ্রেণী অন্য শ্রেণীকে দমন করার যন্ত্র।",
+          "শ্রমিকশ্রেণী প্রস্তুত রাষ্ট্রযন্ত্র হাতে তুলে নিয়ে ব্যবহার করতে পারে না।",
+          "প্যারিস কমিউনই আদর্শ — সশস্ত্র শ্রমিকদের স্বশাসন, বাতিলযোগ্য প্রতিনিধি, কর্মচারীর সমান বেতন।",
+          "রাষ্ট্র ‘নির্বাপিত’ হবে — কিন্তু তার আগে দরকার প্রলেতারিয়েতার একনায়কত্ব।",
+        ],
+      },
+    },
+    witbd: {
+      read: {
+        context:
+          "১৯০২ সালের এই পুস্তিকা বলশেভিক পার্টির সাংগঠনিক ভিত রচনা করে। শ্রমিক আন্দোলনকে কেবল অর্থনৈতিক দাবির মধ্যে সীমাবদ্ধ রাখার ‘অর্থনীতিবাদী’ ঝোঁকের বিরুদ্ধে লেনিন তুলে ধরেন পেশাদার বিপ্লবীদের পার্টির প্রয়োজন।",
+        points: [
+          "“বিপ্লবী তত্ত্ব ছাড়া বিপ্লবী আন্দোলন হতে পারে না।”",
+          "আপনা-আপনি শ্রমিকশ্রেণী কেবল ট্রেড-ইউনিয়ন সচেতনতায় পৌঁছয় — সমাজতান্ত্রিক সচেতনতা আনতে হয় সংগঠিত প্রচারণায়।",
+          "পার্টি শ্রেণীর সবটা নয় — তার সংগঠিত অগ্রদল।",
+        ],
+      },
+    },
+    imperialism: {
+      pdf: "https://www.marxists.org/archive/lenin/works/download/pdf/imperialism.pdf",
+      read: {
+        context:
+          "প্রথম বিশ্বযুদ্ধের মাঝখানে, ১৯১৬ সালে জুরিখের পাঠাগারে বসে লেখা। বুর্জোয়া অর্থনীতিবিদদের পরিসংখ্যান দিয়েই লেনিন দেখান — পুঁজিবাদ ঢুকে পড়েছে তার সর্বোচ্চ ও শেষ স্তরে: একচেটিয়া, অর্থপুঁজি আর বিশ্বভাগের যুগে।",
+        points: [
+          "পাঁচটি বৈশিষ্ট্য: উৎপাদনের কেন্দ্রীভবন, ব্যাংক-শিল্প পুঁজির মিশ্রণ, পুঁজি রপ্তানি, একচেটিয়া সংস্থার বিশ্বভাগ, সাম্রাজ্যবাদী শক্তিদের ভূখণ্ড ভাগ।",
+          "সাম্রাজ্যবাদ পরজীবী ও পচনশীল পুঁজিবাদ।",
+          "বিশ্বযুদ্ধ বিশ্বকে নতুন করে ভাগাভাগির লড়াইয়েরই ফল।",
+          "সাম্রাজ্যবাদই সমাজতান্ত্রিক বিপ্লবের প্রাক্কাল।",
+        ],
+      },
+    },
+
+    /* ---------- তত্ত্ব ---------- */
+    reform: {
+      read: {
+        context:
+          "১৮৯৮–৯৯ সালে তরুণ রোজা লুক্সেমবুর্গ লেখেন এই প্রবন্ধমালা — এডুয়ার্ড বের্নস্টাইনের সংশোধনবাদের জবাবে। সংস্কারের পথে ধাপে ধাপে পুঁজিবাদ মোচনের যে স্বপ্ন, তাকে তিনি দেখান সমাজতন্ত্রের লক্ষ্য ত্যাগেরই নামান্তর।",
+        points: [
+          "সংস্কার ও বিপ্লব এক লক্ষ্যের দুই পথ নয় — দুটি ভিন্ন লক্ষ্য।",
+          "যে সংস্কারের পথ বেছে নেয়, সে ধীর পথ নয়, অন্য গন্তব্য বেছে নেয়।",
+          "ঋণ ও কার্টেল পুঁজিবাদের দ্বন্দ্ব কমায় না — আরও তীক্ষ্ণ করে।",
+        ],
+      },
+    },
+    gramsci: {
+      read: {
+        context:
+          "১৯২৯–৩৫, মুসোলিনির কারাগারে বন্দী অবস্থায় লেখা ৩৩টি খাতা। শাসকশ্রেণী শুধু জোরে নয়, সম্মতি তৈরি করেও শাসন করে — ‘আধিপত্য’ বা হেজেমনির এই তত্ত্ব বিংশ শতাব্দীর সবচেয়ে প্রভাবশালী মার্কসবাদী ধারণাগুলোর একটি।",
+        points: [
+          "আধিপত্য: বলপ্রয়োগ নয়, সংস্কৃতি ও সম্মতির ভেতর দিয়ে শাসন।",
+          "নাগরিক সমাজ — স্কুল, গির্জা, সংবাদপত্র — সম্মতি উৎপাদনের কারখানা।",
+          "“পুরোনোটা মরছে, নতুনটা জন্মাতে পারছে না — এই ফাঁকেই নানা রকম রোগের লক্ষণ দেখা দেয়।”",
+        ],
+      },
+    },
+
+    /* ---------- মুক্তিসংগ্রাম ---------- */
+    "che-guerrilla": {
+      read: {
+        context:
+          "১৯৬০ সালে কিউবার বিপ্লবের অভিজ্ঞতা থেকে লেখা এই হ্যান্ডবুক গেরিলা যুদ্ধের নীতিমালা তুলে ধরে — লাতিন আমেরিকা থেকে এশিয়া পর্যন্ত নিপীড়িত জনগণের মুক্তিসংগ্রামের পাথেয় হয়ে ওঠে।",
+        points: [
+          "গেরিলা ফোকো জনগণের বিকল্প নয় — তাদেরই সংগঠিত অগ্রদল।",
+          "ভূমি জানা আর কৃষকের সমর্থনই গেরিলার প্রধান অস্ত্র।",
+          "গেরিলা যুদ্ধ দীর্ঘমেয়াদী — জয় দুঃসাহসে নয়, শৃঙ্খলা ও ধৈর্যে।",
+        ],
+      },
+    },
+    "ho-decl": {
+      read: {
+        context:
+          "১৯৪৫ সালের ২ সেপ্টেম্বর, হ্যানয়ের বা দিঁ চত্বরে হো চি মিন পাঠ করেন ভিয়েতনামের স্বাধীনতার ঘোষণাপত্র। শুরুটা ১৭৭৬-এর মার্কিন স্বাধীনতার ঘোষণাপত্রের উদ্ধৃতি দিয়ে — যে প্রতিশ্রুতি উপনিবেশবাদীরাই লঙ্ঘন করেছে, সেটাই তাদের বিরুদ্ধে অস্ত্র।",
+        points: [
+          "সব জাতির বাঁচার, স্বাধীনতার ও সুখের অধিকার আছে — উপনিবেশবাদীরা সেই প্রতিশ্রুতি পায়ের তলায় পিষেছে।",
+          "ভিয়েতনামি জনগণ জাপানের শিকল ছিঁড়ে, ফরাসি শাসন থেকে নিজেরাই স্বাধীনতা ছিনিয়ে এনেছে।",
+          "স্বাধীনতা রক্ষায় সমস্ত কিছু বিলিয়ে দিতেও এই জনগণ প্রস্তুত।",
+        ],
+      },
+    },
+    fanon: {
+      read: {
+        context:
+          "১৯৬১ সালে, মৃত্যুর মাত্র কয়েক মাস আগে, আলজেরীয় মুক্তিযুদ্ধের চিকিৎসক-যোদ্ধা ফ্রানৎজ ফানোঁ লেখেন এই বই। ঔপনিবেশিক শাসন কীভাবে মানুষের মন পর্যন্ত কলোনাইজ করে, আর মুক্তি কেন সম্পূর্ণ ভাঙচুর ছাড়া সম্ভব নয় — তা তিনি দেখান অভিজ্ঞতার ভেতর থেকে।",
+        points: [
+          "ঔপনিবেশিক বিশ্ব দ্বিখণ্ডিত — সৈনিক ও পুলিশের বেড়া দিয়ে আঁকা দুই অঞ্চল।",
+          "নিপীড়িতের জন্য সহিংসতা এক প্রকার শুদ্ধিকরণ — ভয় ভেঙে মানুষ হওয়ার প্রক্রিয়া।",
+          "জাতীয় বুর্জোয়াদের হাতে স্বাধীনতা বিপথগামী হয় — মুক্তি হতে হবে জনগণের।",
+        ],
+      },
+    },
+    luxun: {
+      read: {
+        context:
+          "১৯১৮ সালে প্রকাশিত লু শুনের এই ছোটোগল্প আধুনিক চীনা সাহিত্যের প্রথম বিদ্রোহী চিৎকার। এক ‘পাগলের’ চোখে সমাজের আসল রূপ — যে সভ্যতার ইতিহাস খুললেই পাতায় পাতায় লেখা ‘মানুষ খাও’।",
+        points: [
+          "পুরোনো সমাজ ‘মানুষ খাওয়া’র সমাজ — রীতি, নীতি আর ধর্ম সবই তার ঢাকনা।",
+          "পাগলটাই একমাত্র সুস্থ — কারণ সে-ই সত্য দেখতে পায়।",
+          "গল্পের শেষ প্রশ্ন এখনও জ্বলজ্বলে: “বাচ্চাদের বাঁচাও…”",
+        ],
+      },
+    },
+    bhagat: {
+      read: {
+        context:
+          "১৯৩০ সালের অক্টোবর মাসে লাহোর কেন্দ্রীয় কারাগারে ফাঁসির প্রতীক্ষায় থাকা অবস্থায় রচিত। ভগৎ সিংহ দেখিয়েছেন তাঁর নাস্তিকতা কোনো অহংকার নয়, বরং বস্তুনিষ্ঠ মার্ক্সীয় পাঠ, বিজ্ঞানচেতনা এবং মেহনতি মানুষের প্রতি গভীর ভালোবাসা থেকে জন্ম নেওয়া আপসহীন যুক্তিবাদ।",
+        points: [
+          "যেকোনো মানুষ যে প্রগতির পক্ষে দাঁড়ায়, তাকে অতীতের প্রতিটি সনাতন বিশ্বাসের তীব্র সমালোচনা করতে হবে।",
+          "বিশ্বাস অন্ধ করে দেয়, যুক্তি মানুষকে স্বাধীন করে।",
+          "বিপ্লবী আদর্শে আত্মাহুতি কোনো অলৌকিক পুরস্কারের আশায় নয়, মানুষের মুক্তির প্রতি নিরঙ্কুশ অঙ্গীকারে।"
+        ]
+      }
+    },
+
+    /* ---------- উপন্যাস ---------- */
+    "gorky-mother": {
+      read: {
+        context:
+          "১৯০৬ সালে, প্রবাসে বসে মাক্সিম গোর্কি লেখেন ‘মা’ — সাহিত্যে প্রথমবার বিপ্লবী শ্রমিকের চরিত্র এলো, আর তার সঙ্গে এলো তার মায়ের রূপান্তর। লেনিন বলেছিলেন, “যে বই প্রতিটি শ্রমিকের পড়া উচিত”।",
+        points: [
+          "পেলাগেয়া নীলভ্না — মার খাওয়া স্ত্রীর জীবন থেকে দুঃসাহসী প্রচারকের জীবনে যাত্রা।",
+          "পাভেল ভ্লাসভের এজলাস-বক্তৃতা আদালতকেই বদলে দেয় বিপ্লবের মঞ্চে।",
+          "উপসংহারের বার্তা: মানুষকে বন্দী করা যায়, ধারণাকে নয়।",
+        ],
+      },
+    },
+    "pather-dabi": {
+      read: {
+        context:
+          "বাংলা সাহিত্যের অবিসংবাদিত রাজদ্রোহী বিপ্লবী উপন্যাস। পরাধীন ভারতবর্ষে সশস্ত্র বিপ্লবের মাধ্যমে ব্রিটিশ শাসন উচ্ছেদ করার শপথ নেওয়া এক গুপ্ত বিপ্লবী দল ‘পথের দাবী’, তাদের অবিস্মরণীয় নেতা ডাক্তার সব্যসাচী, অপূর্ব, ভারতী ও সুমিত্রার আত্মত্যাগ ও আদর্শিক দ্বন্দ্বের কালজয়ী মহা-আখ্যান।",
+        points: [
+          "দেশের স্বাধীনতা মানুষের সবচেয়ে বড় অধিকার — দাসত্ব মেনে নেওয়া জাতির বেঁচে থাকার অধিকার নেই।",
+          "ডাক্তার সব্যসাচীর অমর চরিত্র: বিপ্লব কোনো অপরাধ নয়, বিপ্লব হলো শৃঙ্খল মুক্তির পরম ধর্ম।",
+          "ব্রিটিশ শাসকগোষ্ঠী গ্রন্থটি প্রকাশমাত্র বাজেয়াপ্ত ও নিষিদ্ধ করেছিল।"
+        ]
+      }
+    },
+    ostrovsky: {
+      read: {
+        context:
+          "নিকোলাই অস্ত্রোভস্কি নিজেই ছিলেন গৃহযুদ্ধের আহত সৈনিক — অন্ধ ও পক্ষাঘাতগ্রস্ত হয়ে বিছানায় শুয়ে লেখেন এই আত্মজীবনীমূলক উপন্যাস। পাভেল করচাগিনের জীবন সোভিয়েত তরুণের কাছে হয়ে ওঠে চরিত্র গড়ার পাঠ্যবই।",
+        points: [
+          "“মানুষের সবচেয়ে দামি জিনিস জীবন — আর সেটা দিতে হয় মানবতার মুক্তির জন্য।”",
+          "ইস্পাত ঝালাই হয় সংগ্রামের আগুনে — চরিত্রও।",
+          "অসুস্থতা নয়, অলসতাই মানুষের আসল পরাজয়।",
+        ],
+      },
+    },
+    "iron-heel": {
+      pdf: "https://www.gutenberg.org/cache/epub/1063/pg1063-images.pdf",
+      html: "https://www.gutenberg.org/cache/epub/1063/pg1063.html",
+      read: {
+        context:
+          "১৯০৮ সালে জ্যাক লন্ডন লেখেন এই ডিস্টোপিয়া — ফ্যাসিজম নামটার জন্মেরও আগে মার্কিন পুঁজিপতির ফ্যাসিবাদী অলিগার্কির কল্পনা। বইটি ভবিষ্যৎ থেকে উদ্ধার একটি পাণ্ডুলিপির কাঠামোতে লেখা।",
+        points: [
+          "‘লৌহ জঁতা’ হলো একচেটিয়া পুঁজির একনায়কত্ব — হিংসা ও ঘুষ দিয়ে শ্রমিক আন্দোলন পিষে ফেলা।",
+          "লন্ডন আগেভাগে দেখেছিলেন রাষ্ট্র ও ট্রাস্টের মিলন, সংবাদপত্রের কারসাজি, শ্রমিক-অভিজাতের বিশ্বাসঘাতকতা।",
+          "পাণ্ডুলিপির শেষ কথা: শতাব্দীর লড়াইয়ের পরেও জিতবে জনগণ।",
+        ],
+      },
+    },
+    tendays: {
+      ebook: "https://archive.org/details/TenDaysThatShookTheWorld",
+      read: {
+        context:
+          "১৯১৭-এর অক্টোবরে আমেরিকান সাংবাদিক জন রিড ছিলেন স্মোলনি ইনস্টিটিউটের ভেতরে — বিপ্লবের কেন্দ্রে। তাঁর প্রত্যক্ষদর্শী বিবরণ, ১৯১৯-এ প্রকাশিত, আজও বিপ্লবের শ্রেষ্ঠ রিপোর্তাজ; ভূমিকা লিখেছিলেন স্বয়ং লেনিন।",
+        points: [
+          "দিন-পঞ্জির হিসাব: অন্তর্বর্তী সরকার কীভাবে পড়ল, সোভিয়েত ক্ষমতা কীভাবে এলো।",
+          "সৈনিক, নাবিক, শ্রমিক — ইতিহাস-নির্মাতা সাধারণ মানুষেরই প্রতিকৃতি।",
+          "প্রচারপুস্তি নয়, রিপোর্তাজ — ঘটনা, ঘোষণাপত্র, বিতর্ক, সব চোখের সামনে।",
+        ],
+      },
+    },
+
+    /* ---------- কবিতা ---------- */
+    samyabadi: {
+      read: {
+        context:
+          "১৯২৫ সালে প্রকাশিত নজরুলের ‘সাম্যবাদী’ কাব্যগ্রন্থের নামকবিতা বাংলা সাহিত্যের অন্যতম শক্তিশালী সাম্যের ঘোষণা। কবি কোনো দলের পতাকা নন — তিনি নিপীড়িতের পক্ষে, বঞ্চনার প্রতিটি রূপের বিরুদ্ধে।",
+        points: [
+          "কবির ঘোষণা: “গাহি সাম্যের গান” — বড়ো-ছোটো, ধনী-দরিদ্রের সব ভেদাভেদের ঊর্ধ্বে।",
+          "নজরুলের কাছে সাম্যবাদ মতবাদ নয় — শোষিতের ন্যায্যতার চিৎকার।",
+          "ধর্মীয়, শ্রেণীগত ও লিঙ্গবৈষম্য — তিনের বিরুদ্ধেই একসাথে প্রতিবাদ।",
+        ],
+      },
+    },
+    chharpatra: {
+      read: {
+        context:
+          "১৯৪৮-এ প্রকাশিত সুকান্তের ‘ছাড়পত্র’ — কবির মৃত্যুর ঠিক আগে; বয়স মাত্র বাইশ। চুয়াল্লিশের দুর্ভিক্ষ, সাম্প্রদায়িক দাঙ্গা আর মুক্তির লড়াইয়ের মাঝে লেখা এই কবিতাগুলো হয়ে ওঠে ক্ষুধার্ত ও বিদ্রোহী প্রজন্মের কণ্ঠ।",
+        points: [
+          "“লিখি না ফ্যান্সির কলমে, লিখি লোহার শাণে” — কবিতা যখন অস্ত্র।",
+          "ক্ষুধা, দাঙ্গা আর যুদ্ধের শহরে কবিতার কাজ — পাশে দাঁড়ানো।",
+          "সুকান্ত বাংলা কবিতায় নিয়ে আসেন খিদে-পাওয়া শহর: মিল, কারখানা, ফুটপাত।",
+        ],
+      },
+    },
+    padatik: {
+      read: {
+        context:
+          "১৯৫২-এ প্রকাশিত সুভাষ মুখোপাধ্যায়ের ‘পদাতিক’ — পঞ্চাশের দশকের বাঙালি বাম কবিতার মাইলফলক। যুদ্ধ-পরবর্তী হতাশা, ভাঙা শহর আর নতুন লড়াইয়ের বিশ্বাস — সব একসাথে এই কাব্যগ্রন্থে।",
+        points: [
+          "“পদাতিকের পদযাত্রা” — নিঃসঙ্গ নয়, সমবেত পায়ে হাঁটার কবিতা।",
+          "যুদ্ধবিধ্বস্ত ইউরোপের ছবি আর কলকাতার রাজপথ এক ফ্রেমে।",
+          "আধুনিক ছন্দে শ্লোগানের শক্তি — কবিতা সভা থেকে নেমে এলো মিছিলে।",
+        ],
+      },
+    },
+  };
+
+  const QUOTES = [
+    { text: "শৃঙ্খল ছাড়া প্রলেতারিয়েতের হারাবার কিছুই নেই — জেতার আছে এক গোটা পৃথিবী।", by: "মার্কস–এঙ্গেলস, কমিউনিস্ট ইশতেহার" },
+    { text: "দার্শনিকরা এতকাল জগতকে কেবল ব্যাখ্যা করেছেন — আসল কথা তা বদলে ফেলা।", by: "কার্ল মার্কস" },
+    { text: "শিক্ষা নিন, সংগঠিত হন, আন্দোলন করুন।", by: "আন্তোনিও গ্রামশি" },
+    { text: "দাসের মতো বাঁচার চেয়ে দাঁড়িয়ে মরা ভালো।", by: "ডোলোরেস ইবারুরি, ‘লা পাসিওনারিয়া’" },
+    { text: "সবচেয়ে সুন্দর দিনটি এখনো আসেনি।", by: "নাজিম হিকমত" },
+    { text: "সমাজতন্ত্র না হলে মৃত্যু।", by: "চে গেভারা" },
+    { text: "ধর্ম হলো জনগণের আফিম।", by: "কার্ল মার্কস" },
+    { text: "আমি মানুষ — মানুষের কিছুই আমার কাছে পর নয়।", by: "কার্ল মার্কসের প্রিয় উক্তি" },
+  ];
+
+  const TIMELINE = [
+    { year: "১৮৪৮", title: "কমিউনিস্ট ইশতেহার", note: "লন্ডনে ছাপা হয় ২৩ পাতার পুস্তিকা — বদলে যায় রাজনীতির ভাষা।" },
+    { year: "১৮৬৪", title: "প্রথম আন্তর্জাতিক", note: "শ্রমিক সংগঠনের প্রথম বিশ্বসংঘ প্রতিষ্ঠা।" },
+    { year: "১৮৬৭", title: "পুঁজি, ১ম খণ্ড", note: "হামবুর্গ থেকে বেরোয় শতাব্দীর সবচেয়ে বিস্ফোরক বই।" },
+    { year: "১৮৭১", title: "প্যারিস কমিউন", note: "৭২ দিনের শ্রমিক-শাসন; রক্তাক্ত দমন, তবু অমর দৃষ্টান্ত।" },
+    { year: "১৯০২", title: "কী করা করণীয়?", note: "বিপ্লবী দলের রূপরেখা — নতুন ধরনের সংগঠন।" },
+    { year: "১৯১৭", title: "অক্টোবর বিপ্লব", note: "“শান্তি, রুটি, জমি” — পেত্রোগ্রাদে ক্ষমতা সোভিয়েতের হাতে।" },
+    { year: "১৯১৯", title: "তৃতীয় আন্তর্জাতিক", note: "বিশ্ববিপ্লবের সংগঠন — ছুঁয়ে যায় ভারতের কানপুর ষড়যন্ত্র মামলাও।" },
+    { year: "১৯৩৪", title: "ইস্পাত কীভাবে ঝালানো হলো", note: "করচাগিন — সোভিয়েত সাহিত্যের প্রভাবশালী নায়ক।" },
+    { year: "১৯৩৬", title: "স্পেনের গৃহযুদ্ধ", note: "৪০ হাজার আন্তর্জাতিক স্বেচ্ছাসেবী ফ্যাসিবাদের বিরুদ্ধে।" },
+    { year: "১৯৪৬", title: "তেভাগা আন্দোলন", note: "বাংলার কৃষক ফসলের দুই-তৃতীয়াংশের দাবিতে মাঠে।" },
+    { year: "১৯৫০", title: "কান্তো জেনেরাল", note: "নির্বাসনে নেরুদার লাতিন আমেরিকার মহাকাব্য।" },
+    { year: "১৯৬১", title: "পৃথিবীর নিপীড়িত মানুষ", note: "উপনিবেশ-মুক্তির মানসিক দলিল — ফানোঁর শেষ বই।" },
+  ];
+
+  const STATS = {
+    works: WORKS.length,
+    langs: [...new Set(WORKS.map((w) => w.lang))].length,
+    authors: [...new Set(WORKS.map((w) => w.author))].length,
+    links: WORKS.reduce((n, w) => n + w.links.length, 0),
+  };
+
+  const LANGS = [...new Set(WORKS.map((w) => w.lang))];
+
+  const getExtra = (id) => EXTRA[id] || {};
+
+  // Export to window
   window.THE_WAY_BOOKS = {
-    getAllBooks: () => REVOLUTIONARY_BOOKS,
-    getBookById: (id) => REVOLUTIONARY_BOOKS.find(b => b.id === id || b.slug === id),
-    getCategories: () => [
-      { id: 'all', name_bn: 'সকল ধ্রুপদী বই', name_en: 'All Classics' },
-      { id: 'literature', name_bn: 'বিপ্লবী সাহিত্য ও উপন্যাস', name_en: 'Literature & Novels' },
-      { id: 'economy', name_bn: 'পুঁজি ও রাজনৈতিক অর্থনীতি', name_en: 'Das Kapital & Economy' },
-      { id: 'manifesto', name_bn: 'ঐতিহাসিক ইশতেহার', name_en: 'Manifestos' },
-      { id: 'state', name_bn: 'রাষ্ট্র ও সমাজ বিপ্লব', name_en: 'State & Revolution' },
-      { id: 'philosophy', name_bn: 'দ্বান্দ্বিক বস্তুবাদ ও দর্শন', name_en: 'Dialectics & Philosophy' },
-      { id: 'imperialism', name_bn: 'সাম্রাজ্যবাদ ও বিশ্বরাজনীতি', name_en: 'Imperialism' }
-    ]
+    getAllBooks: () => WORKS,
+    getBookById: (id) => WORKS.find(b => b.id === id || b.slug === id),
+    getCategories: () => CATEGORIES,
+    getExtra: getExtra,
+    QUOTES: QUOTES,
+    TIMELINE: TIMELINE,
+    STATS: STATS,
+    LANGS: LANGS,
+    WORKS: WORKS
   };
 
 })(typeof window !== 'undefined' ? window : this);
