@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/svg+xml" href="assets/images/favicon.svg" />
+  <title>সমাজতান্ত্রিক সংগঠন নেটওয়ার্ক — দ্য ওয়ে (The Way)</title>
+  <meta name="description" content="Global Socialist Organizations — Trade unions, study circles, peasant associations, and research collectives worldwide.">
+  <link rel="stylesheet" href="assets/css/style.css">
+  <link rel="stylesheet" href="assets/css/network.css">
+  <style>
+    .org-hero {
+      background: linear-gradient(135deg, rgba(25,7,11,0.95), rgba(12,3,5,0.98));
+      border: 1px solid rgba(196,18,48,0.3);
+      border-radius: 16px;
+      padding: 2.5rem 2rem;
+      margin: 2rem 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1.5rem;
+    }
+    .org-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+      gap: 1.5rem;
+      margin-top: 1.5rem;
+    }
+    .org-card-box {
+      background: rgba(255,255,255,0.02);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 14px;
+      padding: 1.75rem;
+      transition: all 0.2s;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .org-card-box:hover {
+      border-color: rgba(196,18,48,0.4);
+      background: rgba(196,18,48,0.02);
+      transform: translateY(-2px);
+    }
+  </style>
+</head>
+<body id="top">
+
+  <div id="theway-ticker-mount" class="theway-ticker-bar"></div>
+  <header id="theway-header-mount" class="theway-header"></header>
+
+  <main class="container" style="padding-bottom:5rem;">
+
+    <!-- Hero -->
+    <div class="org-hero">
+      <div style="max-width:650px;">
+        <div style="font-size:0.8rem; font-weight:700; color:var(--crimson-primary,#c41230); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:0.5rem;">
+          🏛️ বৈশ্বিক যৌথ পরিকাঠামো (Collective Infrastructure)
+        </div>
+        <h1 style="font-size:2rem; font-weight:800; color:#fff; margin-bottom:0.75rem;">
+          সমাজতান্ত্রিক সংগঠন নেটওয়ার্ক (Organizations)
+        </h1>
+        <p style="color:rgba(255,255,255,0.75); font-size:0.95rem; line-height:1.6;">
+          আন্তর্জাতিক ট্রেড ইউনিয়ন, কৃষক আন্দোলন, পাঠচক্র, মুক্ত গবেষণা কেন্দ্র এবং সাংস্কৃতিক কালেক্টিভগুলোর ডিরেক্টরি। আপনার সংগঠনকে যুক্ত করুন।
+        </p>
+      </div>
+      <div>
+        <button class="btn-solid-crimson" style="padding:0.75rem 1.4rem; font-size:0.9rem;" onclick="openRegisterOrgModal()">
+          + নতুন সংগঠন যোগ করুন
+        </button>
+      </div>
+    </div>
+
+    <!-- Type Filters -->
+    <div class="directory-filters" style="margin-bottom:1.5rem;">
+      <button class="filter-chip active" onclick="filterOrgType('all', this)">সব সংগঠন</button>
+      <button class="filter-chip" onclick="filterOrgType('Trade Union', this)">⚒️ ট্রেড ইউনিয়ন</button>
+      <button class="filter-chip" onclick="filterOrgType('Study Circle', this)">📚 পাঠচক্র ও প্ল্যাটফর্ম</button>
+      <button class="filter-chip" onclick="filterOrgType('Research Center', this)">🎓 গবেষণা কেন্দ্র</button>
+      <button class="filter-chip" onclick="filterOrgType('Peasant Movement', this)">🌾 কৃষক আন্দোলন</button>
+      <button class="filter-chip" onclick="filterOrgType('Cultural Collective', this)">🎭 সাংস্কৃতিক কালেক্টিভ</button>
+    </div>
+
+    <!-- Organizations List -->
+    <div class="org-grid" id="orgs-grid-container">
+      <div style="color:rgba(255,255,255,0.4); text-align:center; padding:3rem; grid-column:1/-1;">সংগঠনসমূহ লোড হচ্ছে...</div>
+    </div>
+
+  </main>
+
+  <!-- Register Org Modal -->
+  <div class="editor-modal" id="org-modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.8); z-index:10000; align-items:center; justify-content:center; padding:1.5rem;">
+    <div style="background:#14070a; border:1px solid rgba(196,18,48,0.3); border-radius:14px; padding:2rem; max-width:540px; width:100%; color:#fff;">
+      <h3 style="font-size:1.25rem; font-weight:700; margin-bottom:1rem;">সংগঠন প্রোফাইল নিবন্ধন</h3>
+      
+      <div style="margin-bottom:0.75rem;">
+        <label style="display:block; font-size:0.8rem; color:rgba(255,255,255,0.6); margin-bottom:0.25rem;">সংগঠনের নাম *</label>
+        <input type="text" id="org-name" style="width:100%; padding:0.6rem; border-radius:6px; border:1px solid rgba(255,255,255,0.2); background:rgba(255,255,255,0.05); color:#fff; font-family:inherit;" placeholder="যেমন: Workers' Study Collective" />
+      </div>
+
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.75rem; margin-bottom:0.75rem;">
+        <div>
+          <label style="display:block; font-size:0.8rem; color:rgba(255,255,255,0.6); margin-bottom:0.25rem;">ধরন</label>
+          <select id="org-type" style="width:100%; padding:0.6rem; border-radius:6px; border:1px solid rgba(255,255,255,0.2); background:#1a1012; color:#fff; font-family:inherit;">
+            <option value="Trade Union">ট্রেড ইউনিয়ন</option>
+            <option value="Study Circle">পাঠচক্র ও প্ল্যাটফর্ম</option>
+            <option value="Research Center">গবেষণা কেন্দ্র</option>
+            <option value="Peasant Movement">কৃষক আন্দোলন</option>
+            <option value="Cultural Collective">সাংস্কৃতিক কালেক্টিভ</option>
+          </select>
+        </div>
+        <div>
+          <label style="display:block; font-size:0.8rem; color:rgba(255,255,255,0.6); margin-bottom:0.25rem;">দেশ *</label>
+          <input type="text" id="org-country" style="width:100%; padding:0.6rem; border-radius:6px; border:1px solid rgba(255,255,255,0.2); background:rgba(255,255,255,0.05); color:#fff; font-family:inherit;" placeholder="যেমন: ভারত / বাংলাদেশ / ব্রাজিল" />
+        </div>
+      </div>
+
+      <div style="margin-bottom:0.75rem;">
+        <label style="display:block; font-size:0.8rem; color:rgba(255,255,255,0.6); margin-bottom:0.25rem;">ওয়েবসাইট বা সামাজিক যোগাযোগ লিংক:</label>
+        <input type="url" id="org-link" style="width:100%; padding:0.6rem; border-radius:6px; border:1px solid rgba(255,255,255,0.2); background:rgba(255,255,255,0.05); color:#fff; font-family:inherit;" placeholder="https://..." />
+      </div>
+
+      <div style="margin-bottom:1.5rem;">
+        <label style="display:block; font-size:0.8rem; color:rgba(255,255,255,0.6); margin-bottom:0.25rem;">সংক্ষিপ্ত পরিচয় ও মূল কাজের ক্ষেত্র:</label>
+        <textarea id="org-desc" rows="3" style="width:100%; padding:0.6rem; border-radius:6px; border:1px solid rgba(255,255,255,0.2); background:rgba(255,255,255,0.05); color:#fff; font-family:inherit;" placeholder="কাজের ক্ষেত্র ও উদ্দেশ্য..."></textarea>
+      </div>
+
+      <div style="display:flex; justify-content:flex-end; gap:0.75rem;">
+        <button class="btn-follow" onclick="closeRegisterOrgModal()">বাতিল</button>
+        <button class="btn-solid-crimson" onclick="submitNewOrg()">নিবন্ধন করুন</button>
+      </div>
+    </div>
+  </div>
+
+  <footer id="theway-footer-mount" class="theway-footer"></footer>
+
+  <script src="assets/js/i18n.js"></script>
+  <script src="assets/js/components.js"></script>
+  <script src="assets/js/script.js"></script>
+  <script>
+    const INITIAL_ORGS = [
+      {
+        id: 'org_1',
+        name: 'Workers\' Study Collective',
+        country: 'India',
+        country_flag: '🇮🇳',
+        type: 'Study Circle',
+        icon: '📚',
+        desc: 'Kolkata-based collective organizing political economy study circles and labor research seminars.',
+        members: 120,
+        verified: true,
+        focus: ['Labor', 'Political Economy', 'Education']
+      },
+      {
+        id: 'org_2',
+        name: 'Bangladesh Garment Sramik Sangram Parishad',
+        country: 'Bangladesh',
+        country_flag: '🇧🇩',
+        type: 'Trade Union',
+        icon: '⚒️',
+        desc: 'Federation of apparel trade unions fighting for living wages and safety democracy on factory floors.',
+        members: 14500,
+        verified: true,
+        focus: ['RMG Labor', 'Living Wage', 'Legal Rights']
+      },
+      {
+        id: 'org_3',
+        name: 'Movimento dos Trabalhadores Sem Terra (MST)',
+        country: 'Brazil',
+        country_flag: '🇧🇷',
+        type: 'Peasant Movement',
+        icon: '🌾',
+        desc: 'Landless rural workers movement struggling for agrarian reform and agroecological popular sovereignty.',
+        members: 350000,
+        verified: true,
+        focus: ['Agrarian Reform', 'Ecology', 'Cooperatives']
+      },
+      {
+        id: 'org_4',
+        name: 'Hellenic Federation of Metalworkers',
+        country: 'Greece',
+        country_flag: '🇬🇷',
+        type: 'Trade Union',
+        icon: '🏭',
+        desc: 'National trade union federation defending metal and industrial workers against austerity.',
+        members: 8200,
+        verified: true,
+        focus: ['Industrial Labor', 'Strikes', 'Solidarity']
+      },
+      {
+        id: 'org_5',
+        name: 'Institut Tribune Socialiste',
+        country: 'France',
+        country_flag: '🇫🇷',
+        type: 'Research Center',
+        icon: '🎓',
+        desc: 'Independent research center preserving the history of self-management socialism and democratic planning.',
+        members: 430,
+        verified: false,
+        focus: ['History', 'Self-Management', 'Archives']
+      }
+    ];
+
+    let currentOrgFilter = 'all';
+    let organizationsList = [...INITIAL_ORGS];
+
+    function filterOrgType(type, btn) {
+      currentOrgFilter = type;
+      document.querySelectorAll('.filter-chip').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      renderOrgs();
+    }
+
+    function renderOrgs() {
+      const container = document.getElementById('orgs-grid-container');
+      let filtered = organizationsList;
+      if (currentOrgFilter !== 'all') {
+        filtered = filtered.filter(o => o.type === currentOrgFilter);
+      }
+
+      if (!filtered.length) {
+        container.innerHTML = '<div style="color:rgba(255,255,255,0.4); text-align:center; padding:3rem; grid-column:1/-1;">কোনো সংগঠন পাওয়া যায়নি।</div>';
+        return;
+      }
+
+      container.innerHTML = filtered.map(o => `
+        <div class="org-card-box">
+          <div>
+            <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:0.75rem;">
+              <span style="font-size:1.75rem;">${o.icon || '🏛️'}</span>
+              ${o.verified ? `<span style="font-size:0.75rem; background:rgba(232,184,75,0.15); color:#e8b84b; padding:0.2rem 0.6rem; border-radius:12px; font-weight:700;">✓ যাচাইকৃত (Verified)</span>` : `<span style="font-size:0.75rem; background:rgba(255,255,255,0.06); color:rgba(255,255,255,0.5); padding:0.2rem 0.6rem; border-radius:12px;">উন্মুক্ত</span>`}
+            </div>
+
+            <h3 style="font-size:1.2rem; font-weight:700; color:#fff; margin-bottom:0.35rem;">${o.name}</h3>
+            <div style="font-size:0.82rem; color:var(--crimson-primary,#c41230); font-weight:600; margin-bottom:0.75rem;">
+              ${o.country_flag || '🌍'} ${o.country} · <span style="color:rgba(255,255,255,0.5);">${o.type}</span>
+            </div>
+
+            <p style="font-size:0.88rem; color:rgba(255,255,255,0.7); line-height:1.5; margin-bottom:1rem;">
+              ${o.desc}
+            </p>
+
+            <div style="display:flex; gap:0.4rem; flex-wrap:wrap; margin-bottom:1.25rem;">
+              ${(o.focus || []).map(f => `<span style="font-size:0.72rem; background:rgba(255,255,255,0.06); padding:0.15rem 0.5rem; border-radius:10px; color:rgba(255,255,255,0.7);">${f}</span>`).join('')}
+            </div>
+          </div>
+
+          <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid rgba(255,255,255,0.06); padding-top:1rem;">
+            <span style="font-size:0.8rem; color:rgba(255,255,255,0.4);">
+              👥 ${o.members ? o.members.toLocaleString() : '৫০+'} সদস্য
+            </span>
+            <button class="btn-solid-crimson" style="padding:0.35rem 0.85rem; font-size:0.8rem;" onclick="joinOrg('${o.id}', this)">
+              যোগাযোগ / যুক্ত হন
+            </button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function joinOrg(id, btn) {
+      btn.innerText = '✓ অনুরোধ পাঠানো হয়েছে';
+      btn.style.background = 'rgba(34,197,94,0.2)';
+      btn.style.borderColor = '#4ade80';
+      btn.style.color = '#4ade80';
+    }
+
+    function openRegisterOrgModal() {
+      document.getElementById('org-modal').style.display = 'flex';
+    }
+
+    function closeRegisterOrgModal() {
+      document.getElementById('org-modal').style.display = 'none';
+    }
+
+    async function loadFederatedOrgs() {
+      try {
+        const res = await fetch('/api/v1?endpoint=organizations');
+        if (res.ok) {
+          const data = await res.json();
+          if (data && data.organizations && data.organizations.length > 0) {
+            organizationsList = data.organizations;
+          }
+        }
+      } catch (e) {
+        console.warn('Using local initial orgs:', e);
+      }
+      renderOrgs();
+    }
+
+    async function submitNewOrg() {
+      const name = document.getElementById('org-name').value.trim();
+      const type = document.getElementById('org-type').value;
+      const country = document.getElementById('org-country').value.trim();
+      const desc = document.getElementById('org-desc').value.trim();
+
+      if (!name || !country) {
+        alert('সংগঠনের নাম ও দেশ পূরণ করুন।');
+        return;
+      }
+
+      const icons = {
+        'Trade Union': '⚒️',
+        'Study Circle': '📚',
+        'Research Center': '🎓',
+        'Peasant Movement': '🌾',
+        'Cultural Collective': '🎭'
+      };
+
+      const payload = {
+        type: 'org',
+        name,
+        country,
+        country_flag: '🌍',
+        org_type: type,
+        icon: icons[type] || '🏛️',
+        desc: desc || 'আন্তর্জাতিক সমাজতান্ত্রিক নেটওয়ার্কের সদস্য সংগঠন।',
+        members: 12
+      };
+
+      try {
+        const res = await fetch('/api/v1', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        if (res.ok) {
+          const result = await res.json();
+          if (result.organization) {
+            organizationsList.unshift(result.organization);
+          }
+        } else {
+          organizationsList.unshift({
+            id: 'org_' + Date.now(),
+            ...payload,
+            focus: [type]
+          });
+        }
+      } catch (e) {
+        organizationsList.unshift({
+          id: 'org_' + Date.now(),
+          ...payload,
+          focus: [type]
+        });
+      }
+
+      alert('সংগঠনটি সফলভাবে নিবন্ধিত হয়েছে!');
+      closeRegisterOrgModal();
+      renderOrgs();
+    }
+
+    document.addEventListener('DOMContentLoaded', loadFederatedOrgs);
+  </script>
+</body>
+</html>

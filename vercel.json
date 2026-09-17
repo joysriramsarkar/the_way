@@ -1,4 +1,4 @@
-﻿{
+{
   "cleanUrls": true,
   "trailingSlash": false,
   "rewrites": [
@@ -7,7 +7,18 @@
     { "source": "/article/:path*", "destination": "/api/article-seo?slug=:path*" },
     { "source": "/events", "destination": "/events.html" },
     { "source": "/admin", "destination": "/admin.html" },
-    { "source": "/login", "destination": "/admin-login.html" }
+    { "source": "/login", "destination": "/admin-login.html" },
+    { "source": "/search", "destination": "/search.html" },
+    { "source": "/resource", "destination": "/resource.html" },
+    { "source": "/solidarity", "destination": "/solidarity.html" },
+    { "source": "/feed", "destination": "/feed.html" },
+    { "source": "/directory", "destination": "/directory.html" },
+    { "source": "/groups", "destination": "/groups.html" },
+    { "source": "/profile", "destination": "/profile.html" },
+    { "source": "/translations", "destination": "/translations.html" },
+    { "source": "/organizations", "destination": "/organizations.html" },
+    { "source": "/languages", "destination": "/languages.html" },
+    { "source": "/api/v1/:path*", "destination": "/api/v1?endpoint=:path*" }
   ],
   "headers": [
     {

@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/svg+xml" href="assets/images/favicon.svg" />
+  <title>ভাষা হাব ও বৈশ্বিক রিসোর্স সূচক — দ্য ওয়ে (The Way)</title>
+  <meta name="description" content="Language Hubs — Explore socialist literature, editors and community resources in Bengali, English, Spanish, Arabic, Hindi, Portuguese and French.">
+  <link rel="stylesheet" href="assets/css/style.css">
+  <link rel="stylesheet" href="assets/css/network.css">
+  <style>
+    .lang-hero {
+      background: linear-gradient(135deg, rgba(22,6,10,0.95), rgba(10,3,5,0.98));
+      border: 1px solid rgba(196,18,48,0.3);
+      border-radius: 16px;
+      padding: 3rem 2rem;
+      margin: 2rem 0;
+      text-align: center;
+    }
+    .lang-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 1.5rem;
+      margin-top: 2rem;
+    }
+    .lang-hub-card {
+      background: rgba(255,255,255,0.02);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 14px;
+      padding: 1.75rem;
+      transition: all 0.25s;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .lang-hub-card:hover {
+      border-color: rgba(196,18,48,0.5);
+      background: rgba(196,18,48,0.03);
+      transform: translateY(-3px);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    }
+    .volunteer-box {
+      background: linear-gradient(135deg, rgba(232,184,75,0.08), rgba(196,18,48,0.08));
+      border: 1px solid rgba(232,184,75,0.25);
+      border-radius: 14px;
+      padding: 2rem;
+      margin-top: 3.5rem;
+    }
+  </style>
+</head>
+<body id="top">
+
+  <div id="theway-ticker-mount" class="theway-ticker-bar"></div>
+  <header id="theway-header-mount" class="theway-header"></header>
+
+  <main class="container" style="padding-bottom:5rem;">
+
+    <!-- Hero -->
+    <div class="lang-hero">
+      <div style="font-size:0.8rem; font-weight:700; color:var(--crimson-primary,#c41230); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:0.5rem;">
+        🌐 বহুভাষিক আন্তর্জাতিকীকরণ (Multilingual Core)
+      </div>
+      <h1 style="font-size:2.2rem; font-weight:800; color:#fff; margin-bottom:0.75rem;">
+        ভাষা হাব ও বৈশ্বিক রিসোর্স সূচক (Language Hubs)
+      </h1>
+      <p style="color:rgba(255,255,255,0.75); font-size:1rem; max-width:680px; margin:0 auto; line-height:1.6;">
+        ভাষা কোনো বাধা নয়, জ্ঞানের প্রবেশদ্বার। আপনার পছন্দের ভাষায় ধ্রুপদী টেক্সট, অনুবাদক দল, সম্পাদকীয় পরিষদ ও স্থানীয় গণআন্দোলনের রিসোর্স ব্রাউজ করুন।
+      </p>
+    </div>
+
+    <!-- Active Hubs -->
+    <h2 style="font-size:1.35rem; font-weight:700; color:#fff; margin-bottom:1rem;">
+      সক্রিয় ভাষা হাবসমূহ (<span id="total-hubs-count">8</span>)
+    </h2>
+
+    <div class="lang-grid" id="lang-hubs-container">
+      <!-- Injected by JS -->
+    </div>
+
+    <!-- Contributor Volunteer Callout -->
+    <div class="volunteer-box">
+      <div style="max-width:700px;">
+        <h3 style="font-size:1.35rem; font-weight:800; color:#fff; margin-bottom:0.5rem;">
+          🤝 আপনার ভাষার অনুবাদ ও গবেষণা সেলে যোগ দিন
+        </h3>
+        <p style="color:rgba(255,255,255,0.75); font-size:0.92rem; line-height:1.6; margin-bottom:1.5rem;">
+          আমরা অনুবাদক, প্রুফরিডার, মেটাডেটা গবেষক ও সমাজতান্ত্রিক আর্কাইভ ডিজিটাইজেশনের জন্য আন্তর্জাতিক স্বেচ্ছাসেবক খুঁজছি।
+        </p>
+
+        <form id="volunteer-form" onsubmit="submitVolunteer(event)">
+          <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:1rem; margin-bottom:1rem;">
+            <div>
+              <label style="display:block; font-size:0.8rem; color:rgba(255,255,255,0.6); margin-bottom:0.3rem;">আপনার নাম / ছদ্মনাম:</label>
+              <input type="text" id="v-name" required style="width:100%; padding:0.6rem; border-radius:6px; border:1px solid rgba(255,255,255,0.2); background:rgba(0,0,0,0.3); color:#fff; font-family:inherit;" placeholder="কমরেড নাম" />
+            </div>
+            <div>
+              <label style="display:block; font-size:0.8rem; color:rgba(255,255,255,0.6); margin-bottom:0.3rem;">ইমেইল / যোগাযোগ:</label>
+              <input type="text" id="v-contact" required style="width:100%; padding:0.6rem; border-radius:6px; border:1px solid rgba(255,255,255,0.2); background:rgba(0,0,0,0.3); color:#fff; font-family:inherit;" placeholder="email@domain.com" />
+            </div>
+            <div>
+              <label style="display:block; font-size:0.8rem; color:rgba(255,255,255,0.6); margin-bottom:0.3rem;">প্রাথমিক ভাষা:</label>
+              <select id="v-lang" style="width:100%; padding:0.6rem; border-radius:6px; border:1px solid rgba(255,255,255,0.2); background:#1a1012; color:#fff; font-family:inherit;">
+                <option value="bn">বাংলা (Bengali)</option>
+                <option value="en">English</option>
+                <option value="es">Español</option>
+                <option value="hi">हिन्दी (Hindi)</option>
+                <option value="ar">العربية (Arabic)</option>
+                <option value="pt">Português</option>
+                <option value="fr">Français</option>
+                <option value="ru">Русский</option>
+              </select>
+            </div>
+          </div>
+
+          <div style="margin-bottom:1.5rem;">
+            <label style="display:block; font-size:0.8rem; color:rgba(255,255,255,0.6); margin-bottom:0.5rem;">আপনি যেভাবে অবদান রাখতে চান:</label>
+            <div style="display:flex; flex-wrap:wrap; gap:1rem; font-size:0.85rem; color:rgba(255,255,255,0.85);">
+              <label><input type="checkbox" name="v_skills" value="Translation" checked /> অনুবাদ (Translation)</label>
+              <label><input type="checkbox" name="v_skills" value="Proofreading" /> প্রুফরিডিং (Proofreading)</label>
+              <label><input type="checkbox" name="v_skills" value="Research" /> গবেষণা ও উদ্ধৃতি (Research)</label>
+              <label><input type="checkbox" name="v_skills" value="Digitization" /> টেক্সট ডিজিটাইজেশন (Digitization)</label>
+            </div>
+          </div>
+
+          <button type="submit" class="btn-solid-crimson" style="padding:0.65rem 1.75rem; font-size:0.9rem;">
+            স্বেচ্ছাসেবক হিসেবে যোগ দিন
+          </button>
+        </form>
+      </div>
+    </div>
+
+  </main>
+
+  <footer id="theway-footer-mount" class="theway-footer"></footer>
+
+  <script src="assets/js/i18n.js"></script>
+  <script src="assets/js/components.js"></script>
+  <script src="assets/js/script.js"></script>
+  <script>
+    const HUBS = [
+      {
+        code: 'bn',
+        name: 'বাংলা',
+        name_native: 'বাংলা',
+        tagline: 'উপমহাদেশ ও আন্তর্জাতিক সমাজতান্ত্রিক চিন্তন',
+        editors: 'তানভীর আহমেদ, প্রিয়া নায়ার',
+        books_count: 53,
+        articles_count: 142,
+        translators_count: 24,
+        flag: '🇧🇩 🇮🇳'
+      },
+      {
+        code: 'en',
+        name: 'English',
+        name_native: 'English',
+        tagline: 'Global theory, history and labour analysis',
+        editors: 'International Editorial Collective',
+        books_count: 420,
+        articles_count: 580,
+        translators_count: 65,
+        flag: '🌐'
+      },
+      {
+        code: 'es',
+        name: 'Español',
+        name_native: 'Español',
+        tagline: 'Luchas populares y marxismo latinoamericano',
+        editors: 'Ana Rodriguez (Argentina)',
+        books_count: 180,
+        articles_count: 230,
+        translators_count: 32,
+        flag: '🇦🇷 🇨🇱'
+      },
+      {
+        code: 'ar',
+        name: 'Arabic',
+        name_native: 'العربية',
+        tagline: 'الفكر الاشتراكي وحركات التحرر في العالم العربي',
+        editors: 'Amira Hassan (Egypt)',
+        books_count: 95,
+        articles_count: 110,
+        translators_count: 18,
+        flag: '🇪🇬 🇹🇳'
+      },
+      {
+        code: 'hi',
+        name: 'Hindi',
+        name_native: 'हिन्दी',
+        tagline: 'भारतीय मजदूर आंदोलन और समाजवादी साहित्य',
+        editors: 'Priya Nair, R. Sharma',
+        books_count: 68,
+        articles_count: 95,
+        translators_count: 16,
+        flag: '🇮🇳'
+      },
+      {
+        code: 'pt',
+        name: 'Portuguese',
+        name_native: 'Português',
+        tagline: 'Luta pela terra e ecossocialismo brasileiro',
+        editors: 'João Silva (Brasil)',
+        books_count: 112,
+        articles_count: 140,
+        translators_count: 21,
+        flag: '🇧🇷'
+      },
+      {
+        code: 'fr',
+        name: 'French',
+        name_native: 'Français',
+        tagline: 'Autogestion, anti-impérialisme et critique sociale',
+        editors: 'Institut Tribune Collective',
+        books_count: 145,
+        articles_count: 165,
+        translators_count: 26,
+        flag: '🇫🇷 🇸🇳'
+      },
+      {
+        code: 'ru',
+        name: 'Russian',
+        name_native: 'Русский',
+        tagline: 'Архивы революционной мысли и советской истории',
+        editors: 'V. Morozov',
+        books_count: 310,
+        articles_count: 210,
+        translators_count: 19,
+        flag: '🇷🇺'
+      }
+    ];
+
+    function renderHubs() {
+      const container = document.getElementById('lang-hubs-container');
+      container.innerHTML = HUBS.map(h => `
+        <div class="lang-hub-card">
+          <div>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.75rem;">
+              <span style="font-size:1.5rem;">${h.flag}</span>
+              <span class="lang-badge" style="font-size:0.75rem;">${h.code.toUpperCase()}</span>
+            </div>
+
+            <h3 style="font-size:1.35rem; font-weight:800; color:#fff; margin-bottom:0.25rem;">
+              ${h.name_native} <span style="font-size:0.95rem; opacity:0.6; font-weight:400;">(${h.name})</span>
+            </h3>
+            <p style="font-size:0.85rem; color:rgba(255,255,255,0.7); line-height:1.5; margin-bottom:1rem;">
+              ${h.tagline}
+            </p>
+
+            <div style="font-size:0.8rem; color:rgba(255,255,255,0.5); margin-bottom:0.75rem;">
+              সম্পাদকীয় সেল: <strong style="color:var(--crimson-primary,#c41230);">${h.editors}</strong>
+            </div>
+
+            <div style="display:flex; justify-content:space-between; font-size:0.75rem; color:rgba(255,255,255,0.45); background:rgba(255,255,255,0.03); padding:0.5rem 0.75rem; border-radius:6px; margin-bottom:1.25rem;">
+              <span>📚 ${h.books_count} গ্রন্থ</span>
+              <span>📰 ${h.articles_count} প্রবন্ধ</span>
+              <span>👥 ${h.translators_count} অনুবাদক</span>
+            </div>
+          </div>
+
+          <div style="display:flex; gap:0.5rem;">
+            <button class="btn-solid-crimson" style="flex:1; padding:0.4rem; font-size:0.82rem;" onclick="activateLanguage('${h.code}')">
+              এই ভাষায় দেখুন
+            </button>
+            <a href="/translations.html" class="btn-follow" style="padding:0.4rem 0.75rem; font-size:0.82rem; text-decoration:none;">
+              অনুবাদ সেল →
+            </a>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function activateLanguage(code) {
+      if (window.TheWayI18n) {
+        window.TheWayI18n.setLocale(code).then(() => {
+          alert(`ভাষা পরিবর্তিত হয়েছে: ${code.toUpperCase()}।`);
+        });
+      }
+    }
+
+    function submitVolunteer(e) {
+      e.preventDefault();
+      const name = document.getElementById('v-name').value.trim();
+      const contact = document.getElementById('v-contact').value.trim();
+      const lang = document.getElementById('v-lang').value;
+      const skills = Array.from(document.querySelectorAll('input[name="v_skills"]:checked')).map(cb => cb.value);
+
+      alert(`লাল সালাম কমরেড ${name}! আপনার তথ্য (${lang.toUpperCase()}) সেলে গৃহীত হয়েছে। খুব শীঘ্রই আমাদের অনুবাদ পরিষদ যোগাযোগ করবে।`);
+      document.getElementById('volunteer-form').reset();
+    }
+
+    document.addEventListener('DOMContentLoaded', renderHubs);
+  </script>
+</body>
+</html>

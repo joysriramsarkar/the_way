@@ -1,0 +1,277 @@
+﻿<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/svg+xml" href="assets/images/favicon.svg" />
+  <title>বিশ্ব সমাজতান্ত্রিক ডিরেক্টরি — দ্য ওয়ে</title>
+  <meta name="description" content="The Way Global Socialist Directory — Find socialist people, organizations, study groups and events from around the world.">
+  <link rel="stylesheet" href="assets/css/style.css">
+  <link rel="stylesheet" href="assets/css/network.css">
+</head>
+<body id="top">
+
+  <div id="theway-ticker-mount" class="theway-ticker-bar"></div>
+  <header id="theway-header-mount" class="theway-header"></header>
+
+  <main class="container">
+
+    <!-- Directory Hero -->
+    <div class="directory-hero">
+      <h1 data-i18n="directory.title">বিশ্ব সমাজতান্ত্রিক ডিরেক্টরি</h1>
+      <p>বিশ্বজুড়ে সমাজতন্ত্রী, শ্রমিক সংগঠক, গবেষক ও অনুবাদক খুঁজুন। ভাষা, দেশ ও আগ্রহ অনুযায়ী ফিল্টার করুন।</p>
+      <div class="directory-search-bar">
+        <input type="search" class="directory-search-input" id="dir-search-input"
+               placeholder="মানুষ, সংগঠন বা গ্রুপ খুঁজুন..." autocomplete="off">
+        <button class="btn-solid-crimson" style="padding:0.75rem 1.25rem; font-size:0.9rem;" onclick="runSearch()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="display:inline-block; vertical-align:middle; margin-inline-end:0.35rem;"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <span data-i18n="actions.search">অনুসন্ধান</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="directory-tabs">
+      <button class="directory-tab active" id="dtab-people" onclick="showDirTab('people')">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline-block; vertical-align:middle; margin-inline-end:0.35rem;"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        মানুষ
+      </button>
+      <button class="directory-tab" id="dtab-orgs" onclick="showDirTab('orgs')">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline-block; vertical-align:middle; margin-inline-end:0.35rem;"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+        সংগঠন
+      </button>
+      <button class="directory-tab" id="dtab-groups" onclick="showDirTab('groups')">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline-block; vertical-align:middle; margin-inline-end:0.35rem;"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+        গ্রুপ
+      </button>
+    </div>
+
+    <!-- Filters -->
+    <div style="margin-bottom:1.5rem;">
+      <div class="directory-filters" id="dir-filters">
+        <span style="font-size:0.8rem; color:rgba(255,255,255,0.4); align-self:center;">ফিল্টার:</span>
+        
+        <select id="filter-country" class="filter-select" onchange="runSearch()" style="padding:0.4rem 0.8rem; border-radius:20px; border:1px solid rgba(255,255,255,0.15); background:rgba(255,255,255,0.04); color:rgba(255,255,255,0.65); font-size:0.8rem; font-family:inherit; cursor:pointer;">
+          <option value="">সব দেশ</option>
+          <option value="BD">বাংলাদেশ</option>
+          <option value="IN">ভারত</option>
+          <option value="BR">ব্রাজিল</option>
+          <option value="AR">আর্জেন্টিনা</option>
+          <option value="FR">ফ্রান্স</option>
+          <option value="DE">জার্মানি</option>
+          <option value="ZA">দক্ষিণ আফ্রিকা</option>
+          <option value="GB">যুক্তরাজ্য</option>
+          <option value="US">যুক্তরাষ্ট্র</option>
+          <option value="NP">নেপাল</option>
+        </select>
+
+        <select id="filter-lang" class="filter-select" onchange="runSearch()" style="padding:0.4rem 0.8rem; border-radius:20px; border:1px solid rgba(255,255,255,0.15); background:rgba(255,255,255,0.04); color:rgba(255,255,255,0.65); font-size:0.8rem; font-family:inherit; cursor:pointer;">
+          <option value="">সব ভাষা</option>
+          <option value="bn">বাংলা</option>
+          <option value="en">English</option>
+          <option value="hi">हिन्दी</option>
+          <option value="es">Español</option>
+          <option value="pt">Português</option>
+          <option value="fr">Français</option>
+          <option value="ar">العربية</option>
+          <option value="ru">Русский</option>
+        </select>
+
+        <select id="filter-ideology" class="filter-select" onchange="runSearch()" style="padding:0.4rem 0.8rem; border-radius:20px; border:1px solid rgba(255,255,255,0.15); background:rgba(255,255,255,0.04); color:rgba(255,255,255,0.65); font-size:0.8rem; font-family:inherit; cursor:pointer;">
+          <option value="">সব ঐতিহ্য</option>
+          <option value="marxist">Marxist</option>
+          <option value="leninist">Leninist</option>
+          <option value="democratic_socialist">Democratic Socialist</option>
+          <option value="eco_socialist">Eco-socialist</option>
+          <option value="feminist_socialist">Feminist Socialist</option>
+          <option value="anarchist">Anarchist</option>
+          <option value="trotskyist">Trotskyist</option>
+          <option value="maoist">Maoist</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- People Tab -->
+    <div id="dtab-content-people">
+      <div class="profiles-grid" id="people-grid">
+        <!-- Demo profiles -->
+      </div>
+    </div>
+
+    <!-- Organizations Tab -->
+    <div id="dtab-content-orgs" style="display:none;">
+      <div style="display:grid; gap:0.85rem;" id="orgs-grid">
+        <!-- Orgs rendered by JS -->
+      </div>
+    </div>
+
+    <!-- Groups Tab -->
+    <div id="dtab-content-groups" style="display:none;">
+      <div class="groups-grid" id="groups-grid">
+        <!-- Groups rendered by JS -->
+      </div>
+    </div>
+
+    <!-- No results -->
+    <div id="no-results" style="display:none; text-align:center; padding:4rem 1rem; color:rgba(255,255,255,0.35);">
+      <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="margin:0 auto 1rem; display:block; opacity:0.4;"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <p style="font-size:1rem; margin-bottom:0.5rem;">কোনো ফলাফল পাওয়া যায়নি।</p>
+      <p style="font-size:0.82rem;">ফিল্টার পরিবর্তন করুন বা নতুন কিছু খুঁজুন।</p>
+    </div>
+
+  </main>
+
+  <footer id="theway-footer-mount" class="theway-footer"></footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="assets/js/supabase-config.js"></script>
+  <script src="assets/js/i18n.js"></script>
+  <script src="assets/js/components.js"></script>
+  <script src="assets/js/script.js"></script>
+  <script>
+    // Directory Page Logic
+
+    const DEMO_PEOPLE = [
+      { name: 'Amira Hassan', country: 'Egypt', country_flag: '🇪🇬', ideology: ['marxist', 'feminist_socialist'], langs: ['ar', 'en', 'fr'], interests: ['feminism', 'labour'], followers: 234, articles: 12, translations: 8, verified: true },
+      { name: 'João Silva', country: 'Brazil', country_flag: '🇧🇷', ideology: ['democratic_socialist', 'eco_socialist'], langs: ['pt', 'es', 'en'], interests: ['ecology', 'labour', 'anti_colonialism'], followers: 189, articles: 7, translations: 3, verified: false },
+      { name: 'Priya Nair', country: 'India', country_flag: '🇮🇳', ideology: ['marxist', 'eco_socialist'], langs: ['ml', 'hi', 'en'], interests: ['political_economy', 'ecology', 'feminism'], followers: 312, articles: 19, translations: 11, verified: true },
+      { name: 'Red Sparrow', country: 'Bangladesh', country_flag: '🇧🇩', ideology: ['leninist'], langs: ['bn', 'en'], interests: ['labour', 'imperialism'], followers: 78, articles: 4, translations: 6, verified: false },
+      { name: 'Sofia Papadopoulou', country: 'Greece', country_flag: '🇬🇷', ideology: ['democratic_socialist', 'feminist_socialist'], langs: ['el', 'en', 'de'], interests: ['political_economy', 'feminism', 'history'], followers: 145, articles: 9, translations: 5, verified: false },
+      { name: 'Omar Diallo', country: 'Senegal', country_flag: '🇸🇳', ideology: ['marxist', 'anti_colonialism'], langs: ['fr', 'wolof', 'en'], interests: ['anti_colonialism', 'imperialism', 'history'], followers: 201, articles: 14, translations: 2, verified: true },
+      { name: 'Laila Ahmadi', country: 'Iran', country_flag: '🇮🇷', ideology: ['eco_socialist', 'feminist_socialist'], langs: ['fa', 'en'], interests: ['ecology', 'feminism', 'philosophy'], followers: 96, articles: 5, translations: 9, verified: false },
+      { name: 'Carlos Mendoza', country: 'Chile', country_flag: '🇨🇱', ideology: ['marxist', 'leninist'], langs: ['es', 'en'], interests: ['labour', 'anti_colonialism', 'history'], followers: 267, articles: 21, translations: 7, verified: true }
+    ];
+
+    const DEMO_ORGS = [
+      { name: 'শ্রমিক পাঠচক্র — কলকাতা', type: 'Study Circle', country: 'India', flag: '🇮🇳', lang: 'Bengali', members: 45, icon: '📚', desc: 'কলকাতাভিত্তিক মার্ক্সীয় পাঠচক্র। শ্রমিক ও কৃষক আন্দোলনে আগ্রহীদের জন্য।', verified: false },
+      { name: 'Frente Socialista Latinoamericano', type: 'Political Organization', country: 'Argentina', flag: '🇦🇷', lang: 'Spanish', members: 312, icon: '✊', desc: 'Red de organizaciones socialistas de América Latina.', verified: true },
+      { name: 'Socialist Workers Tribune', type: 'Publication', country: 'UK', flag: '🇬🇧', lang: 'English', members: 89, icon: '📰', desc: 'Independent socialist publication covering labour struggles globally.', verified: false },
+      { name: 'Eco-Socialist International Network', type: 'Study Circle', country: 'Germany', flag: '🇩🇪', lang: 'English/German', members: 178, icon: '🌿', desc: 'Connecting eco-socialist activists across Europe and beyond.', verified: true },
+      { name: 'جبهة العمال العربي', type: 'Labour Organization', country: 'Tunisia', flag: '🇹🇳', lang: 'Arabic', members: 234, icon: '⚒️', desc: 'منظمة عمالية عربية تناضل من أجل حقوق العمال في العالم العربي', verified: false }
+    ];
+
+    function showDirTab(tab) {
+      ['people', 'orgs', 'groups'].forEach(t => {
+        document.getElementById('dtab-content-' + t).style.display = t === tab ? '' : 'none';
+        document.getElementById('dtab-' + t).classList.toggle('active', t === tab);
+      });
+    }
+
+    function renderPeople(people) {
+      const grid = document.getElementById('people-grid');
+      if (!people.length) { grid.innerHTML = ''; document.getElementById('no-results').style.display = ''; return; }
+      document.getElementById('no-results').style.display = 'none';
+      grid.innerHTML = people.map(p => `
+        <div class="profile-card" onclick="window.location.href='profile.html?user=${encodeURIComponent(p.name)}'">
+          <div style="display:flex; align-items:flex-start; gap:0.75rem; margin-bottom:0.75rem;">
+            <div class="profile-card-avatar">${p.name.split(' ').map(n=>n[0]).join('').slice(0,2)}</div>
+            <div style="flex:1; min-width:0;">
+              <div class="profile-card-name">
+                ${p.name}
+                ${p.verified ? '<svg width="12" height="12" viewBox="0 0 24 24" fill="#e8b84b" style="display:inline;"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>' : ''}
+              </div>
+              <div class="profile-card-location">${p.country_flag} ${p.country}</div>
+            </div>
+          </div>
+          <div class="profile-card-tags">
+            ${p.ideology.slice(0,2).map(tag => `<span class="ideology-tag">${tag.replace('_',' ')}</span>`).join('')}
+          </div>
+          <div class="profile-card-tags">
+            ${p.langs.slice(0,3).map(l => `<span class="lang-badge">${l.toUpperCase()}</span>`).join('')}
+          </div>
+          <div style="font-size:0.72rem; color:rgba(255,255,255,0.35); margin-top:0.5rem;">
+            ${p.articles} articles · ${p.translations} translations
+          </div>
+          <div class="profile-card-actions">
+            <button class="btn-follow" onclick="event.stopPropagation();" data-i18n="actions.follow">অনুসরণ করুন</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function renderOrgs(orgs) {
+      const grid = document.getElementById('orgs-grid');
+      grid.innerHTML = orgs.map(o => `
+        <div class="org-card">
+          <div class="org-card-logo">${o.icon}</div>
+          <div class="org-card-info">
+            <div class="org-card-name">${o.name} ${o.verified ? '<svg width="12" height="12" viewBox="0 0 24 24" fill="#e8b84b" style="display:inline;"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>' : ''}</div>
+            <div class="org-card-desc">${o.desc}</div>
+            <div class="org-card-meta">
+              <span>${o.flag} ${o.country}</span>
+              <span>·</span>
+              <span>${o.lang}</span>
+              <span>·</span>
+              <span>${o.members} members</span>
+              <span>·</span>
+              <span style="color:rgba(196,18,48,0.7);">${o.type}</span>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function runSearch() {
+      const q = document.getElementById('dir-search-input').value.toLowerCase();
+      const filtered = DEMO_PEOPLE.filter(p =>
+        !q || p.name.toLowerCase().includes(q) || p.country.toLowerCase().includes(q)
+      );
+      renderPeople(filtered);
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      renderPeople(DEMO_PEOPLE);
+      renderOrgs(DEMO_ORGS);
+      
+      // Also load groups
+      loadGroups();
+
+      document.getElementById('dir-search-input').addEventListener('input', runSearch);
+    });
+
+    async function loadGroups() {
+      // Will load from Supabase when available
+      const grid = document.getElementById('groups-grid');
+      grid.innerHTML = `<div style="text-align:center; padding:3rem; color:rgba(255,255,255,0.35); grid-column:1/-1;">
+        <p>গ্রুপ লোড হচ্ছে...</p>
+      </div>`;
+      
+      if (typeof window.TheWayDB !== 'undefined') {
+        try {
+          const { data } = await window.TheWayDB.from('groups').select('*').eq('status', 'active').limit(12);
+          if (data?.length) {
+            grid.innerHTML = data.map(g => renderGroupCard(g)).join('');
+            return;
+          }
+        } catch(e) { /* fallback to demo */ }
+      }
+      
+      // Demo fallback
+      const demoGroups = [
+        { emoji_icon: '📚', name: 'মার্ক্সীয় রাজনৈতিক অর্থনীতি', description: 'মার্ক্স ও উত্তরসূরিদের রাজনৈতিক অর্থনীতির পাঠচক্র', members_count: 45, posts_count: 127, primary_language: 'bn', topic_tags: ['marxism', 'political_economy'] },
+        { emoji_icon: '✊', name: 'Global Labour Movement', description: 'International labour struggles and workers movements', members_count: 234, posts_count: 389, primary_language: 'en', topic_tags: ['labour', 'imperialism'] },
+        { emoji_icon: '🌿', name: 'Eco-Socialism Circle', description: 'Marxist ecology and climate crisis alternatives', members_count: 178, posts_count: 256, primary_language: 'en', topic_tags: ['ecology', 'marxism'] },
+        { emoji_icon: '🌎', name: 'Latin American Left Studies', description: 'Movimientos de izquierda y luchas populares', members_count: 312, posts_count: 534, primary_language: 'es', topic_tags: ['anti_colonialism', 'labour'] },
+        { emoji_icon: '📕', name: 'Bengali Socialist Readers', description: 'বাংলা ভাষায় সমাজতান্ত্রিক সাহিত্য পাঠ', members_count: 89, posts_count: 203, primary_language: 'bn', topic_tags: ['marxism', 'culture'] },
+        { emoji_icon: '⚡', name: 'Marxist Feminism', description: 'Social reproduction theory and feminist Marxism', members_count: 145, posts_count: 318, primary_language: 'en', topic_tags: ['feminism', 'labour'] }
+      ];
+      grid.innerHTML = demoGroups.map(g => `
+        <div class="group-card">
+          <div class="group-card-icon">${g.emoji_icon}</div>
+          <div class="group-card-name">${g.name}</div>
+          <div class="group-card-desc">${g.description}</div>
+          <div class="group-card-stats">
+            <span class="group-card-stat"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg> ${g.members_count}</span>
+            <span class="group-card-stat"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg> ${g.posts_count}</span>
+          </div>
+          <div class="group-card-langs">
+            <span class="lang-badge">${g.primary_language.toUpperCase()}</span>
+            ${g.topic_tags.map(t => `<span class="ideology-tag" style="font-size:0.65rem;">${t}</span>`).join('')}
+          </div>
+          <button class="btn-join-group" data-i18n="actions.join_group">গ্রুপে যোগ দিন</button>
+        </div>
+      `).join('');
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <!-- Anti-Cache Meta Tags to prevent stale mobile/browser caching -->
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate, max-age=0" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
+  <script>
+    (function() {
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.getRegistrations().then(function(regs) {
+          for (var i = 0; i < regs.length; i++) regs[i].unregister();
+        });
+      }
+    })();
+  </script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/svg+xml" href="assets/images/favicon.svg" />
+  <link rel="alternate icon" type="image/svg+xml" href="favicon.svg" />
+  <title>দ্য ওয়ে (The Way) — আন্তর্জাতিক সমাজতান্ত্রিক চিন্তন ও গণআন্দোলনের উন্মুক্ত পোর্টাল</title>
+  <meta name="description" content="নব্য-সাম্রাজ্যবাদ ও নব্য-উদারবাদী বিশ্ব ব্যবস্থার বিরুদ্ধে বিশ্বজনীন মেহনতি মানুষের বিকল্প চিন্তন ও বিপ্লবী গণআন্দোলনের উন্মুক্ত পোর্টাল।">
+  <meta name="keywords" content="সমাজতন্ত্র, মার্ক্সবাদ, রাজনৈতিক অর্থনীতি, সাম্রাজ্যবাদ, শ্রমিক আন্দোলন, গ্লোবাল সাউথ, ইকো-সোশ্যালিজম">
+
+  <!-- Social Media OpenGraph -->
+  <meta property="og:title" content="দ্য ওয়ে (The Way) — আন্তর্জাতিক সমাজতান্ত্রিক চিন্তন ও গণআন্দোলনের পোর্টাল">
+  <meta property="og:description" content="নব্য-সাম্রাজ্যবাদ ও নব্য-উদারবাদী বিশ্ব ব্যবস্থার বিরুদ্ধে মেহনতি মানুষের বৈপ্লবিক বিকল্প।">
+  <meta property="og:image" content="assets/images/logo-cover.svg">
+  <meta property="og:type" content="website">
+
+  <!-- Core Stylesheets -->
+  <link rel="stylesheet" href="assets/css/style.css">
+  <link rel="stylesheet" href="assets/css/network.css">
+</head>
+<body id="top">
+
+  <!-- Ticker Mount (Global Struggle Wire) -->
+  <div id="theway-ticker-mount" class="theway-ticker-bar"></div>
+
+  <!-- Header Mount -->
+  <header id="theway-header-mount" class="theway-header"></header>
+
+  <!-- ═══════════ GLOBAL STATS BAR ═══════════ -->
+  <div class="global-stats-bar" id="global-stats-bar">
+    <div class="global-stats-inner">
+      <div class="stat-item">
+        <span class="stat-icon">🌍</span>
+        <span class="stat-number" id="stat-countries">12</span>
+        <span data-i18n="stats.countries">দেশ</span>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat-item">
+        <span class="stat-icon">👥</span>
+        <span class="stat-number" id="stat-members">4,821</span>
+        <span data-i18n="stats.members">সদস্য</span>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat-item">
+        <span class="stat-icon">📝</span>
+        <span class="stat-number" id="stat-contributors">182</span>
+        <span data-i18n="stats.contributors">অবদানকারী</span>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat-item">
+        <span class="stat-icon">📚</span>
+        <span class="stat-number" id="stat-texts">1,240</span>
+        <span data-i18n="stats.texts">গ্রন্থ</span>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat-item">
+        <span class="stat-icon">🌐</span>
+        <span class="stat-number" id="stat-langs">9</span>
+        <span data-i18n="stats.languages">ভাষা</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Content Container -->
+  <main class="container">
+
+    <!-- Hero Editorial Mount (Lead Analysis + Secondary Stories) -->
+    <section class="hero-editorial-section" id="hero-editorial-mount">
+      <!-- Dynamically populated by assets/js/script.js -->
+    </section>
+
+    <!-- Revolutionary Thought of the Day Mount -->
+    <section id="revolutionary-quote-mount">
+      <!-- Dynamically populated by assets/js/script.js -->
+    </section>
+
+    <!-- Thematic Editorial Sections (Theory, Imperialism, Labor, Economy) -->
+    <div id="editorial-sections-mount">
+      <!-- Dynamically populated by assets/js/script.js -->
+    </div>
+
+    <!-- ═══════════ PEOPLE TO DISCOVER ═══════════ -->
+    <section class="network-section" id="people-discover-section">
+      <div class="network-section-header">
+        <h2 class="network-section-title" data-i18n="section.people">মানুষ</h2>
+        <a href="/directory.html" class="network-see-all">
+          সবাই দেখুন
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+        </a>
+      </div>
+      <div class="profiles-grid" id="homepage-people-grid">
+        <!-- Rendered by JS -->
+      </div>
+    </section>
+
+    <!-- ═══════════ ACTIVE GROUPS ═══════════ -->
+    <section class="network-section" id="groups-section">
+      <div class="network-section-header">
+        <h2 class="network-section-title" data-i18n="section.groups">গ্রুপ</h2>
+        <a href="/groups.html" class="network-see-all">
+          সব গ্রুপ
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+        </a>
+      </div>
+      <div class="groups-grid" id="homepage-groups-grid">
+        <!-- Rendered by JS -->
+      </div>
+    </section>
+
+    <!-- ═══════════ UPCOMING EVENTS ═══════════ -->
+    <section class="network-section" id="events-network-section">
+      <div class="network-section-header">
+        <h2 class="network-section-title" data-i18n="section.events">আসন্ন অনুষ্ঠান</h2>
+        <a href="/events.html" class="network-see-all">
+          সব অনুষ্ঠান
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+        </a>
+      </div>
+      <div class="events-grid" id="homepage-events-grid">
+        <!-- Rendered by JS -->
+      </div>
+    </section>
+
+    <!-- ═══════════ SOLIDARITY REQUESTS ═══════════ -->
+    <section class="network-section" id="solidarity-section">
+      <div class="network-section-header">
+        <h2 class="network-section-title" data-i18n="section.solidarity">আন্তর্জাতিক সংহতি</h2>
+        <a href="/feed.html?type=solidarity_request" class="network-see-all">
+          সব অনুরোধ
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+        </a>
+      </div>
+      <div style="display:grid; gap:0.85rem;" id="solidarity-grid">
+        <!-- Rendered by JS -->
+      </div>
+    </section>
+
+    <!-- Revolutionary Classics Web Books Showcase -->
+    <section class="editorial-section-block" id="books-showcase-mount">
+      <!-- Dynamically populated by assets/js/script.js -->
+    </section>
+
+    <!-- ═══════════ ONBOARDING / INTEREST SELECTOR ═══════════ -->
+    <section class="onboarding-section" id="onboarding-section" style="margin: 2rem 0;">
+      <h2 class="onboarding-title">The Way-এ আপনাকে স্বাগতম</h2>
+      <p class="onboarding-subtitle">আপনার আগ্রহ বেছে নিন এবং বিশ্বব্যাপী সমাজতন্ত্রীদের সঙ্গে যুক্ত হন</p>
+      
+      <div style="font-size:0.78rem; color:rgba(255,255,255,0.45); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:0.75rem;">আগ্রহের বিষয়</div>
+      <div class="interest-grid" id="interest-selector">
+        <button class="interest-chip" onclick="toggleInterest(this, 'labour')">✊ শ্রম</button>
+        <button class="interest-chip" onclick="toggleInterest(this, 'marxism')">📖 মার্ক্সবাদ</button>
+        <button class="interest-chip" onclick="toggleInterest(this, 'political_economy')">💹 রাজনৈতিক অর্থনীতি</button>
+        <button class="interest-chip" onclick="toggleInterest(this, 'ecology')">🌿 পরিবেশ</button>
+        <button class="interest-chip" onclick="toggleInterest(this, 'history')">📜 ইতিহাস</button>
+        <button class="interest-chip" onclick="toggleInterest(this, 'feminism')">⚡ নারীবাদ</button>
+        <button class="interest-chip" onclick="toggleInterest(this, 'anti_colonialism')">🌍 উপনিবেশবিরোধ</button>
+        <button class="interest-chip" onclick="toggleInterest(this, 'culture')">🎭 সংস্কৃতি</button>
+      </div>
+
+      <div style="font-size:0.78rem; color:rgba(255,255,255,0.45); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:0.75rem;">ভাষা</div>
+      <div class="lang-select-grid" id="lang-selector">
+        <button class="lang-select-chip" onclick="toggleLang(this, 'bn')">বাংলা</button>
+        <button class="lang-select-chip" onclick="toggleLang(this, 'en')">English</button>
+        <button class="lang-select-chip" onclick="toggleLang(this, 'es')">Español</button>
+        <button class="lang-select-chip" onclick="toggleLang(this, 'pt')">Português</button>
+        <button class="lang-select-chip" onclick="toggleLang(this, 'fr')">Français</button>
+        <button class="lang-select-chip" onclick="toggleLang(this, 'ar')">العربية</button>
+        <button class="lang-select-chip" onclick="toggleLang(this, 'hi')">हिन्दी</button>
+        <button class="lang-select-chip" onclick="toggleLang(this, 'ru')">Русский</button>
+      </div>
+
+      <button class="btn-solid-crimson" style="padding:0.65rem 2rem; font-size:0.95rem; margin-top:0.5rem;" onclick="exploreTheWay()">
+        The Way অন্বেষণ করুন →
+      </button>
+    </section>
+
+    <!-- Movement Action Center ("সংগঠিত হোন") -->
+    <section class="action-center-section">
+      <div class="action-center-grid">
+        <div class="action-center-intro">
+          <h2>নব্য-উদারবাদী ব্যবস্থার বিরুদ্ধে <span>ঐক্যবদ্ধ হোন</span></h2>
+          <p>
+            'দ্য ওয়ে' কেবল একটি তাত্ত্বিক পোর্টাল নয়; এটি হলো সমকালীন সাম্রাজ্যবাদী ও করপোরেট শোষণের বিরুদ্ধে বিকল্প গণআন্দোলন ও মেহনতি মানুষের মুক্তিকামী নেটওয়ার্ক।
+          </p>
+          <div class="action-cards-duo">
+            <div class="action-item-card">
+              <h4><svg class="svg-inline-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--crimson-primary);"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg> সমাজতান্ত্রিক পাঠচক্র</h4>
+              <p>মার্ক্স, লেনিন, গ্রামশি ও ফ্যাননের চিন্তা নিয়ে স্থানীয় ও অনলাইন পাঠচক্রে অংশ নিন।</p>
+              <button class="btn-solid-crimson" style="padding:0.4rem 0.8rem; font-size:0.8rem;" onclick="TheWayComponents.openModal('action-modal')">নিবন্ধন করুন</button>
+            </div>
+            <div class="action-item-card">
+              <h4><svg class="svg-inline-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--crimson-primary);"><path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/><path d="M2 2l7.586 7.586"/><circle cx="11" cy="11" r="2"/></svg> লেখা ও গবেষণা পাঠান</h4>
+              <p>শ্রমিক আন্দোলন, রাজনৈতিক অর্থনীতি ও আন্তর্জাতিক রাজনীতি বিষয়ক আপনার বিশ্লেষণ জমা দিন।</p>
+              <button class="btn-solid-crimson" style="padding:0.4rem 0.8rem; font-size:0.8rem;" onclick="TheWayComponents.openModal('submit-modal')">লেখা পাঠান</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="newsletter-subscribe-box">
+          <h3><svg class="svg-inline-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--gold-bright);"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg> সমাজতান্ত্রিক বুলেটিন</h3>
+          <p>বিশ্বজুড়ে শ্রমিক আন্দোলন, অ্যান্টি-ইম্পেরিয়ালিস্ট রিপোর্ট ও তাত্ত্বিক বিশ্লেষণ প্রতি সপ্তাহে আপনার ইনবক্সে পেতে সাবস্ক্রাইব করুন।</p>
+          <form onsubmit="TheWayComponents.handleNewsletterSubmit(event, this)" class="subscribe-form-row">
+            <input type="email" placeholder="আপনার ইমেইল ঠিকানা..." required class="subscribe-input">
+            <button type="submit" class="btn-solid-crimson">সাবস্ক্রাইব</button>
+          </form>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Footer Mount -->
+  <footer id="theway-footer-mount" class="theway-footer"></footer>
+
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="assets/js/supabase-config.js"></script>
+  <script src="assets/js/books-data.js"></script>
+  <script src="assets/js/components.js"></script>
+  <script src="assets/js/script.js"></script>
+</body>
+</html>
+

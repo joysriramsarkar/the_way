@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/svg+xml" href="assets/images/favicon.svg" />
+  <title>অনুবাদ কর্মশালা — দ্য ওয়ে (The Way)</title>
+  <meta name="description" content="Socialist Translation Workspace — Translate Marxist theory, revolutionary literature and labour reports across world languages.">
+  <link rel="stylesheet" href="assets/css/style.css">
+  <link rel="stylesheet" href="assets/css/network.css">
+  <style>
+    .trans-hero {
+      background: linear-gradient(135deg, rgba(28,8,12,0.95), rgba(14,4,6,0.98));
+      border: 1px solid rgba(196,18,48,0.3);
+      border-radius: 16px;
+      padding: 2.5rem 2rem;
+      margin: 2rem 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1.5rem;
+    }
+    .trans-card {
+      background: rgba(255,255,255,0.02);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 1rem;
+      transition: all 0.2s;
+    }
+    .trans-card:hover {
+      border-color: rgba(196,18,48,0.4);
+      background: rgba(196,18,48,0.02);
+    }
+    .status-badge {
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 0.2rem 0.6rem;
+      border-radius: 20px;
+      text-transform: uppercase;
+    }
+    .status-requested { background: rgba(234,179,8,0.15); color: #facc15; }
+    .status-in_progress { background: rgba(59,130,246,0.15); color: #60a5fa; }
+    .status-review_requested { background: rgba(168,85,247,0.15); color: #c084fc; }
+    .status-published { background: rgba(34,197,94,0.15); color: #4ade80; }
+
+    .editor-modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.85);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 10000;
+      padding: 1.5rem;
+    }
+    .editor-container {
+      background: #120608;
+      border: 1px solid rgba(196,18,48,0.3);
+      border-radius: 16px;
+      max-width: 1100px;
+      width: 100%;
+      height: 85vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      box-shadow: 0 25px 60px rgba(0,0,0,0.9);
+    }
+    .editor-panels {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      flex: 1;
+      overflow: hidden;
+    }
+    @media (max-width: 800px) {
+      .editor-panels { grid-template-columns: 1fr; }
+    }
+    .editor-panel-left {
+      padding: 1.5rem;
+      border-right: 1px solid rgba(255,255,255,0.08);
+      overflow-y: auto;
+      background: rgba(0,0,0,0.2);
+    }
+    .editor-panel-right {
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+    }
+    .editor-textarea {
+      flex: 1;
+      width: 100%;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 8px;
+      padding: 1rem;
+      color: #fff;
+      font-size: 1rem;
+      line-height: 1.6;
+      font-family: inherit;
+      resize: none;
+      outline: none;
+    }
+    .editor-textarea:focus {
+      border-color: var(--crimson-primary, #c41230);
+    }
+  </style>
+</head>
+<body id="top">
+
+  <div id="theway-ticker-mount" class="theway-ticker-bar"></div>
+  <header id="theway-header-mount" class="theway-header"></header>
+
+  <main class="container" style="padding-bottom:5rem;">
+
+    <!-- Hero -->
+    <div class="trans-hero">
+      <div style="max-width:650px;">
+        <div style="font-size:0.8rem; font-weight:700; color:var(--crimson-primary,#c41230); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:0.5rem;">
+          🌐 বহুভাষিক অনুবাদ কালেক্টিভ
+        </div>
+        <h1 style="font-size:2rem; font-weight:800; color:#fff; margin-bottom:0.75rem;">
+          অনুবাদ কর্মশালা (Translation Workspace)
+        </h1>
+        <p style="color:rgba(255,255,255,0.75); font-size:0.95rem; line-height:1.6;">
+          সমাজতান্ত্রিক ধ্রুপদী সাহিত্য ও সমকালীন শ্রমিক সংগ্রামের রিপোর্ট এক ভাষা থেকে অন্য ভাষায় পৌঁছে দিন। সাইড-বাই-সাইড এডিটর দিয়ে অনুবাদ করুন এবং সমমনা অনুবাদকদের সাথে সমন্বয় করুন।
+        </p>
+      </div>
+      <div>
+        <button class="btn-solid-crimson" style="padding:0.75rem 1.4rem; font-size:0.9rem;" onclick="openNewRequestModal()">
+          + নতুন অনুবাদ প্রস্তাব
+        </button>
+      </div>
+    </div>
+
+    <!-- Filter Tabs -->
+    <div class="directory-tabs">
+      <button class="directory-tab active" data-status="all" onclick="filterStatus('all', this)">সব প্রকল্প</button>
+      <button class="directory-tab" data-status="requested" onclick="filterStatus('requested', this)">অনুরোধকৃত</button>
+      <button class="directory-tab" data-status="in_progress" onclick="filterStatus('in_progress', this)">চলমান</button>
+      <button class="directory-tab" data-status="review_requested" onclick="filterStatus('review_requested', this)">পর্যালোচনাধীন</button>
+      <button class="directory-tab" data-status="published" onclick="filterStatus('published', this)">প্রকাশিত</button>
+    </div>
+
+    <!-- Projects List -->
+    <div id="projects-list">
+      <div style="text-align:center; padding:3rem; color:rgba(255,255,255,0.4);">অনুবাদ প্রকল্পসমূহ লোড হচ্ছে...</div>
+    </div>
+
+  </main>
+
+  <!-- Side-by-Side Translation Editor Modal -->
+  <div class="editor-modal" id="editor-modal">
+    <div class="editor-container">
+      <div style="padding:1.25rem 1.75rem; border-bottom:1px solid rgba(255,255,255,0.08); display:flex; justify-content:space-between; align-items:center; background:#18080b;">
+        <div>
+          <h2 id="editor-title" style="font-size:1.15rem; font-weight:700; color:#fff;">অনুবাদ সম্পাদনা</h2>
+          <div id="editor-lang-pair" style="font-size:0.78rem; color:rgba(255,255,255,0.5);">EN ➔ BN</div>
+        </div>
+        <button onclick="closeEditorModal()" style="background:transparent; border:none; color:rgba(255,255,255,0.5); font-size:1.5rem; cursor:pointer;">✕</button>
+      </div>
+
+      <div class="editor-panels">
+        <!-- Left: Source text -->
+        <div class="editor-panel-left">
+          <div style="font-size:0.75rem; font-weight:700; color:var(--crimson-primary,#c41230); text-transform:uppercase; margin-bottom:0.75rem;">
+            মূল পাঠ্য (Original Text)
+          </div>
+          <div id="editor-source-text" style="color:rgba(255,255,255,0.85); font-size:0.95rem; line-height:1.7; white-space:pre-line;"></div>
+        </div>
+
+        <!-- Right: Target Translation -->
+        <div class="editor-panel-right">
+          <div style="font-size:0.75rem; font-weight:700; color:#4ade80; text-transform:uppercase; margin-bottom:0.75rem; display:flex; justify-content:space-between;">
+            <span>অনূদিত পাঠ্য (Target Translation)</span>
+            <span id="editor-char-count" style="color:rgba(255,255,255,0.4);">০ অক্ষর</span>
+          </div>
+          <textarea id="editor-textarea" class="editor-textarea" placeholder="এখানে অনুবাদ লিখুন..."></textarea>
+          
+          <div style="display:flex; justify-content:flex-end; gap:0.75rem; margin-top:1rem;">
+            <button class="btn-follow" onclick="saveDraft()">ড্রাফট সংরক্ষণ</button>
+            <button class="btn-solid-crimson" onclick="submitForReview()">পর্যালোচনার জন্য জমা দিন</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- New Request Modal -->
+  <div class="editor-modal" id="new-request-modal">
+    <div style="background:#14070a; border:1px solid rgba(196,18,48,0.3); border-radius:14px; padding:2rem; max-width:540px; width:100%; color:#fff;">
+      <h3 style="font-size:1.25rem; font-weight:700; margin-bottom:1rem;">নতুন অনুবাদ প্রস্তাবনা</h3>
+      
+      <div style="margin-bottom:0.75rem;">
+        <label style="display:block; font-size:0.8rem; color:rgba(255,255,255,0.6); margin-bottom:0.25rem;">মূল রচনার শিরোনাম *</label>
+        <input type="text" id="req-title" style="width:100%; padding:0.6rem; border-radius:6px; border:1px solid rgba(255,255,255,0.2); background:rgba(255,255,255,0.05); color:#fff; font-family:inherit;" placeholder="যেমন: State and Revolution (Chapter 1)" />
+      </div>
+
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.75rem; margin-bottom:0.75rem;">
+        <div>
+          <label style="display:block; font-size:0.8rem; color:rgba(255,255,255,0.6); margin-bottom:0.25rem;">মূল ভাষা</label>
+          <select id="req-source-lang" style="width:100%; padding:0.6rem; border-radius:6px; border:1px solid rgba(255,255,255,0.2); background:#1a1012; color:#fff; font-family:inherit;">
+            <option value="en">English</option>
+            <option value="de">German</option>
+            <option value="ru">Russian</option>
+            <option value="fr">French</option>
+            <option value="es">Spanish</option>
+          </select>
+        </div>
+        <div>
+          <label style="display:block; font-size:0.8rem; color:rgba(255,255,255,0.6); margin-bottom:0.25rem;">অনুবাদ করতে চান কোন ভাষায়? *</label>
+          <select id="req-target-lang" style="width:100%; padding:0.6rem; border-radius:6px; border:1px solid rgba(255,255,255,0.2); background:#1a1012; color:#fff; font-family:inherit;">
+            <option value="bn">বাংলা (Bengali)</option>
+            <option value="es">Español (Spanish)</option>
+            <option value="ar">العربية (Arabic)</option>
+            <option value="hi">हिन्दी (Hindi)</option>
+            <option value="pt">Português (Portuguese)</option>
+            <option value="fr">Français (French)</option>
+          </select>
+        </div>
+      </div>
+
+      <div style="margin-bottom:1.5rem;">
+        <label style="display:block; font-size:0.8rem; color:rgba(255,255,255,0.6); margin-bottom:0.25rem;">মূল পাঠ্য (যদি জানা থাকে):</label>
+        <textarea id="req-text" rows="4" style="width:100%; padding:0.6rem; border-radius:6px; border:1px solid rgba(255,255,255,0.2); background:rgba(255,255,255,0.05); color:#fff; font-family:inherit;" placeholder="অনুবাদ করার মূল টেক্সট বা প্যারাগ্রাফ পেস্ট করুন..."></textarea>
+      </div>
+
+      <div style="display:flex; justify-content:flex-end; gap:0.75rem;">
+        <button class="btn-follow" onclick="closeNewRequestModal()">বাতিল</button>
+        <button class="btn-solid-crimson" onclick="submitTranslationRequest()">জমা দিন</button>
+      </div>
+    </div>
+  </div>
+
+  <footer id="theway-footer-mount" class="theway-footer"></footer>
+
+  <script src="assets/js/i18n.js"></script>
+  <script src="assets/js/components.js"></script>
+  <script src="assets/js/script.js"></script>
+  <script>
+    let activeStatus = 'all';
+    let allProjects = [];
+    let currentEditingProject = null;
+
+    async function loadProjects() {
+      try {
+        const res = await fetch(`/api/translations?action=list&status=${activeStatus}`);
+        const data = await res.json();
+        allProjects = data.projects || [];
+        renderProjects();
+      } catch (err) {
+        document.getElementById('projects-list').innerHTML = '<div style="color:var(--crimson-primary); text-align:center; padding:3rem;">প্রকল্প লোড করতে ত্রুটি হয়েছে।</div>';
+      }
+    }
+
+    function filterStatus(status, btn) {
+      activeStatus = status;
+      document.querySelectorAll('.directory-tab').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      loadProjects();
+    }
+
+    function renderProjects() {
+      const container = document.getElementById('projects-list');
+      if (!allProjects.length) {
+        container.innerHTML = '<div style="text-align:center; padding:3rem; color:rgba(255,255,255,0.4);">কোনো অনুবাদ প্রকল্প পাওয়া যায়নি।</div>';
+        return;
+      }
+
+      const statusLabels = {
+        requested: 'অনুরোধকৃত',
+        in_progress: 'চলমান',
+        review_requested: 'পর্যালোচনাধীন',
+        published: 'প্রকাশিত'
+      };
+
+      container.innerHTML = allProjects.map(p => `
+        <div class="trans-card">
+          <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:0.5rem; margin-bottom:0.5rem;">
+            <div>
+              <span class="status-badge status-${p.status}">${statusLabels[p.status] || p.status}</span>
+              <span style="font-size:0.75rem; color:rgba(255,255,255,0.4); margin-inline-start:0.5rem;">${(p.source_lang || 'EN').toUpperCase()} ➔ ${(p.target_lang || 'BN').toUpperCase()}</span>
+            </div>
+            <div style="font-size:0.75rem; color:rgba(255,255,255,0.4);">
+              হালনাগাদ: ${new Date(p.updated_at).toLocaleDateString()}
+            </div>
+          </div>
+
+          <h3 style="font-size:1.15rem; font-weight:700; color:#fff; margin-bottom:0.25rem;">
+            ${p.source_title}
+          </h3>
+          <div style="font-size:0.85rem; color:var(--crimson-primary,#c41230); margin-bottom:0.75rem;">
+            ${p.source_author || 'লেখক অনুল্লেখিত'}
+          </div>
+
+          <p style="font-size:0.85rem; color:rgba(255,255,255,0.65); line-height:1.5; margin-bottom:1rem; font-style:italic;">
+            "${(p.original_text || '').slice(0, 150)}${(p.original_text || '').length > 150 ? '...' : ''}"
+          </p>
+
+          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.75rem; border-top:1px solid rgba(255,255,255,0.06); padding-top:0.75rem;">
+            <div style="font-size:0.8rem; color:rgba(255,255,255,0.5);">
+              অনুবাদক: <strong style="color:#fff;">${p.translator || 'এখনো নির্ধারিত নয়'}</strong>
+              ${p.progress !== undefined ? ` · অগ্রগতি: ${p.progress}%` : ''}
+            </div>
+            <div>
+              ${p.status === 'requested' ? `
+                <button class="btn-solid-crimson" style="padding:0.35rem 0.85rem; font-size:0.8rem;" onclick="claimProject('${p.id}')">
+                  দায়িত্ব নিন (Claim)
+                </button>
+              ` : `
+                <button class="btn-solid-crimson" style="padding:0.35rem 0.85rem; font-size:0.8rem;" onclick="openEditor('${p.id}')">
+                  ওয়ার্কস্পেস খুলুন →
+                </button>
+              `}
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    async function claimProject(id) {
+      const name = prompt('আপনার নাম বা ছদ্মনাম লিখুন:');
+      if (!name) return;
+
+      try {
+        const res = await fetch('/api/translations?action=claim', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id, translatorName: name })
+        });
+        const d = await res.json();
+        if (d.success) {
+          alert('লাল সালাম! অনুবাদ প্রকল্পটি আপনি গ্রহণ করেছেন। ওয়ার্কস্পেস খুলুন।');
+          loadProjects();
+        }
+      } catch (e) {
+        alert('ত্রুটি হয়েছে।');
+      }
+    }
+
+    function openEditor(id) {
+      const p = allProjects.find(item => item.id === id);
+      if (!p) return;
+      currentEditingProject = p;
+
+      document.getElementById('editor-title').innerText = p.source_title;
+      document.getElementById('editor-lang-pair').innerText = `${(p.source_lang || 'EN').toUpperCase()} ➔ ${(p.target_lang || 'BN').toUpperCase()}`;
+      document.getElementById('editor-source-text').innerText = p.original_text || 'মূল পাঠ্য উপস্থিত নেই।';
+      
+      const textarea = document.getElementById('editor-textarea');
+      textarea.value = p.translated_text || '';
+      updateCharCount();
+
+      textarea.oninput = updateCharCount;
+      document.getElementById('editor-modal').style.display = 'flex';
+    }
+
+    function updateCharCount() {
+      const text = document.getElementById('editor-textarea').value;
+      document.getElementById('editor-char-count').innerText = `${text.length} অক্ষর`;
+    }
+
+    function closeEditorModal() {
+      document.getElementById('editor-modal').style.display = 'none';
+      currentEditingProject = null;
+    }
+
+    async function saveDraft() {
+      if (!currentEditingProject) return;
+      const translated_text = document.getElementById('editor-textarea').value;
+
+      try {
+        const res = await fetch('/api/translations?action=save_draft', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id: currentEditingProject.id, translated_text, progress: 50 })
+        });
+        const d = await res.json();
+        if (d.success) {
+          alert('ড্রাফট সফলভাবে সংরক্ষিত হয়েছে!');
+          loadProjects();
+        }
+      } catch (e) {
+        alert('ড্রাফট সংরক্ষণ ব্যর্থ হয়েছে।');
+      }
+    }
+
+    async function submitForReview() {
+      if (!currentEditingProject) return;
+      const translated_text = document.getElementById('editor-textarea').value;
+
+      try {
+        await fetch('/api/translations?action=save_draft', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id: currentEditingProject.id, translated_text })
+        });
+
+        const res = await fetch('/api/translations?action=submit_review', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id: currentEditingProject.id })
+        });
+        const d = await res.json();
+        if (d.success) {
+          alert('অনুবাদটি সফলভাবে পর্যালোচনার জন্য জমা দেওয়া হয়েছে!');
+          closeEditorModal();
+          loadProjects();
+        }
+      } catch (e) {
+        alert('জমা দিতে ব্যর্থ হয়েছে।');
+      }
+    }
+
+    function openNewRequestModal() {
+      document.getElementById('new-request-modal').style.display = 'flex';
+    }
+
+    function closeNewRequestModal() {
+      document.getElementById('new-request-modal').style.display = 'none';
+    }
+
+    async function submitTranslationRequest() {
+      const title = document.getElementById('req-title').value.trim();
+      const sLang = document.getElementById('req-source-lang').value;
+      const tLang = document.getElementById('req-target-lang').value;
+      const text = document.getElementById('req-text').value.trim();
+
+      if (!title) {
+        alert('মূল রচনার নাম আবশ্যক।');
+        return;
+      }
+
+      try {
+        const res = await fetch('/api/translations?action=request', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ source_title: title, source_lang: sLang, target_lang: tLang, original_text: text })
+        });
+        const d = await res.json();
+        if (d.success) {
+          alert('অনুবাদ প্রস্তাব গৃহীত হয়েছে!');
+          closeNewRequestModal();
+          loadProjects();
+        }
+      } catch (e) {
+        alert('প্রস্তাবনা পাঠাতে ব্যর্থ হয়েছে।');
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', loadProjects);
+  </script>
+</body>
+</html>

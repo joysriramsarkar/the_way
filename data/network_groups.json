@@ -1,0 +1,20 @@
+[
+  {
+    "id": "grp_1",
+    "name": "Marxist Political Economy Circle",
+    "name_bn": "মার্ক্সবাদী রাজনৈতিক অর্থনীতি পাঠচক্র",
+    "category": "Theory",
+    "lang": "en",
+    "members_count": 142,
+    "description": "Weekly reading group analyzing Marx's Capital and theories of imperialism."
+  },
+  {
+    "id": "grp_2",
+    "name": "বাংলা সমাজতান্ত্রিক পাঠশালা",
+    "name_bn": "বাংলা সমাজতান্ত্রিক পাঠশালা",
+    "category": "Philosophy",
+    "lang": "bn",
+    "members_count": 320,
+    "description": "ঐতিহাসিক বস্তুবাদ, দ্বন্দ্বমূলক বস্তুবাদ এবং ভারতীয় উপমহাদেশের কমিউনিস্ট আন্দোলনের ইতিহাস।"
+  }
+]

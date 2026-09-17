@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/svg+xml" href="assets/images/favicon.svg" />
+  <title>গ্রুপ ও পাঠচক্র — দ্য ওয়ে</title>
+  <meta name="description" content="The Way — Socialist study groups and reading circles. Join multilingual discussions on Marxism, ecology, feminism and labour.">
+  <link rel="stylesheet" href="assets/css/style.css">
+  <link rel="stylesheet" href="assets/css/network.css">
+</head>
+<body id="top">
+
+  <div id="theway-ticker-mount" class="theway-ticker-bar"></div>
+  <header id="theway-header-mount" class="theway-header"></header>
+
+  <main class="container" style="padding-top:2rem; padding-bottom:4rem;">
+
+    <!-- Page Header -->
+    <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:2rem; flex-wrap:wrap; gap:1rem;">
+      <div>
+        <h1 style="font-size:clamp(1.5rem,3vw,2.2rem); font-weight:800; color:#fff; margin-bottom:0.4rem;" data-i18n="groups.title">গ্রুপ ও পাঠচক্র</h1>
+        <p style="color:rgba(255,255,255,0.45); font-size:0.9rem;">বিষয়ভিত্তিক সমাজতান্ত্রিক অধ্যয়ন ও পাঠচক্রে যোগ দিন বা নতুন তৈরি করুন।</p>
+      </div>
+      <button class="btn-solid-crimson" style="padding:0.6rem 1.25rem; font-size:0.88rem;" onclick="openCreateGroupModal()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="display:inline; margin-inline-end:0.4rem;"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        নতুন গ্রুপ
+      </button>
+    </div>
+
+    <!-- Type Filter -->
+    <div class="directory-filters" style="margin-bottom:2rem;">
+      <button class="filter-chip active" onclick="filterGroups('all', this)">সব</button>
+      <button class="filter-chip" onclick="filterGroups('reading_circle', this)">📚 পাঠচক্র</button>
+      <button class="filter-chip" onclick="filterGroups('study_group', this)">🎓 অধ্যয়ন গ্রুপ</button>
+    </div>
+
+    <!-- Language filter -->
+    <div class="directory-filters" style="margin-bottom:2rem;">
+      <button class="filter-chip active" onclick="filterLang('all', this)" id="lang-all">সব ভাষা</button>
+      <button class="filter-chip" onclick="filterLang('bn', this)">বাংলা</button>
+      <button class="filter-chip" onclick="filterLang('en', this)">English</button>
+      <button class="filter-chip" onclick="filterLang('es', this)">Español</button>
+      <button class="filter-chip" onclick="filterLang('pt', this)">Português</button>
+      <button class="filter-chip" onclick="filterLang('fr', this)">Français</button>
+      <button class="filter-chip" onclick="filterLang('ar', this)">العربية</button>
+    </div>
+
+    <!-- Groups Grid -->
+    <div class="groups-grid" id="groups-main-grid">
+      <!-- Populated by JS -->
+    </div>
+
+    <!-- Reading Circles Section -->
+    <div class="network-section" style="margin-top:3rem;">
+      <div class="network-section-header">
+        <h2 class="network-section-title">🗓️ আসন্ন পাঠচক্র অনুষ্ঠান</h2>
+      </div>
+      <div class="events-grid" id="reading-circle-events">
+        <!-- Events -->
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Create Group Modal (simplified) -->
+  <div id="create-group-modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.7); z-index:9999; display:flex; align-items:center; justify-content:center; padding:1rem;" hidden>
+    <div style="background:linear-gradient(145deg,#1a0a0a,#0d0404); border:1px solid rgba(196,18,48,0.3); border-radius:16px; padding:2rem; max-width:480px; width:100%; max-height:90vh; overflow-y:auto; position:relative;">
+      <button onclick="closeCreateGroupModal()" style="position:absolute; top:1rem; right:1rem; background:transparent; border:none; color:rgba(255,255,255,0.4); cursor:pointer; font-size:1.4rem;">✕</button>
+      <h2 style="font-size:1.2rem; font-weight:800; color:#fff; margin-bottom:1.5rem;">নতুন গ্রুপ তৈরি করুন</h2>
+      <form id="create-group-form" onsubmit="submitCreateGroup(event)">
+        <div style="display:grid; gap:1rem;">
+          <div>
+            <label style="font-size:0.8rem; color:rgba(255,255,255,0.6); display:block; margin-bottom:0.4rem;">গ্রুপের নাম *</label>
+            <input type="text" id="new-group-name" required style="width:100%; padding:0.65rem 1rem; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.12); border-radius:8px; color:#fff; font-family:inherit; font-size:0.9rem;">
+          </div>
+          <div>
+            <label style="font-size:0.8rem; color:rgba(255,255,255,0.6); display:block; margin-bottom:0.4rem;">ধরন</label>
+            <select id="new-group-type" style="width:100%; padding:0.65rem 1rem; background:rgba(10,3,3,0.9); border:1px solid rgba(255,255,255,0.12); border-radius:8px; color:#fff; font-family:inherit; font-size:0.9rem;">
+              <option value="study_group">অধ্যয়ন গ্রুপ</option>
+              <option value="reading_circle">পাঠচক্র</option>
+            </select>
+          </div>
+          <div>
+            <label style="font-size:0.8rem; color:rgba(255,255,255,0.6); display:block; margin-bottom:0.4rem;">প্রাথমিক ভাষা</label>
+            <select id="new-group-lang" style="width:100%; padding:0.65rem 1rem; background:rgba(10,3,3,0.9); border:1px solid rgba(255,255,255,0.12); border-radius:8px; color:#fff; font-family:inherit; font-size:0.9rem;">
+              <option value="bn">বাংলা</option>
+              <option value="en">English</option>
+              <option value="es">Español</option>
+              <option value="pt">Português</option>
+              <option value="fr">Français</option>
+              <option value="ar">العربية</option>
+            </select>
+          </div>
+          <div>
+            <label style="font-size:0.8rem; color:rgba(255,255,255,0.6); display:block; margin-bottom:0.4rem;">বিবরণ</label>
+            <textarea id="new-group-desc" rows="3" style="width:100%; padding:0.65rem 1rem; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.12); border-radius:8px; color:#fff; font-family:inherit; font-size:0.9rem; resize:vertical;"></textarea>
+          </div>
+          <button type="submit" class="btn-solid-crimson" style="padding:0.7rem; font-size:0.9rem; width:100%;">গ্রুপ তৈরি করুন</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <footer id="theway-footer-mount" class="theway-footer"></footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="assets/js/supabase-config.js"></script>
+  <script src="assets/js/i18n.js"></script>
+  <script src="assets/js/components.js"></script>
+  <script src="assets/js/script.js"></script>
+  <script>
+    let activeTypeFilter = 'all';
+    let activeLangFilter = 'all';
+    let liveGroups = [];
+
+    async function fetchGroups() {
+      try {
+        const res = await fetch('/api/network?action=groups');
+        const data = await res.json();
+        const custom = data.groups || [];
+        
+        // Combine with default catalog
+        liveGroups = [
+          ...custom.map(g => ({
+            id: g.id,
+            emoji_icon: '📚',
+            name: g.name_bn || g.name,
+            description: g.description || 'সমাজতান্ত্রিক অধ্যয়ন ও পাঠচক্র।',
+            group_type: 'study_group',
+            members_count: g.members_count || 1,
+            posts_count: 12,
+            primary_language: g.lang || 'bn',
+            topic_tags: [g.category || 'marxism']
+          }))
+        ];
+        renderGroups();
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    function filterGroups(type, btn) {
+      activeTypeFilter = type;
+      document.querySelectorAll('.directory-filters button').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      renderGroups();
+    }
+
+    function filterLang(lang, btn) {
+      activeLangFilter = lang;
+      document.querySelectorAll('#lang-all, .filter-chip[onclick*="filterLang"]').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      renderGroups();
+    }
+
+    function renderGroups() {
+      let filtered = liveGroups;
+      if (activeTypeFilter !== 'all') filtered = filtered.filter(g => g.group_type === activeTypeFilter);
+      if (activeLangFilter !== 'all') filtered = filtered.filter(g => g.primary_language === activeLangFilter);
+
+      const grid = document.getElementById('groups-main-grid');
+      if (!filtered.length) {
+        grid.innerHTML = '<div style="grid-column:1/-1; text-align:center; padding:3rem; color:rgba(255,255,255,0.4);">কোনো গ্রুপ পাওয়া যায়নি।</div>';
+        return;
+      }
+
+      grid.innerHTML = filtered.map(g => `
+        <div class="group-card">
+          <div class="group-card-icon">${g.emoji_icon || '📚'}</div>
+          <div class="group-card-name">${g.name}</div>
+          <div class="group-card-desc">${g.description}</div>
+          <div class="group-card-stats">
+            <span class="group-card-stat"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg> <span id="g-count-${g.id}">${g.members_count}</span> জন</span>
+            <span class="group-card-stat"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg> ${g.posts_count || 5}</span>
+          </div>
+          <div class="group-card-langs">
+            <span class="lang-badge">${(g.primary_language || 'BN').toUpperCase()}</span>
+            ${(g.topic_tags || []).map(t => `<span class="ideology-tag" style="font-size:0.65rem;">${t.replace('_',' ')}</span>`).join('')}
+          </div>
+          <button class="btn-join-group" onclick="joinGroup('${g.id}', this)">যোগ দিন</button>
+        </div>
+      `).join('');
+    }
+
+    function joinGroup(id, btn) {
+      const countEl = document.getElementById(`g-count-${id}`);
+      if (countEl) {
+        let count = parseInt(countEl.innerText, 10) || 0;
+        countEl.innerText = count + 1;
+      }
+      btn.innerText = '✓ যুক্ত হয়েছেন';
+      btn.style.background = 'rgba(34,197,94,0.2)';
+      btn.style.borderColor = '#4ade80';
+      btn.style.color = '#4ade80';
+    }
+
+    function openCreateGroupModal() {
+      const modal = document.getElementById('create-group-modal');
+      modal.style.display = 'flex';
+      modal.hidden = false;
+    }
+
+    function closeCreateGroupModal() {
+      const modal = document.getElementById('create-group-modal');
+      modal.style.display = 'none';
+      modal.hidden = true;
+    }
+
+    async function submitCreateGroup(e) {
+      e.preventDefault();
+      const name = document.getElementById('new-group-name').value.trim();
+      const type = document.getElementById('new-group-type').value;
+      const lang = document.getElementById('new-group-lang').value;
+      const desc = document.getElementById('new-group-desc').value.trim();
+
+      if (!name) return;
+
+      try {
+        const res = await fetch('/api/network?action=groups', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, category: type, lang, description: desc })
+        });
+        const d = await res.json();
+        if (d.success) {
+          alert('গ্রুপ সফলভাবে তৈরি হয়েছে!');
+          closeCreateGroupModal();
+          fetchGroups();
+        } else {
+          alert(d.error || 'গ্রুপ তৈরিতে ত্রুটি হয়েছে।');
+        }
+      } catch (err) {
+        alert('সার্ভার সংযোগে ব্যর্থ হয়েছে।');
+      }
+    }
+
+    function renderEvents() {
+      const eventsGrid = document.getElementById('reading-circle-events');
+      const events = [
+        { title: 'Capital Vol. I পাঠচক্র — পর্ব ১', date: '২৫ সেপ্টেম্বর ২০২৬', time: 'রাত ৮টা (IST)', type: 'study_circle', lang: 'bn', mode: 'online' },
+        { title: 'State and Revolution Reading Group', date: 'Sep 28, 2026', time: '6:00 PM (UTC)', type: 'study_circle', lang: 'en', mode: 'online' },
+        { title: 'Labour Rights Webinar: Gig Economy', date: 'Oct 2, 2026', time: '4:00 PM (UTC)', type: 'webinar', lang: 'en', mode: 'online' },
+        { title: 'Capital — Círculo de Lectura en Español', date: '5 Oct 2026', time: '7:00 PM (Buenos Aires)', type: 'reading_circle', lang: 'es', mode: 'online' }
+      ];
+      eventsGrid.innerHTML = events.map(e => `
+        <div class="event-card">
+          <span class="event-date-badge">📅 ${e.date} · ${e.time}</span>
+          <div class="event-card-title">${e.title}</div>
+          <div class="event-card-meta">
+            <span><span class="lang-badge">${e.lang.toUpperCase()}</span></span>
+          </div>
+          <div class="event-card-footer">
+            <span class="event-type-badge">${e.type.replace('_',' ')}</span>
+            <span class="event-mode-badge">🌐 ${e.mode}</span>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      fetchGroups();
+      renderEvents();
+    });
+  </script>
+</body>
+</html>

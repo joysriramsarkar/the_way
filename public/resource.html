@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/svg+xml" href="assets/images/favicon.svg" />
+  <title>রিসোর্স বিবরণ — দ্য ওয়ে (The Way)</title>
+  <meta name="description" content="Socialist Knowledge Resource — Editions, Translations, Scholarly Papers, and Reading Circles.">
+  <link rel="stylesheet" href="assets/css/style.css">
+  <link rel="stylesheet" href="assets/css/network.css">
+  <style>
+    .res-hero {
+      background: linear-gradient(135deg, rgba(26,6,10,0.95), rgba(12,4,6,0.98));
+      border: 1px solid rgba(196,18,48,0.25);
+      border-radius: 16px;
+      padding: 2.5rem;
+      margin: 2rem 0;
+      display: grid;
+      grid-template-columns: 200px 1fr;
+      gap: 2.5rem;
+      box-shadow: 0 16px 40px rgba(0,0,0,0.5);
+    }
+    @media (max-width: 768px) {
+      .res-hero { grid-template-columns: 1fr; gap: 1.5rem; padding: 1.5rem; }
+    }
+    .res-cover {
+      width: 100%;
+      height: 280px;
+      object-fit: cover;
+      border-radius: 10px;
+      border: 1px solid rgba(255,255,255,0.1);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.6);
+      background: #1a1012;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 3rem;
+    }
+    .res-meta-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.25rem 0.75rem;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      background: rgba(255,255,255,0.06);
+      color: rgba(255,255,255,0.7);
+      margin-inline-end: 0.5rem;
+      margin-bottom: 0.5rem;
+    }
+    .editions-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 1rem;
+      margin: 1.5rem 0;
+    }
+    .edition-card {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 10px;
+      padding: 1.25rem;
+      transition: all 0.2s;
+    }
+    .edition-card:hover {
+      border-color: rgba(196,18,48,0.4);
+      background: rgba(196,18,48,0.04);
+      transform: translateY(-2px);
+    }
+    .research-list-item {
+      padding: 1.25rem;
+      background: rgba(255,255,255,0.02);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 10px;
+      margin-bottom: 1rem;
+      transition: border-color 0.2s;
+    }
+    .research-list-item:hover {
+      border-color: rgba(255,255,255,0.15);
+    }
+  </style>
+</head>
+<body id="top">
+
+  <div id="theway-ticker-mount" class="theway-ticker-bar"></div>
+  <header id="theway-header-mount" class="theway-header"></header>
+
+  <main class="container" style="padding-bottom:5rem;">
+
+    <!-- Breadcrumb -->
+    <div style="margin-top:1.5rem; font-size:0.82rem; color:rgba(255,255,255,0.5);">
+      <a href="/" style="color:inherit; text-decoration:none;">হোম</a> / 
+      <a href="/books.html" style="color:inherit; text-decoration:none;">পাঠাগার</a> / 
+      <span id="breadcrumb-title" style="color:#fff;">রিসোর্স</span>
+    </div>
+
+    <!-- Hero Card -->
+    <div class="res-hero" id="resource-hero">
+      <div id="res-cover-wrap">
+        <div class="res-cover" id="res-cover-img">📚</div>
+      </div>
+      <div>
+        <div style="margin-bottom:0.75rem;">
+          <span class="res-meta-pill" id="res-type-pill">বই / CLASSIC</span>
+          <span class="res-meta-pill" id="res-provider-pill">উৎস: ওপেন লাইব্রেরি</span>
+          <span class="res-meta-pill" id="res-year-pill">১৮৬৭</span>
+        </div>
+
+        <h1 id="res-title" style="font-size:2rem; font-weight:800; color:#fff; line-height:1.25; margin-bottom:0.5rem;">
+          লোড হচ্ছে...
+        </h1>
+        <h2 id="res-author" style="font-size:1.15rem; color:var(--crimson-primary,#c41230); font-weight:600; margin-bottom:1rem;">
+          ...
+        </h2>
+
+        <p id="res-description" style="color:rgba(255,255,255,0.75); line-height:1.65; font-size:0.95rem; margin-bottom:1.5rem;">
+          রিসোর্স মেটাডেটা সংগ্রহ করা হচ্ছে...
+        </p>
+
+        <div style="display:flex; flex-wrap:wrap; gap:0.75rem; align-items:center;">
+          <a id="res-primary-btn" href="#" class="btn-solid-crimson" style="padding:0.6rem 1.4rem; font-size:0.9rem;" target="_blank">
+            📖 পড়ুন / ওপেন করুন
+          </a>
+          <button class="btn-follow" onclick="readInMyLanguage()">
+            🌐 আমার ভাষায় পড়ুন
+          </button>
+          <button class="btn-follow" onclick="requestTranslationModal()">
+            ✍️ অনুবাদ অনুরোধ
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Related Concepts Banner -->
+    <div id="res-concept-section" style="display:none; background:rgba(232,184,75,0.08); border:1px solid rgba(232,184,75,0.25); border-radius:12px; padding:1.25rem 1.5rem; margin-bottom:2.5rem;">
+      <div style="font-size:0.78rem; font-weight:700; color:#e8b84b; text-transform:uppercase; letter-spacing:0.06em; margin-bottom:0.35rem;">
+        💡 তাত্ত্বিক ধারণা (Concept Graph)
+      </div>
+      <div id="res-concept-body" style="color:#fff; font-size:0.95rem;"></div>
+    </div>
+
+    <!-- Multilingual Editions Section -->
+    <section style="margin-bottom:3rem;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+        <h2 style="font-size:1.35rem; font-weight:700; color:#fff; display:flex; align-items:center; gap:0.5rem;">
+          🌐 বিভিন্ন ভাষার সংস্করণ (Multilingual Editions)
+        </h2>
+        <span style="font-size:0.8rem; color:rgba(255,255,255,0.4);" id="editions-count-badge"></span>
+      </div>
+      <div class="editions-grid" id="editions-grid">
+        <div style="color:rgba(255,255,255,0.4); padding:1rem;">সংস্করণ লোড হচ্ছে...</div>
+      </div>
+    </section>
+
+    <!-- Scholarly Research Literature via OpenAlex -->
+    <section style="margin-bottom:3rem;">
+      <h2 style="font-size:1.35rem; font-weight:700; color:#fff; margin-bottom:1rem; display:flex; align-items:center; gap:0.5rem;">
+        🎓 সম্পর্কিত অ্যাকাডেমিক গবেষণা (OpenAlex Scholarly Graph)
+      </h2>
+      <p style="color:rgba(255,255,255,0.6); font-size:0.88rem; margin-bottom:1.25rem;">
+        উন্মুক্ত আন্তর্জাতিক অ্যাকাডেমিক জার্নাল ও গবেষণা থেকে সংগৃহীত।
+      </p>
+      <div id="research-list">
+        <div style="color:rgba(255,255,255,0.4); padding:1rem;">গবেষণা পেপার লোড হচ্ছে...</div>
+      </div>
+    </section>
+
+    <!-- Active Reading Circles -->
+    <section>
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+        <h2 style="font-size:1.35rem; font-weight:700; color:#fff; display:flex; align-items:center; gap:0.5rem;">
+          👥 পাঠচক্র ও আলোচনা (Reading Circles)
+        </h2>
+        <a href="groups.html" class="btn-solid-crimson" style="padding:0.35rem 0.85rem; font-size:0.78rem;">
+          + নতুন পাঠচক্র শুরু করুন
+        </a>
+      </div>
+      <div id="reading-circles-grid" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(320px, 1fr)); gap:1.25rem;">
+        <!-- Injected via JS -->
+      </div>
+    </section>
+
+  </main>
+
+  <footer id="theway-footer-mount" class="theway-footer"></footer>
+
+  <script src="assets/js/i18n.js"></script>
+  <script src="assets/js/components.js"></script>
+  <script src="assets/js/script.js"></script>
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const resourceId = urlParams.get('id') || 'ol:OL71057W'; // Default to Das Kapital OL71057W if none specified
+
+    async function loadResource() {
+      try {
+        const res = await fetch(`/api/resources?action=get&id=${encodeURIComponent(resourceId)}`);
+        const data = await res.json();
+
+        if (!data || !data.resource) {
+          document.getElementById('res-title').innerText = 'রিসোর্স পাওয়া যায়নি';
+          return;
+        }
+
+        const r = data.resource;
+        document.getElementById('breadcrumb-title').innerText = r.title || 'রিসোর্স';
+        document.title = `${r.title} — দ্য ওয়ে`;
+
+        // Hero info
+        document.getElementById('res-title').innerText = r.title;
+        document.getElementById('res-author').innerText = r.author || (r.authors && r.authors.join(', ')) || 'সমাজতান্ত্রিক ঐতিহ্য';
+        document.getElementById('res-provider-pill').innerText = 'উৎস: ' + (r.source || r.provider || 'Open Library');
+        if (r.year) document.getElementById('res-year-pill').innerText = r.year;
+
+        if (r.description) {
+          document.getElementById('res-description').innerText = r.description;
+        } else {
+          document.getElementById('res-description').innerText = 'সমাজতান্ত্রিক তত্ত্ব ও আন্তর্জাতিক গণআন্দোলনের ক্লাসিক পাঠ। বিস্তারিত গবেষণা ও সংস্করণসমূহ নিচে দেখুন।';
+        }
+
+        // Cover
+        if (r.covers && r.covers[0]) {
+          document.getElementById('res-cover-wrap').innerHTML = `<img src="${r.covers[0]}" alt="${r.title}" class="res-cover">`;
+        } else if (r.cover_url) {
+          document.getElementById('res-cover-wrap').innerHTML = `<img src="${r.cover_url}" alt="${r.title}" class="res-cover">`;
+        }
+
+        // Read button
+        const primaryBtn = document.getElementById('res-primary-btn');
+        if (r.read_url) {
+          primaryBtn.href = r.read_url;
+        } else if (r.url) {
+          primaryBtn.href = r.url;
+        }
+
+        // Concept
+        if (data.concept) {
+          const c = data.concept;
+          const conceptSec = document.getElementById('res-concept-section');
+          conceptSec.style.display = 'block';
+          document.getElementById('res-concept-body').innerHTML = `
+            <strong>${c.labels.bn || c.canonical}</strong> (${c.canonical}) — ${c.description}. 
+            <span style="opacity:0.75; font-size:0.85rem; display:block; margin-top:0.35rem;">
+              অন্যান্য ভাষায়: ${Object.entries(c.labels).map(([lang, val]) => `<span style="display:inline-block; margin-inline-end:0.6rem;">${lang.toUpperCase()}: <strong>${val}</strong></span>`).join(' ')}
+            </span>
+          `;
+        }
+
+        // Editions
+        const editionsGrid = document.getElementById('editions-grid');
+        const editions = r.editions || [];
+        if (editions.length) {
+          document.getElementById('editions-count-badge').innerText = `${editions.length}টি সংস্করণ`;
+          editionsGrid.innerHTML = editions.map(ed => `
+            <div class="edition-card">
+              <div style="font-weight:700; color:#fff; font-size:0.95rem; margin-bottom:0.35rem;">
+                ${ed.title || r.title}
+              </div>
+              <div style="font-size:0.8rem; color:rgba(255,255,255,0.5); margin-bottom:0.5rem;">
+                ${ed.publish_date || 'প্রকাশকাল অনুল্লেখিত'} · ${(ed.publishers && ed.publishers[0]) || 'পাবলিশার'}
+              </div>
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-top:0.75rem;">
+                <span style="font-size:0.75rem; background:rgba(255,255,255,0.06); padding:0.2rem 0.5rem; border-radius:4px; color:rgba(255,255,255,0.8);">
+                  ${(ed.languages && ed.languages.join(', ')) || 'মুদ্রিত সংস্করণ'}
+                </span>
+                <a href="${r.url || '#'}" target="_blank" style="font-size:0.78rem; color:var(--crimson-primary,#c41230); text-decoration:none; font-weight:600;">
+                  বিবরণ →
+                </a>
+              </div>
+            </div>
+          `).join('');
+        } else {
+          editionsGrid.innerHTML = `
+            <div class="edition-card">
+              <div style="font-weight:700; color:#fff; margin-bottom:0.3rem;">বাংলা সংস্করণ (অনূদিত)</div>
+              <div style="font-size:0.8rem; color:rgba(255,255,255,0.5); margin-bottom:0.5rem;">দ্য ওয়ে উন্মুক্ত সমাজতান্ত্রিক পাঠাগার সংস্করণ</div>
+              <a href="/books.html" class="btn-follow" style="display:inline-block; font-size:0.75rem; padding:0.3rem 0.75rem;">পাঠাগারে পড়ুন →</a>
+            </div>
+            <div class="edition-card">
+              <div style="font-weight:700; color:#fff; margin-bottom:0.3rem;">English Original / Translation</div>
+              <div style="font-size:0.8rem; color:rgba(255,255,255,0.5); margin-bottom:0.5rem;">Marxists Internet Archive / Public Domain</div>
+              <a href="${r.url || 'https://www.marxists.org'}" target="_blank" class="btn-follow" style="display:inline-block; font-size:0.75rem; padding:0.3rem 0.75rem;">Open External →</a>
+            </div>
+          `;
+        }
+
+        // Research Papers
+        const researchList = document.getElementById('research-list');
+        const research = data.related_research || [];
+        if (research.length) {
+          researchList.innerHTML = research.map(p => `
+            <div class="research-list-item">
+              <div style="display:flex; justify-content:space-between; align-items:start; gap:1rem;">
+                <div>
+                  <a href="${p.url || '#'}" target="_blank" style="font-size:1rem; font-weight:700; color:#fff; text-decoration:none;">
+                    ${p.title}
+                  </a>
+                  <div style="font-size:0.82rem; color:rgba(255,255,255,0.5); margin-top:0.3rem;">
+                    ${p.author || (p.authors && p.authors[0]) || 'গবেষক'} · ${p.year || ''} · <em>${p.journal || 'Academic Venue'}</em>
+                  </div>
+                  ${p.abstract ? `<p style="font-size:0.85rem; color:rgba(255,255,255,0.65); margin-top:0.5rem; line-height:1.5;">${p.abstract}</p>` : ''}
+                </div>
+                ${p.is_oa ? `<span style="padding:0.2rem 0.5rem; font-size:0.7rem; background:rgba(34,197,94,0.15); color:#4ade80; border-radius:4px; font-weight:700; white-space:nowrap;">উন্মুক্ত প্রবেশাধিকার (OA)</span>` : ''}
+              </div>
+            </div>
+          `).join('');
+        } else {
+          researchList.innerHTML = '<div style="color:rgba(255,255,255,0.4); padding:1rem;">কোনো সরাসরি গবেষণাপত্র পাওয়া যায়নি।</div>';
+        }
+
+        // Reading Circles
+        renderReadingCircles(r.title);
+
+      } catch (err) {
+        console.error('Error loading resource:', err);
+        document.getElementById('res-title').innerText = 'ত্রুটি ঘটেছে';
+      }
+    }
+
+    function renderReadingCircles(title) {
+      const grid = document.getElementById('reading-circles-grid');
+      grid.innerHTML = `
+        <div class="edition-card">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
+            <span style="font-size:0.72rem; padding:0.2rem 0.5rem; border-radius:4px; background:rgba(196,18,48,0.15); color:var(--crimson-primary); font-weight:700;">বাংলা পাঠচক্র</span>
+            <span style="font-size:0.75rem; color:rgba(255,255,255,0.4);">প্রতি রবিবার</span>
+          </div>
+          <div style="font-size:0.95rem; font-weight:700; color:#fff; margin-bottom:0.35rem;">${title} পাঠ ও বিশ্লেষণ</div>
+          <p style="font-size:0.8rem; color:rgba(255,255,255,0.6); margin-bottom:1rem; line-height:1.45;">
+            অনলাইন সাপ্তাহিক আলোচনা। মূল টেক্সট ও বর্তমান বিশ্বের রাজনৈতিক পরিস্থিতির আলোকে বিশ্লেষণ।
+          </p>
+          <button class="btn-solid-crimson" style="width:100%; padding:0.4rem; font-size:0.8rem;" onclick="joinReadingCircle()">যুক্ত হন (Join)</button>
+        </div>
+      `;
+    }
+
+    function readInMyLanguage() {
+      const currentLang = window.TheWayI18n ? window.TheWayI18n.getLang() : 'bn';
+      alert(`বর্তমান ভাষা: ${currentLang.toUpperCase()}। এই রিসোর্সের জন্য স্থানীয় অনুবাদ পাঠাগারে উপলব্ধ রয়েছে।`);
+    }
+
+    function requestTranslationModal() {
+      const email = prompt('আপনার ইমেইল অথবা দ্য ওয়ে ইউজারনেম লিখুন (অনুবাদ প্রক্রিয়ার আপডেটের জন্য):');
+      if (email) {
+        alert('আপনার অনুবাদ অনুরোধটি আন্তর্জাতিক অনুবাদক কালেক্টিভে পাঠানো হয়েছে। ধন্যবাদ!');
+      }
+    }
+
+    function joinReadingCircle() {
+      alert('আপনি পাঠচক্রে সফলভাবে তালিকাভুক্ত হয়েছেন! বিস্তারিত সময়সূচী ও লিঙ্ক পাঠানো হবে।');
+    }
+
+    document.addEventListener('DOMContentLoaded', loadResource);
+  </script>
+</body>
+</html>

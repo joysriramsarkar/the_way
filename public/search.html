@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/svg+xml" href="assets/images/favicon.svg" />
+  <title>বহুভাষিক অনুসন্ধান — দ্য ওয়ে (The Way)</title>
+  <meta name="description" content="Search across socialist articles, books, academic research, people, groups, and international solidarity campaigns.">
+  <link rel="stylesheet" href="assets/css/style.css">
+  <link rel="stylesheet" href="assets/css/network.css">
+  <style>
+    .search-hero-box {
+      background: linear-gradient(135deg, rgba(20,5,8,0.95), rgba(10,3,5,0.98));
+      border: 1px solid rgba(196,18,48,0.25);
+      border-radius: 16px;
+      padding: 2.5rem 2rem;
+      margin: 2rem 0;
+      text-align: center;
+    }
+    .search-bar-wrap {
+      max-width: 680px;
+      margin: 1.5rem auto 0;
+      display: flex;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.18);
+      border-radius: 30px;
+      overflow: hidden;
+      transition: all 0.2s;
+    }
+    .search-bar-wrap:focus-within {
+      border-color: var(--crimson-primary, #c41230);
+      box-shadow: 0 0 20px rgba(196,18,48,0.25);
+      background: rgba(255,255,255,0.09);
+    }
+    .search-main-input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      padding: 0.9rem 1.5rem;
+      color: #fff;
+      font-size: 1.05rem;
+      font-family: inherit;
+      outline: none;
+    }
+    .search-tab-bar {
+      display: flex;
+      gap: 0.5rem;
+      overflow-x: auto;
+      padding-bottom: 0.5rem;
+      margin-bottom: 2rem;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+    .search-tab-btn {
+      background: transparent;
+      border: none;
+      color: rgba(255,255,255,0.6);
+      padding: 0.5rem 1rem;
+      font-size: 0.88rem;
+      font-family: inherit;
+      cursor: pointer;
+      border-radius: 20px;
+      white-space: nowrap;
+      transition: all 0.15s;
+    }
+    .search-tab-btn.active {
+      background: rgba(196,18,48,0.15);
+      color: #fff;
+      font-weight: 700;
+    }
+    .result-card {
+      background: rgba(255,255,255,0.02);
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 12px;
+      padding: 1.25rem 1.5rem;
+      margin-bottom: 1rem;
+      transition: all 0.2s;
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+    }
+    .result-card:hover {
+      border-color: rgba(196,18,48,0.4);
+      background: rgba(196,18,48,0.03);
+      transform: translateY(-2px);
+    }
+    .result-badge {
+      display: inline-block;
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 0.2rem 0.6rem;
+      border-radius: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .badge-article { background: rgba(59,130,246,0.15); color: #60a5fa; }
+    .badge-book { background: rgba(196,18,48,0.15); color: #f87171; }
+    .badge-research { background: rgba(168,85,247,0.15); color: #c084fc; }
+    .badge-people { background: rgba(34,197,94,0.15); color: #4ade80; }
+    .badge-group { background: rgba(234,179,8,0.15); color: #facc15; }
+    .badge-solidarity { background: rgba(239,68,68,0.2); color: #f87171; }
+  </style>
+</head>
+<body id="top">
+
+  <div id="theway-ticker-mount" class="theway-ticker-bar"></div>
+  <header id="theway-header-mount" class="theway-header"></header>
+
+  <main class="container" style="padding-bottom:5rem;">
+
+    <!-- Search Hero -->
+    <div class="search-hero-box">
+      <h1 style="font-size:1.85rem; font-weight:800; color:#fff; margin-bottom:0.5rem;">
+        🔍 বহুভাষিক সমাজতান্ত্রিক অনুসন্ধান
+      </h1>
+      <p style="color:rgba(255,255,255,0.7); font-size:0.95rem; max-width:620px; margin:0 auto;">
+        যেকোনো ভাষায় তত্ত্ব, বই, জার্নাল পেপার, লেখক, সংগঠন বা সংহতি উদ্যোগ খুঁজুন।
+      </p>
+
+      <div class="search-bar-wrap">
+        <input type="search" id="search-input" class="search-main-input"
+               placeholder="যেমন: সাম্রাজ্যবাদ, উদ্বৃত্ত মূল্য, Marx, Lenin, আশুলিয়া..." autofocus />
+        <button class="btn-solid-crimson" style="padding:0 1.5rem; border-radius:0;" onclick="triggerSearch()">
+          অনুসন্ধান
+        </button>
+      </div>
+
+      <!-- Quick concept tags -->
+      <div style="margin-top:1rem; font-size:0.8rem; color:rgba(255,255,255,0.5);">
+        জনপ্রিয় ধারণা: 
+        <a href="javascript:void(0)" onclick="setSearch('উদ্বৃত্ত মূল্য')" style="color:#e8b84b; margin-inline:0.3rem;">উদ্বৃত্ত মূল্য</a> ·
+        <a href="javascript:void(0)" onclick="setSearch('সাম্রাজ্যবাদ')" style="color:#e8b84b; margin-inline:0.3rem;">সাম্রাজ্যবাদ</a> ·
+        <a href="javascript:void(0)" onclick="setSearch('ঐতিহাসিক বস্তুবাদ')" style="color:#e8b84b; margin-inline:0.3rem;">ঐতিহাসিক বস্তুবাদ</a> ·
+        <a href="javascript:void(0)" onclick="setSearch('Marx Capital')" style="color:#e8b84b; margin-inline:0.3rem;">Marx Capital</a> ·
+        <a href="javascript:void(0)" onclick="setSearch('Labour strike')" style="color:#e8b84b; margin-inline:0.3rem;">Labour strike</a>
+      </div>
+    </div>
+
+    <!-- Concept Synonyms Alert -->
+    <div id="concept-banner" style="display:none; background:rgba(232,184,75,0.08); border:1px solid rgba(232,184,75,0.25); border-radius:10px; padding:1rem 1.25rem; margin-bottom:1.5rem; font-size:0.88rem; color:#fff;">
+      <!-- Filled by JS -->
+    </div>
+
+    <!-- Category Tabs -->
+    <div class="search-tab-bar" id="search-tabs">
+      <button class="search-tab-btn active" data-category="all" onclick="changeCategory('all')">সব ফলাফল (<span id="count-all">0</span>)</button>
+      <button class="search-tab-btn" data-category="books" onclick="changeCategory('books')">📚 বই (<span id="count-books">0</span>)</button>
+      <button class="search-tab-btn" data-category="articles" onclick="changeCategory('articles')">📰 প্রবন্ধ (<span id="count-articles">0</span>)</button>
+      <button class="search-tab-btn" data-category="research" onclick="changeCategory('research')">🎓 গবেষণা (<span id="count-research">0</span>)</button>
+      <button class="search-tab-btn" data-category="people" onclick="changeCategory('people')">👥 মানুষ (<span id="count-people">0</span>)</button>
+      <button class="search-tab-btn" data-category="groups" onclick="changeCategory('groups')">🏛️ গ্রুপ (<span id="count-groups">0</span>)</button>
+      <button class="search-tab-btn" data-category="solidarity" onclick="changeCategory('solidarity')">✊ সংহতি (<span id="count-solidarity">0</span>)</button>
+    </div>
+
+    <!-- Results Container -->
+    <div id="search-results-list">
+      <div style="text-align:center; padding:3rem; color:rgba(255,255,255,0.4);">
+        অনুসন্ধান শুরু করতে ওপরে কোনো শব্দ লিখুন।
+      </div>
+    </div>
+
+  </main>
+
+  <footer id="theway-footer-mount" class="theway-footer"></footer>
+
+  <script src="assets/js/i18n.js"></script>
+  <script src="assets/js/components.js"></script>
+  <script src="assets/js/script.js"></script>
+  <script>
+    let currentCategory = 'all';
+    let currentData = null;
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const initialQ = urlParams.get('q');
+
+    document.getElementById('search-input').addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') triggerSearch();
+    });
+
+    function setSearch(term) {
+      document.getElementById('search-input').value = term;
+      triggerSearch();
+    }
+
+    function changeCategory(cat) {
+      currentCategory = cat;
+      document.querySelectorAll('.search-tab-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.getAttribute('data-category') === cat);
+      });
+      renderResults();
+    }
+
+    async function triggerSearch() {
+      const q = document.getElementById('search-input').value.trim();
+      if (!q) return;
+
+      const container = document.getElementById('search-results-list');
+      container.innerHTML = '<div style="text-align:center; padding:3rem; color:rgba(255,255,255,0.6);">অনুসন্ধান চলছে...</div>';
+
+      try {
+        const res = await fetch(`/api/search?q=${encodeURIComponent(q)}&category=all`);
+        const data = await res.json();
+        currentData = data;
+
+        // Concept banner
+        const conceptBanner = document.getElementById('concept-banner');
+        if (data.concept) {
+          const c = data.concept;
+          conceptBanner.style.display = 'block';
+          conceptBanner.innerHTML = `
+            <strong>💡 চিহ্নিত ধারণা: ${c.labels.bn || c.canonical} (${c.canonical})</strong> — ${c.description}
+            <div style="font-size:0.78rem; opacity:0.8; margin-top:0.25rem;">
+              বহুভাষিক অনুসন্ধান অন্তর্ভুক্ত: ${data.search_terms ? data.search_terms.join(', ') : ''}
+            </div>
+          `;
+        } else {
+          conceptBanner.style.display = 'none';
+        }
+
+        // Update counts
+        const c = data.counts || {};
+        document.getElementById('count-all').innerText = c.total || 0;
+        document.getElementById('count-books').innerText = c.books || 0;
+        document.getElementById('count-articles').innerText = c.articles || 0;
+        document.getElementById('count-research').innerText = c.research || 0;
+        document.getElementById('count-people').innerText = c.people || 0;
+        document.getElementById('count-groups').innerText = c.groups || 0;
+        document.getElementById('count-solidarity').innerText = c.solidarity || 0;
+
+        renderResults();
+      } catch (err) {
+        container.innerHTML = '<div style="color:var(--crimson-primary); text-align:center; padding:3rem;">অনুসন্ধানে ত্রুটি দেখা দিয়েছে। আবার চেষ্টা করুন।</div>';
+      }
+    }
+
+    function renderResults() {
+      if (!currentData || !currentData.categories) return;
+      const cats = currentData.categories;
+      const container = document.getElementById('search-results-list');
+      let items = [];
+
+      if (currentCategory === 'all') {
+        items = [
+          ...(cats.books || []).map(x => ({ ...x, _cat: 'book' })),
+          ...(cats.articles || []).map(x => ({ ...x, _cat: 'article' })),
+          ...(cats.research || []).map(x => ({ ...x, _cat: 'research' })),
+          ...(cats.people || []).map(x => ({ ...x, _cat: 'people' })),
+          ...(cats.groups || []).map(x => ({ ...x, _cat: 'group' })),
+          ...(cats.solidarity || []).map(x => ({ ...x, _cat: 'solidarity' }))
+        ];
+      } else {
+        items = (cats[currentCategory] || []).map(x => ({ ...x, _cat: currentCategory }));
+      }
+
+      if (!items.length) {
+        container.innerHTML = '<div style="text-align:center; padding:3rem; color:rgba(255,255,255,0.4);">কোনো ফলাফল পাওয়া যায়নি।</div>';
+        return;
+      }
+
+      container.innerHTML = items.map(item => {
+        if (item._cat === 'book') {
+          const detailUrl = item.id.startsWith('ol:') ? `/resource.html?id=${encodeURIComponent(item.id)}` : (item.read_url || '/books.html');
+          return `
+            <div class="result-card">
+              <div style="display:flex; justify-content:space-between; align-items:center;">
+                <span class="result-badge badge-book">📚 বই / ক্লাসিক</span>
+                <span style="font-size:0.75rem; color:rgba(255,255,255,0.4);">${item.year || ''}</span>
+              </div>
+              <a href="${detailUrl}" style="font-size:1.1rem; font-weight:700; color:#fff; text-decoration:none;">
+                ${item.title}
+              </a>
+              <div style="font-size:0.85rem; color:var(--crimson-primary,#c41230);">${item.author}</div>
+              <p style="font-size:0.85rem; color:rgba(255,255,255,0.65); line-height:1.5;">${item.description || item.subtitle || 'উৎস: ' + (item.source || 'Open Library')}</p>
+            </div>
+          `;
+        }
+
+        if (item._cat === 'article') {
+          return `
+            <div class="result-card">
+              <span class="result-badge badge-article">📰 প্রবন্ধ</span>
+              <a href="${item.url || '#'}" style="font-size:1.1rem; font-weight:700; color:#fff; text-decoration:none;">
+                ${item.title}
+              </a>
+              <div style="font-size:0.85rem; color:rgba(255,255,255,0.5);">${item.author} · ${item.section || ''}</div>
+              <p style="font-size:0.85rem; color:rgba(255,255,255,0.65);">${item.subtitle || ''}</p>
+            </div>
+          `;
+        }
+
+        if (item._cat === 'research') {
+          return `
+            <div class="result-card">
+              <div style="display:flex; justify-content:space-between; align-items:center;">
+                <span class="result-badge badge-research">🎓 অ্যাকাডেমিক গবেষণা</span>
+                <span style="font-size:0.75rem; color:rgba(255,255,255,0.4);">${item.year || ''}</span>
+              </div>
+              <a href="${item.url || '#'}" target="_blank" style="font-size:1.05rem; font-weight:700; color:#fff; text-decoration:none;">
+                ${item.title}
+              </a>
+              <div style="font-size:0.85rem; color:rgba(255,255,255,0.5);">${item.author} · <em>${item.journal || ''}</em></div>
+              ${item.abstract ? `<p style="font-size:0.85rem; color:rgba(255,255,255,0.65);">${item.abstract}</p>` : ''}
+            </div>
+          `;
+        }
+
+        if (item._cat === 'people') {
+          return `
+            <div class="result-card">
+              <div style="display:flex; justify-content:space-between; align-items:center;">
+                <span class="result-badge badge-people">👥 সদস্য</span>
+                <span style="font-size:0.75rem; color:rgba(255,255,255,0.4);">${item.country || ''}</span>
+              </div>
+              <a href="/profile.html?id=${encodeURIComponent(item.id)}" style="font-size:1.1rem; font-weight:700; color:#fff; text-decoration:none;">
+                ${item.name} ${item.pseudonym ? `(${item.pseudonym})` : ''}
+              </a>
+              <div style="font-size:0.85rem; color:var(--crimson-primary,#c41230);">${item.role || 'Member'}</div>
+              <div style="display:flex; gap:0.4rem; flex-wrap:wrap; margin-top:0.35rem;">
+                ${(item.ideologies || []).map(i => `<span style="font-size:0.7rem; background:rgba(255,255,255,0.06); padding:0.15rem 0.5rem; border-radius:10px; color:rgba(255,255,255,0.8);">${i}</span>`).join('')}
+              </div>
+            </div>
+          `;
+        }
+
+        if (item._cat === 'group') {
+          return `
+            <div class="result-card">
+              <span class="result-badge badge-group">🏛️ স্টাডি গ্রুপ</span>
+              <a href="/groups.html" style="font-size:1.1rem; font-weight:700; color:#fff; text-decoration:none;">
+                ${item.name_bn || item.name}
+              </a>
+              <div style="font-size:0.85rem; color:rgba(255,255,255,0.5);">${item.category || ''} · ${item.members_count || 0} জন সদস্য</div>
+              <p style="font-size:0.85rem; color:rgba(255,255,255,0.65);">${item.description || ''}</p>
+            </div>
+          `;
+        }
+
+        if (item._cat === 'solidarity') {
+          return `
+            <div class="result-card">
+              <span class="result-badge badge-solidarity">✊ সংহতি উদ্যোগ</span>
+              <a href="/solidarity.html" style="font-size:1.1rem; font-weight:700; color:#fff; text-decoration:none;">
+                ${item.title}
+              </a>
+              <div style="font-size:0.85rem; color:var(--crimson-primary,#c41230);">${item.organization} · ${item.country || ''}</div>
+              <p style="font-size:0.85rem; color:rgba(255,255,255,0.65);">${item.description || ''}</p>
+            </div>
+          `;
+        }
+
+        return '';
+      }).join('');
+    }
+
+    if (initialQ) {
+      document.getElementById('search-input').value = initialQ;
+      triggerSearch();
+    }
+  </script>
+</body>
+</html>

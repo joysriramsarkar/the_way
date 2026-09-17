@@ -1,0 +1,247 @@
+[
+  {
+    "federation_id": "TW-O-000014",
+    "id": "org_1789646673542",
+    "name": "Sudanese Workers Trade Union Federation",
+    "name_bn": "সুদান ওয়ার্কার্স ট্রেড ইউনিয়ন ফেডারেশন",
+    "country": "Sudan",
+    "country_flag": "🇸🇩",
+    "type": "trade_union",
+    "icon": "🏛️",
+    "desc": "Federated socialist network participant.",
+    "members": 10,
+    "verified": false,
+    "focus": [
+      "Labor Rights",
+      "Anti-Imperialism"
+    ],
+    "created_at": "2026-09-17T12:04:33.542Z"
+  },
+  {
+    "federation_id": "TW-O-000013",
+    "id": "org_1789646536461",
+    "name": "Sudanese Workers Trade Union Federation",
+    "name_bn": "সুদান ওয়ার্কার্স ট্রেড ইউনিয়ন ফেডারেশন",
+    "country": "Sudan",
+    "country_flag": "🇸🇩",
+    "type": "trade_union",
+    "icon": "🏛️",
+    "desc": "Federated socialist network participant.",
+    "members": 10,
+    "verified": false,
+    "focus": [
+      "Labor Rights",
+      "Anti-Imperialism"
+    ],
+    "created_at": "2026-09-17T12:02:16.461Z"
+  },
+  {
+    "federation_id": "TW-O-000012",
+    "id": "org_1789645443391",
+    "name": "Sudanese Professionals Association",
+    "name_bn": "সুদানীজ প্রফেশনালস অ্যাসোসিয়েশন",
+    "country": "Sudan",
+    "country_flag": "🇸🇩",
+    "type": "Trade Union",
+    "icon": "🏛️",
+    "desc": "Umbrella association of 17 different Sudanese trade unions fighting for popular democracy.",
+    "members": 45000,
+    "verified": false,
+    "focus": [
+      "Trade Union"
+    ],
+    "created_at": "2026-09-17T11:44:03.391Z"
+  },
+  {
+    "federation_id": "TW-O-000011",
+    "id": "org_1789645128275",
+    "name": "Sudanese Professionals Association",
+    "name_bn": "সুদানীজ প্রফেশনালস অ্যাসোসিয়েশন",
+    "country": "Sudan",
+    "country_flag": "🇸🇩",
+    "type": "Trade Union",
+    "icon": "🏛️",
+    "desc": "Umbrella association of 17 different Sudanese trade unions fighting for popular democracy.",
+    "members": 45000,
+    "verified": false,
+    "focus": [
+      "Trade Union"
+    ],
+    "created_at": "2026-09-17T11:38:48.275Z"
+  },
+  {
+    "federation_id": "TW-O-000010",
+    "id": "org_1789645109982",
+    "name": "Sudanese Professionals Association",
+    "name_bn": "সুদানীজ প্রফেশনালস অ্যাসোসিয়েশন",
+    "country": "Sudan",
+    "country_flag": "🇸🇩",
+    "type": "Trade Union",
+    "icon": "🏛️",
+    "desc": "Umbrella association of 17 different Sudanese trade unions fighting for popular democracy.",
+    "members": 45000,
+    "verified": false,
+    "focus": [
+      "Trade Union"
+    ],
+    "created_at": "2026-09-17T11:38:29.982Z"
+  },
+  {
+    "federation_id": "TW-O-000009",
+    "id": "org_1789643977825",
+    "name": "Sudanese Professionals Association",
+    "name_bn": "সুদানীজ প্রফেশনালস অ্যাসোসিয়েশন",
+    "country": "Sudan",
+    "country_flag": "🇸🇩",
+    "type": "Trade Union",
+    "icon": "🏛️",
+    "desc": "Umbrella association of 17 different Sudanese trade unions fighting for popular democracy.",
+    "members": 45000,
+    "verified": false,
+    "focus": [
+      "Trade Union"
+    ],
+    "created_at": "2026-09-17T11:19:37.825Z"
+  },
+  {
+    "federation_id": "TW-O-000008",
+    "id": "org_1789643956976",
+    "name": "Sudanese Professionals Association",
+    "name_bn": "সুদানীজ প্রফেশনালস অ্যাসোসিয়েশন",
+    "country": "Sudan",
+    "country_flag": "🇸🇩",
+    "type": "Trade Union",
+    "icon": "🏛️",
+    "desc": "Umbrella association of 17 different Sudanese trade unions fighting for popular democracy.",
+    "members": 45000,
+    "verified": false,
+    "focus": [
+      "Trade Union"
+    ],
+    "created_at": "2026-09-17T11:19:16.976Z"
+  },
+  {
+    "federation_id": "TW-O-000007",
+    "id": "org_1789643939377",
+    "name": "Sudanese Professionals Association",
+    "name_bn": "সুদানীজ প্রফেশনালস অ্যাসোসিয়েশন",
+    "country": "Sudan",
+    "country_flag": "🇸🇩",
+    "type": "Trade Union",
+    "icon": "🏛️",
+    "desc": "Umbrella association of 17 different Sudanese trade unions fighting for popular democracy.",
+    "members": 45000,
+    "verified": false,
+    "focus": [
+      "Trade Union"
+    ],
+    "created_at": "2026-09-17T11:18:59.377Z"
+  },
+  {
+    "federation_id": "TW-O-000006",
+    "id": "org_1789643920724",
+    "name": "Sudanese Professionals Association",
+    "name_bn": "সুদানীজ প্রফেশনালস অ্যাসোসিয়েশন",
+    "country": "Sudan",
+    "country_flag": "🇸🇩",
+    "type": "Trade Union",
+    "icon": "🏛️",
+    "desc": "Umbrella association of 17 different Sudanese trade unions fighting for popular democracy.",
+    "members": 45000,
+    "verified": false,
+    "focus": [
+      "Trade Union"
+    ],
+    "created_at": "2026-09-17T11:18:40.724Z"
+  },
+  {
+    "federation_id": "TW-O-000001",
+    "name": "Workers' Study Collective",
+    "name_bn": "ওয়ার্কার্স স্টাডি কালেক্টিভ",
+    "country": "India",
+    "country_flag": "🇮🇳",
+    "type": "Study Circle",
+    "icon": "📚",
+    "desc": "Autonomous worker-student reading collective studying political economy, trade unionism, and subcontinental labor history.",
+    "members": 120,
+    "verified": true,
+    "focus": [
+      "Labor",
+      "Political Economy",
+      "Education"
+    ],
+    "created_at": "2026-01-15T00:00:00Z"
+  },
+  {
+    "federation_id": "TW-O-000002",
+    "name": "Bangladesh Garment Sramik Sangram Parishad",
+    "name_bn": "বাংলাদেশ গার্মেন্টস শ্রমিক সংগ্রাম পরিষদ",
+    "country": "Bangladesh",
+    "country_flag": "🇧🇩",
+    "type": "Trade Union",
+    "icon": "⚒️",
+    "desc": "Federation of apparel trade unions fighting for living wages and safety democracy on factory floors.",
+    "members": 14500,
+    "verified": true,
+    "focus": [
+      "RMG Labor",
+      "Living Wage",
+      "Legal Rights"
+    ],
+    "created_at": "2026-01-20T00:00:00Z"
+  },
+  {
+    "federation_id": "TW-O-000003",
+    "name": "Movimento dos Trabalhadores Sem Terra (MST)",
+    "name_bn": "মুভিমেন্তো দোস ত্রাবালিয়াদোরেস সেম তেরা (এমএসটি)",
+    "country": "Brazil",
+    "country_flag": "🇧🇷",
+    "type": "Peasant Movement",
+    "icon": "🌾",
+    "desc": "Landless rural workers movement struggling for agrarian reform and agroecological popular sovereignty.",
+    "members": 350000,
+    "verified": true,
+    "focus": [
+      "Agrarian Reform",
+      "Ecology",
+      "Cooperatives"
+    ],
+    "created_at": "2026-02-01T00:00:00Z"
+  },
+  {
+    "federation_id": "TW-O-000004",
+    "name": "Hellenic Federation of Metalworkers",
+    "name_bn": "হেলেনিক মেটালওয়ার্কার্স ফেডারেশন",
+    "country": "Greece",
+    "country_flag": "🇬🇷",
+    "type": "Trade Union",
+    "icon": "🏭",
+    "desc": "National trade union federation defending metal and industrial workers against austerity.",
+    "members": 8200,
+    "verified": true,
+    "focus": [
+      "Industrial Labor",
+      "Strikes",
+      "Solidarity"
+    ],
+    "created_at": "2026-02-10T00:00:00Z"
+  },
+  {
+    "federation_id": "TW-O-000005",
+    "name": "Institut Tribune Socialiste",
+    "name_bn": "আঁস্তিতু ত্রিবুন সোসিয়ালিস্ত",
+    "country": "France",
+    "country_flag": "🇫🇷",
+    "type": "Research Center",
+    "icon": "🎓",
+    "desc": "Independent research center preserving the history of self-management socialism and democratic planning.",
+    "members": 430,
+    "verified": false,
+    "focus": [
+      "History",
+      "Self-Management",
+      "Archives"
+    ],
+    "created_at": "2026-02-15T00:00:00Z"
+  }
+]

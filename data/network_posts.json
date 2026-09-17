@@ -1,0 +1,230 @@
+[
+  {
+    "id": "post_1789646672770_q2oz",
+    "author": "Comrade Joy",
+    "country": "Global",
+    "country_flag": "🌍",
+    "initials": "CJ",
+    "lang": "bn",
+    "post_type": "debate",
+    "created_at": "2026-09-17T12:04:32.770Z",
+    "content": "সংহতি সমাবেশ এবং আন্তর্জাতিক মুক্ত কমরেডশিপ নেটওয়ার্ক টেস্ট পোস্ট।",
+    "reactions": {
+      "solidarity": 2
+    },
+    "comments": [
+      {
+        "id": "c_1789646672777_wt1",
+        "author": "Comrade Lenin",
+        "content": "দারুণ উদ্যোগ!",
+        "created_at": "2026-09-17T12:04:32.777Z"
+      }
+    ]
+  },
+  {
+    "id": "post_1789646535679_wqzf",
+    "author": "Comrade Joy",
+    "country": "Global",
+    "country_flag": "🌍",
+    "initials": "CJ",
+    "lang": "bn",
+    "post_type": "debate",
+    "created_at": "2026-09-17T12:02:15.679Z",
+    "content": "সংহতি সমাবেশ এবং আন্তর্জাতিক মুক্ত কমরেডশিপ নেটওয়ার্ক টেস্ট পোস্ট।",
+    "reactions": {
+      "solidarity": 2
+    },
+    "comments": [
+      {
+        "id": "c_1789646535686_m85",
+        "author": "Comrade Lenin",
+        "content": "দারুণ উদ্যোগ!",
+        "created_at": "2026-09-17T12:02:15.686Z"
+      }
+    ]
+  },
+  {
+    "id": "post_1789646413599_0v47",
+    "author": "Comrade Joy",
+    "country": "Global",
+    "country_flag": "🌍",
+    "initials": "CJ",
+    "lang": "bn",
+    "post_type": "debate",
+    "created_at": "2026-09-17T12:00:13.599Z",
+    "content": "সংহতি সমাবেশ এবং আন্তর্জাতিক মুক্ত কমরেডশিপ নেটওয়ার্ক টেস্ট পোস্ট।",
+    "reactions": {
+      "solidarity": 2
+    },
+    "comments": [
+      {
+        "id": "c_1789646413607_ae4",
+        "author": "Comrade Lenin",
+        "content": "দারুণ উদ্যোগ!",
+        "created_at": "2026-09-17T12:00:13.607Z"
+      }
+    ]
+  },
+  {
+    "id": "post_1789645464454_ydi4",
+    "author": "Test Comrade",
+    "country": "Global",
+    "country_flag": "🌍",
+    "initials": "TC",
+    "lang": "bn",
+    "post_type": "debate",
+    "created_at": "2026-09-17T11:44:24.454Z",
+    "content": "Automated test post for socialist network.",
+    "reactions": {
+      "solidarity": 2
+    },
+    "comments": [
+      {
+        "id": "c_1789645464462_q0h",
+        "author": "Comrade Lenin",
+        "content": "Solidarity with this debate!",
+        "created_at": "2026-09-17T11:44:24.462Z"
+      }
+    ]
+  },
+  {
+    "id": "post_1789645215399_i9bp",
+    "author": "Test Comrade",
+    "country": "Global",
+    "country_flag": "🌍",
+    "initials": "TC",
+    "lang": "bn",
+    "post_type": "debate",
+    "created_at": "2026-09-17T11:40:15.399Z",
+    "content": "Automated test post for socialist network.",
+    "reactions": {
+      "solidarity": 2
+    },
+    "comments": [
+      {
+        "id": "c_1789645215406_7ij",
+        "author": "Comrade Lenin",
+        "content": "Solidarity with this debate!",
+        "created_at": "2026-09-17T11:40:15.406Z"
+      }
+    ]
+  },
+  {
+    "id": "post_1789643994437_xb97",
+    "author": "Test Comrade",
+    "country": "Global",
+    "country_flag": "🌍",
+    "initials": "TC",
+    "lang": "bn",
+    "post_type": "debate",
+    "created_at": "2026-09-17T11:19:54.437Z",
+    "content": "Automated test post for socialist network.",
+    "reactions": {
+      "solidarity": 2
+    },
+    "comments": [
+      {
+        "id": "c_1789643994445_jqw",
+        "author": "Comrade Lenin",
+        "content": "Solidarity with this debate!",
+        "created_at": "2026-09-17T11:19:54.446Z"
+      }
+    ]
+  },
+  {
+    "id": "post_1789643130724_757o",
+    "author": "Test Comrade",
+    "country": "Global",
+    "country_flag": "🌍",
+    "initials": "TC",
+    "lang": "bn",
+    "post_type": "debate",
+    "created_at": "2026-09-17T11:05:30.724Z",
+    "content": "Automated test post for socialist network.",
+    "reactions": {
+      "solidarity": 2
+    },
+    "comments": [
+      {
+        "id": "c_1789643130731_79y",
+        "author": "Comrade Lenin",
+        "content": "Solidarity with this debate!",
+        "created_at": "2026-09-17T11:05:30.731Z"
+      }
+    ]
+  },
+  {
+    "id": "post_1",
+    "author": "Amira Hassan",
+    "country": "Egypt",
+    "country_flag": "🇪🇬",
+    "initials": "AH",
+    "lang": "en",
+    "post_type": "post",
+    "created_at": "2026-09-17T09:05:30.720Z",
+    "content": "The recent wave of strikes in Egypt shows that despite decades of neoliberal restructuring, the working class still has the capacity for organized resistance. What we need now is not just economic demands but political ones.\n\nThe link between labour and broader democratization is not coincidental — it is structural.",
+    "reactions": {
+      "solidarity": 47
+    },
+    "comments": [
+      {
+        "id": "c1",
+        "author": "Red Sparrow",
+        "content": "Fully agree. Strike committees must also become political organs.",
+        "created_at": "2026-09-17T10:05:30.721Z"
+      }
+    ]
+  },
+  {
+    "id": "post_2",
+    "author": "João Silva",
+    "country": "Brazil",
+    "country_flag": "🇧🇷",
+    "initials": "JS",
+    "lang": "pt",
+    "post_type": "debate",
+    "created_at": "2026-09-17T06:05:30.721Z",
+    "content": "Debate: O ecossocialismo é uma síntese viável entre marxismo e ecologia, ou há contradições fundamentais entre desenvolvimento das forças produtivas e sustentabilidade ecológica?\n\nMinha posição: precisamos de uma ruptura com o produtivismo dentro do próprio marxismo.",
+    "reactions": {
+      "solidarity": 89
+    },
+    "comments": []
+  },
+  {
+    "id": "post_3",
+    "author": "Red Sparrow",
+    "country": "Bangladesh",
+    "country_flag": "🇧🇩",
+    "initials": "RS",
+    "lang": "bn",
+    "post_type": "question",
+    "created_at": "2026-09-17T03:05:30.721Z",
+    "content": "প্রশ্ন: মার্ক্স ও এঙ্গেলসের \"কমিউনিস্ট ইশতেহারে\" যে সর্বহারা শ্রেণির কথা বলা হয়েছে, সেই ধারণাটি আজকের গিগ ইকোনমি, প্ল্যাটফর্ম শ্রমিক ও অনানুষ্ঠানিক খাতের শ্রমিকদের ক্ষেত্রে কতটা প্রযোজ্য?\n\nআপনাদের মতামত ও মাঠপর্যায়ের অভিজ্ঞতা জানতে চাই।",
+    "reactions": {
+      "solidarity": 63
+    },
+    "comments": [
+      {
+        "id": "c2",
+        "author": "Priya Nair",
+        "content": "গিগ শ্রমিকরা যন্ত্র বা প্ল্যাটফর্মের মালিক নয়, তারা অ্যালগরিদমের অধীনে মজুরি দাসত্বে যুক্ত। সারমর্মে তারা আধুনিক সর্বহারা।",
+        "created_at": "2026-09-17T07:05:30.721Z"
+      }
+    ]
+  },
+  {
+    "id": "post_4",
+    "author": "Sofia Papadopoulou",
+    "country": "Greece",
+    "country_flag": "🇬🇷",
+    "initials": "SP",
+    "lang": "en",
+    "post_type": "solidarity_request",
+    "created_at": "2026-09-16T23:05:30.721Z",
+    "content": "SOLIDARITY REQUEST\n\nGreek metal workers at Hellenic Steel have been on strike for 47 days. The management is threatening lockouts. We need:\n• International statements of solidarity\n• Translation of strike bulletin to Bengali, Spanish, Arabic\n• Trade union amplification\n\nStand with Hellenic Steel Workers!",
+    "reactions": {
+      "solidarity": 134
+    },
+    "comments": []
+  }
+]

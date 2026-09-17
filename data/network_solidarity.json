@@ -1,0 +1,50 @@
+[
+  {
+    "id": "sol_1",
+    "title": "Hellenic Steel Strike Solidarity",
+    "organization": "Hellenic Federation of Metalworkers",
+    "country": "Greece",
+    "country_flag": "🇬🇷",
+    "status": "active",
+    "created_at": "2026-09-16T11:05:30.721Z",
+    "description": "Workers striking for collective bargaining agreements, workplace safety guarantees, and wage indexation against rampant inflation.",
+    "needs": [
+      "Translation",
+      "Public Statement",
+      "Union Contacts"
+    ],
+    "pledges_count": 28
+  },
+  {
+    "id": "sol_2",
+    "title": "Ashulia Garments Workers Defense Fund",
+    "organization": "Bangladesh Garment Sramik Sangram Parishad",
+    "country": "Bangladesh",
+    "country_flag": "🇧🇩",
+    "status": "active",
+    "created_at": "2026-09-15T11:05:30.721Z",
+    "description": "Demanding liveable minimum wage of 25,000 BDT, withdrawal of false police cases against 80+ worker representatives, and end to blacklisting.",
+    "needs": [
+      "Legal Support",
+      "International Media Coverage",
+      "Translation"
+    ],
+    "pledges_count": 45
+  },
+  {
+    "id": "sol_3",
+    "title": "Defend Indigenous Yanomami Land from Illegal Mining",
+    "organization": "Coletivo de Luta pela Terra",
+    "country": "Brazil",
+    "country_flag": "🇧🇷",
+    "status": "active",
+    "created_at": "2026-09-14T11:05:30.721Z",
+    "description": "Organizing international campaign against illegal gold extraction and mercury poisoning of rivers in the Amazon rainforest basin.",
+    "needs": [
+      "Research",
+      "Public Statement",
+      "Eco-socialist Solidarity"
+    ],
+    "pledges_count": 62
+  }
+]

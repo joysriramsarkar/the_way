@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/svg+xml" href="assets/images/favicon.svg" />
+  <title>আন্তর্জাতিক সংহতি অনুরোধ — দ্য ওয়ে (The Way)</title>
+  <meta name="description" content="International Socialist Solidarity Requests — Support striking workers, peasant struggles, and anti-imperialist campaigns worldwide.">
+  <link rel="stylesheet" href="assets/css/style.css">
+  <link rel="stylesheet" href="assets/css/network.css">
+  <style>
+    .solidarity-hero {
+      background: linear-gradient(135deg, rgba(35,8,12,0.95), rgba(16,4,6,0.98));
+      border: 1px solid rgba(196,18,48,0.3);
+      border-radius: 16px;
+      padding: 3rem 2rem;
+      margin: 2rem 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1.5rem;
+    }
+    .sol-card {
+      background: rgba(255,255,255,0.02);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 14px;
+      padding: 1.75rem;
+      margin-bottom: 1.5rem;
+      transition: all 0.2s;
+    }
+    .sol-card:hover {
+      border-color: rgba(196,18,48,0.4);
+      background: rgba(196,18,48,0.02);
+    }
+    .needs-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.25rem 0.75rem;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      background: rgba(196,18,48,0.12);
+      color: #fca5a5;
+      border: 1px solid rgba(196,18,48,0.25);
+    }
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.8);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      padding: 1rem;
+    }
+    .modal-box {
+      background: #14070a;
+      border: 1px solid rgba(196,18,48,0.3);
+      border-radius: 14px;
+      padding: 2rem;
+      max-width: 500px;
+      width: 100%;
+      color: #fff;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+    }
+  </style>
+</head>
+<body id="top">
+
+  <div id="theway-ticker-mount" class="theway-ticker-bar"></div>
+  <header id="theway-header-mount" class="theway-header"></header>
+
+  <main class="container" style="padding-bottom:5rem;">
+
+    <!-- Hero -->
+    <div class="solidarity-hero">
+      <div style="max-width:650px;">
+        <div style="font-size:0.8rem; font-weight:700; color:var(--crimson-primary,#c41230); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:0.5rem;">
+          ✊ বৈশ্বিক শ্রমিক ও কৃষক সংহতি
+        </div>
+        <h1 style="font-size:2rem; font-weight:800; color:#fff; margin-bottom:0.75rem;">
+          আন্তর্জাতিক সংহতি অনুরোধ (Solidarity Requests)
+        </h1>
+        <p style="color:rgba(255,255,255,0.75); font-size:0.95rem; line-height:1.6;">
+          বিশ্বজুড়ে ধর্মঘটকারী শ্রমিক, কৃষক আন্দোলন ও সাম্রাজ্যবাদবিরোধী উদ্যোগগুলোর পাশে দাঁড়ান। অনুবাদ, গণবিবৃতি, গবেষণা ও আইনি তথ্যের মাধ্যমে আন্তর্জাতিক সংহতি গড়ে তুলুন।
+        </p>
+      </div>
+      <div>
+        <button class="btn-solid-crimson" style="padding:0.75rem 1.5rem; font-size:0.92rem;" onclick="openNewCampaignModal()">
+          + সংহতি আবেদন জমা দিন
+        </button>
+      </div>
+    </div>
+
+    <!-- Active Requests List -->
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem;">
+      <h2 style="font-size:1.3rem; font-weight:700; color:#fff;">
+        চলমান সংহতি আহ্বান (<span id="sol-total-count">0</span>)
+      </h2>
+    </div>
+
+    <div id="solidarity-list">
+      <div style="color:rgba(255,255,255,0.4); text-align:center; padding:3rem;">সংহতি আহ্বান লোড হচ্ছে...</div>
+    </div>
+
+  </main>
+
+  <!-- Pledge Modal -->
+  <div class="modal-overlay" id="pledge-modal">
+    <div class="modal-box">
+      <h3 style="font-size:1.25rem; font-weight:700; margin-bottom:0.5rem; color:#fff;">
+        সংহতি প্রতিজ্ঞা প্রকাশ করুন
+      </h3>
+      <p id="pledge-target-title" style="color:rgba(255,255,255,0.7); font-size:0.88rem; margin-bottom:1.25rem;"></p>
+      
+      <div style="margin-bottom:1rem;">
+        <label style="display:block; font-size:0.8rem; color:rgba(255,255,255,0.6); margin-bottom:0.35rem;">আপনার নাম বা ছদ্মনাম:</label>
+        <input type="text" id="pledge-name" style="width:100%; padding:0.6rem; border-radius:6px; border:1px solid rgba(255,255,255,0.2); background:rgba(255,255,255,0.05); color:#fff; font-family:inherit;" placeholder="যেমন: কমরেড করিম" />
+      </div>
+
+      <div style="margin-bottom:1rem;">
+        <label style="display:block; font-size:0.8rem; color:rgba(255,255,255,0.6); margin-bottom:0.35rem;">আপনি কীভাবে সহায়তা করতে চান?</label>
+        <select id="pledge-type" style="width:100%; padding:0.6rem; border-radius:6px; border:1px solid rgba(255,255,255,0.2); background:#1a1012; color:#fff; font-family:inherit;">
+          <option value="Translation">অনুবাদ সহায়তা (বুলেটিন/লিফলেট অনুবাদ)</option>
+          <option value="Public Statement">গণবিবৃতি ও সামাজিক মাধ্যমে প্রচার</option>
+          <option value="Research">গবেষণা ও তথ্য সংগ্রহ</option>
+          <option value="Legal">আইনি সম্পদ ও নেটওয়ার্ক সংযোগ</option>
+        </select>
+      </div>
+
+      <div style="margin-bottom:1.5rem;">
+        <label style="display:block; font-size:0.8rem; color:rgba(255,255,255,0.6); margin-bottom:0.35rem;">সংক্ষিপ্ত বার্তা (ঐচ্ছিক):</label>
+        <textarea id="pledge-message" rows="2" style="width:100%; padding:0.6rem; border-radius:6px; border:1px solid rgba(255,255,255,0.2); background:rgba(255,255,255,0.05); color:#fff; font-family:inherit;" placeholder="সংহতির বার্তা..."></textarea>
+      </div>
+
+      <div style="display:flex; justify-content:flex-end; gap:0.75rem;">
+        <button class="btn-follow" onclick="closePledgeModal()">বাতিল</button>
+        <button class="btn-solid-crimson" onclick="submitPledge()">প্রতিজ্ঞা জমা দিন</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- New Campaign Modal -->
+  <div class="modal-overlay" id="new-campaign-modal">
+    <div class="modal-box" style="max-width:560px;">
+      <h3 style="font-size:1.25rem; font-weight:700; margin-bottom:1rem; color:#fff;">
+        নতুন সংহতি আবেদন তৈরি করুন
+      </h3>
+      
+      <div style="margin-bottom:0.75rem;">
+        <label style="display:block; font-size:0.8rem; color:rgba(255,255,255,0.6); margin-bottom:0.25rem;">আন্দোলন বা ইস্যুর নাম:</label>
+        <input type="text" id="new-sol-title" style="width:100%; padding:0.6rem; border-radius:6px; border:1px solid rgba(255,255,255,0.2); background:rgba(255,255,255,0.05); color:#fff; font-family:inherit;" placeholder="যেমন: আশুলিয়া গার্মেন্টস শ্রমিক মজুরি আন্দোলন" />
+      </div>
+
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.75rem; margin-bottom:0.75rem;">
+        <div>
+          <label style="display:block; font-size:0.8rem; color:rgba(255,255,255,0.6); margin-bottom:0.25rem;">সংগঠনের নাম:</label>
+          <input type="text" id="new-sol-org" style="width:100%; padding:0.6rem; border-radius:6px; border:1px solid rgba(255,255,255,0.2); background:rgba(255,255,255,0.05); color:#fff; font-family:inherit;" placeholder="সংগঠন বা ট্রেড ইউনিয়ন" />
+        </div>
+        <div>
+          <label style="display:block; font-size:0.8rem; color:rgba(255,255,255,0.6); margin-bottom:0.25rem;">দেশ:</label>
+          <input type="text" id="new-sol-country" style="width:100%; padding:0.6rem; border-radius:6px; border:1px solid rgba(255,255,255,0.2); background:rgba(255,255,255,0.05); color:#fff; font-family:inherit;" placeholder="বাংলাদেশ, ভারত, গ্রিস..." />
+        </div>
+      </div>
+
+      <div style="margin-bottom:0.75rem;">
+        <label style="display:block; font-size:0.8rem; color:rgba(255,255,255,0.6); margin-bottom:0.25rem;">ইস্যুর পটভূমি ও বিবরণ:</label>
+        <textarea id="new-sol-desc" rows="3" style="width:100%; padding:0.6rem; border-radius:6px; border:1px solid rgba(255,255,255,0.2); background:rgba(255,255,255,0.05); color:#fff; font-family:inherit;" placeholder="দাবিসমূহ, চলমান অবস্থা ও প্রয়োজনীয় সহায়তা..."></textarea>
+      </div>
+
+      <div style="margin-bottom:1.5rem;">
+        <label style="display:block; font-size:0.8rem; color:rgba(255,255,255,0.6); margin-bottom:0.25rem;">প্রয়োজনীয় সংহতি (কমা দিয়ে আলাদা করুন):</label>
+        <input type="text" id="new-sol-needs" style="width:100%; padding:0.6rem; border-radius:6px; border:1px solid rgba(255,255,255,0.2); background:rgba(255,255,255,0.05); color:#fff; font-family:inherit;" value="Translation, Public Statement, Legal Support" />
+      </div>
+
+      <div style="display:flex; justify-content:flex-end; gap:0.75rem;">
+        <button class="btn-follow" onclick="closeNewCampaignModal()">বাতিল</button>
+        <button class="btn-solid-crimson" onclick="submitNewCampaign()">প্রকাশ করুন</button>
+      </div>
+    </div>
+  </div>
+
+  <footer id="theway-footer-mount" class="theway-footer"></footer>
+
+  <script src="assets/js/i18n.js"></script>
+  <script src="assets/js/components.js"></script>
+  <script src="assets/js/script.js"></script>
+  <script>
+    let activeCampaigns = [];
+    let currentPledgeId = null;
+
+    async function loadSolidarityRequests() {
+      try {
+        const res = await fetch('/api/network?action=solidarity');
+        const data = await res.json();
+        activeCampaigns = data.requests || [];
+        document.getElementById('sol-total-count').innerText = activeCampaigns.length;
+        renderCampaigns();
+      } catch (e) {
+        document.getElementById('solidarity-list').innerHTML = '<div style="color:var(--crimson-primary); text-align:center; padding:2rem;">তথ্য লোড করা যায়নি।</div>';
+      }
+    }
+
+    function renderCampaigns() {
+      const container = document.getElementById('solidarity-list');
+      if (!activeCampaigns.length) {
+        container.innerHTML = '<div style="color:rgba(255,255,255,0.4); text-align:center; padding:3rem;">বর্তমানে কোনো সংহতি আবেদন নেই।</div>';
+        return;
+      }
+
+      container.innerHTML = activeCampaigns.map(c => `
+        <div class="sol-card">
+          <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:1rem; margin-bottom:0.75rem;">
+            <div>
+              <div style="font-size:0.85rem; color:var(--crimson-primary,#c41230); font-weight:700; display:flex; align-items:center; gap:0.4rem;">
+                ${c.country_flag || '🌍'} ${c.organization} · ${c.country}
+              </div>
+              <h3 style="font-size:1.3rem; font-weight:800; color:#fff; margin-top:0.3rem;">${c.title}</h3>
+            </div>
+            <div style="text-align:end;">
+              <span style="display:inline-block; font-size:0.75rem; background:rgba(34,197,94,0.15); color:#4ade80; padding:0.25rem 0.75rem; border-radius:20px; font-weight:700;">
+                সক্রিয় আহ্বান
+              </span>
+              <div style="font-size:0.8rem; color:rgba(255,255,255,0.4); margin-top:0.35rem;">
+                ✊ ${c.pledges_count || 0} জন সংহতি জানিয়েছেন
+              </div>
+            </div>
+          </div>
+
+          <p style="color:rgba(255,255,255,0.75); line-height:1.6; font-size:0.95rem; margin-bottom:1.25rem;">
+            ${c.description}
+          </p>
+
+          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem; border-top:1px solid rgba(255,255,255,0.06); padding-top:1rem;">
+            <div style="display:flex; flex-wrap:wrap; gap:0.5rem; align-items:center;">
+              <span style="font-size:0.8rem; color:rgba(255,255,255,0.5);">প্রয়োজনীয় সহায়তা:</span>
+              ${(c.needs || []).map(n => `<span class="needs-tag">📌 ${n}</span>`).join('')}
+            </div>
+            <button class="btn-solid-crimson" style="padding:0.45rem 1.15rem; font-size:0.85rem;" onclick="openPledgeModal('${c.id}', '${c.title}')">
+              ✊ সংহতি জানান (Pledge Solidarity)
+            </button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function openPledgeModal(id, title) {
+      currentPledgeId = id;
+      document.getElementById('pledge-target-title').innerText = title;
+      document.getElementById('pledge-modal').style.display = 'flex';
+    }
+
+    function closePledgeModal() {
+      document.getElementById('pledge-modal').style.display = 'none';
+      currentPledgeId = null;
+    }
+
+    async function submitPledge() {
+      if (!currentPledgeId) return;
+      const name = document.getElementById('pledge-name').value.trim() || 'Comrade';
+      const type = document.getElementById('pledge-type').value;
+      const message = document.getElementById('pledge-message').value.trim();
+
+      try {
+        const res = await fetch('/api/network?action=pledge', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ requestId: currentPledgeId, supporterName: name, supportType: type, message })
+        });
+        const d = await res.json();
+        if (d.success) {
+          alert('লাল সালাম! আপনার সংহতি প্রতিজ্ঞা গৃহীত হয়েছে।');
+          closePledgeModal();
+          loadSolidarityRequests();
+        }
+      } catch (e) {
+        alert('প্রতিজ্ঞা জমা দিতে ত্রুটি হয়েছে।');
+      }
+    }
+
+    function openNewCampaignModal() {
+      document.getElementById('new-campaign-modal').style.display = 'flex';
+    }
+
+    function closeNewCampaignModal() {
+      document.getElementById('new-campaign-modal').style.display = 'none';
+    }
+
+    async function submitNewCampaign() {
+      const title = document.getElementById('new-sol-title').value.trim();
+      const org = document.getElementById('new-sol-org').value.trim();
+      const country = document.getElementById('new-sol-country').value.trim();
+      const desc = document.getElementById('new-sol-desc').value.trim();
+      const needsRaw = document.getElementById('new-sol-needs').value.trim();
+
+      if (!title || !org) {
+        alert('শিরোনাম ও সংগঠনের নাম পূরণ করুন।');
+        return;
+      }
+
+      const needs = needsRaw.split(',').map(s => s.trim()).filter(Boolean);
+
+      try {
+        const res = await fetch('/api/network?action=solidarity', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ title, organization: org, country, description: desc, needs })
+        });
+        const d = await res.json();
+        if (d.success) {
+          alert('সংহতি আবেদন সফলভাবে প্রকাশিত হয়েছে!');
+          closeNewCampaignModal();
+          loadSolidarityRequests();
+        }
+      } catch (e) {
+        alert('সংহতি আবেদন তৈরি করতে ব্যর্থ হয়েছে।');
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', loadSolidarityRequests);
+  </script>
+</body>
+</html>
