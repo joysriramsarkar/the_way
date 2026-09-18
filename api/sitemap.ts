@@ -1,8 +1,8 @@
 /**
- * api/sitemap.ts — Dynamic Multilingual XML Sitemap Generator
+ * api/sitemap.ts — Dynamic Multilingual XML Sitemap Generator using Neon PostgreSQL
  */
 
-import { createClient, SupabaseClient } from '@supabase/supabase-js';
+import sql from './_lib/db';
 import type { ApiRequest, ApiResponse } from '../types';
 
 function escapeXml(unsafe: string | null | undefined): string {
@@ -22,12 +22,6 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
   res.setHeader('Content-Type', 'application/xml; charset=utf-8');
   res.setHeader('Cache-Control', 'public, s-maxage=3600, stale-while-revalidate=7200');
 
-  let sb: SupabaseClient | null = null;
-  if (process.env.SUPABASE_URL && process.env.SUPABASE_SERVICE_KEY) {
-    try {
-      sb = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
-    } catch(e) {}
-  }
   const host = (req.headers && (req.headers['x-forwarded-host'] || req.headers.host)) || 'thewaysocialist.vercel.app';
   const proto = (req.headers && req.headers['x-forwarded-proto']) || 'https';
   const baseUrl = `${proto}://${host}`;
@@ -35,26 +29,21 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
   let articles: any[] = [];
   let sections: any[] = [];
 
-  if (sb) {
-    try {
-      const { data: artData } = await sb
-        .from('articles')
-        .select('slug, updated_at, published_at, title, hero_img_url')
-        .eq('status', 'published')
-        .or('is_deleted.is.null,is_deleted.eq.false')
-        .order('published_at', { ascending: false });
-      if (artData) articles = artData;
-    } catch(e) {}
+  try {
+    articles = await sql.query(`
+      SELECT slug, updated_at, published_at, title, hero_img_url
+      FROM articles
+      WHERE status = 'published' AND is_deleted = FALSE
+      ORDER BY published_at DESC;
+    `);
 
-    try {
-      const { data: secData } = await sb
-        .from('sections')
-        .select('slug, updated_at, created_at')
-        .eq('is_active', true)
-        .eq('is_deleted', false);
-      if (secData) sections = secData.filter((s: any) => s.slug && !s.slug.startsWith('__'));
-    } catch(e) {}
-  }
+    sections = await sql.query(`
+      SELECT slug, created_at
+      FROM sections
+      WHERE is_active = TRUE AND is_deleted = FALSE AND (locked = FALSE OR locked IS NULL)
+      ORDER BY display_order ASC;
+    `);
+  } catch(e) {}
 
   const now = new Date().toISOString();
 
@@ -129,8 +118,8 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
   <url>
     <loc>${baseUrl}/organizations</loc>
     <lastmod>${now}</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.75</priority>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
   </url>
   <!-- Languages -->
   <url>
@@ -139,21 +128,14 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
-  <!-- Resources -->
-  <url>
-    <loc>${baseUrl}/resource</loc>
-    <lastmod>${now}</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.85</priority>
-  </url>
 `;
 
   // Sections
   sections.forEach((s: any) => {
     if (s.slug) {
       xml += `  <url>
-    <loc>${baseUrl}/section/${escapeXml(s.slug)}</loc>
-    <lastmod>${s.updated_at || s.created_at || now}</lastmod>
+    <loc>${baseUrl}/section.html?sec=${escapeXml(s.slug)}</loc>
+    <lastmod>${s.created_at || now}</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>\n`;
@@ -163,7 +145,7 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
   // Articles
   articles.forEach((a: any) => {
     if (a.slug) {
-      const artUrl = `${baseUrl}/article/${escapeXml(a.slug)}`;
+      const artUrl = `${baseUrl}/article.html?slug=${escapeXml(a.slug)}`;
       const artDate = a.updated_at || a.published_at || now;
       xml += `  <url>
     <loc>${artUrl}</loc>

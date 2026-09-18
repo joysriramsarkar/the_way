@@ -1,9 +1,9 @@
 /**
- * api/article-seo.ts — Server-side SEO & OpenGraph renderer for articles
+ * api/article-seo.ts — Server-side SEO & OpenGraph renderer for articles using Neon PostgreSQL
  * Serves complete pre-rendered meta tags & HTML to crawlers & users for instant link previews
  */
 
-import { createClient, SupabaseClient } from '@supabase/supabase-js';
+import sql from './_lib/db';
 import fs from 'fs';
 import path from 'path';
 import type { ApiRequest, ApiResponse } from '../types';
@@ -23,9 +23,6 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
   const slug = (req.query?.slug as string) || '';
   const id   = (req.query?.id as string) || '';
 
-  const url = process.env.SUPABASE_URL || '';
-  const key = process.env.SUPABASE_SERVICE_KEY || '';
-  const sb: SupabaseClient = createClient(url, key);
   const host = (req.headers['x-forwarded-host'] as string) || (req.headers.host as string) || 'thewaysocialist.vercel.app';
   const proto = (req.headers['x-forwarded-proto'] as string) || 'https';
   const baseUrl = `${proto}://${host}`;
@@ -33,17 +30,15 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
   let article: any = null;
 
   try {
-    let query = sb.from('articles').select('*').or('is_deleted.is.null,is_deleted.eq.false');
     if (slug) {
-      query = query.eq('slug', slug).eq('status', 'published');
+      const rows = await sql.query('SELECT * FROM articles WHERE slug = $1 AND status = \'published\' AND is_deleted = FALSE LIMIT 1', [slug]);
+      if (rows && rows[0]) article = rows[0];
     } else if (id) {
-      query = query.eq('id', id);
+      const rows = await sql.query('SELECT * FROM articles WHERE id = $1 AND is_deleted = FALSE LIMIT 1', [id]);
+      if (rows && rows[0]) article = rows[0];
     }
-    const { data } = await query.maybeSingle();
-    if (data) article = data;
   } catch (err) {}
 
-  // Read the base article.html template from public/ with root fallback
   let html = '';
   try {
     let templatePath = path.join(process.cwd(), 'public', 'article.html');
@@ -56,7 +51,6 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
   } catch (e) {}
 
   if (!html) {
-    // If template file read fails in serverless, fallback redirect to /article.html
     const targetUrl = `/article.html?slug=${encodeURIComponent(slug)}`;
     if (typeof res.redirect === 'function') {
       return res.redirect(302, targetUrl);
@@ -77,10 +71,14 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
   const fullTitle = `${title} — The Way (দ্য ওয়ে)`;
   const desc = article.meta_description || article.deck || 'The Way (দ্য ওয়ে) — Insights, Stories & Heritage.';
   const canonicalUrl = `${baseUrl}/article/${article.slug || ''}`;
-  const imgUrl = article.hero_img_url || `${baseUrl}/img1.webp`;
+  const imgUrl = article.hero_img_url || `${baseUrl}/assets/images/img1.webp`;
   const publishedTime = article.published_at || article.created_at || new Date().toISOString();
   const modifiedTime = article.updated_at || article.published_at || article.created_at || new Date().toISOString();
-  const author = article.author || 'The Way (দ্য ওয়ে)';
+  const fictionalNames = ['অমিত দাশগুপ্ত', 'তানভীর হাসান', 'সৌমিক রায়হান', 'আহমেদ হাসান', 'Amit Dasgupta', 'Tanvir Hasan', 'Soumik Rayhan'];
+  let author = (article.author || '').trim();
+  if (!author || fictionalNames.some(f => author.toLowerCase().includes(f.toLowerCase()))) {
+    author = 'সম্পাদকীয়';
+  }
   const section = article.section || 'General';
 
   const schemaJson = JSON.stringify({
@@ -104,7 +102,7 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
       "name": "The Way (দ্য ওয়ে)",
       "logo": {
         "@type": "ImageObject",
-        "url": `${baseUrl}/logo.webp`
+        "url": `${baseUrl}/assets/images/favicon.svg`
       }
     },
     "articleSection": section
@@ -139,7 +137,6 @@ ${schemaJson}
   </script>
 `;
 
-  // Replace default title & description in head
   html = html.replace(/<title>[^<]*<\/title>/i, '');
   html = html.replace(/<meta name="description"[^>]*>/i, '');
   html = html.replace(/<head>/i, `<head>\n${metaTags}`);

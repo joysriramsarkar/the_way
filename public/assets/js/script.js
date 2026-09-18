@@ -273,12 +273,170 @@
     `;
   }
 
+  async function renderHomepagePeople() {
+    const mount = document.getElementById('homepage-people-grid');
+    if (!mount) return;
+
+    let people = [];
+    try {
+      const res = await fetch('/api/network?action=people');
+      if (res.ok) {
+        const d = await res.json();
+        people = d.profiles || [];
+      }
+    } catch(e) {}
+
+    if (people.length === 0) {
+      people = [
+        { name: 'সম্পাদকীয় পর্ষদ', role: 'দ্য ওয়ে কেন্দ্রীয় ব্যুরো', bio: 'মার্ক্সবাদী দর্শন ও আন্তর্জাতিক সংহতি প্ল্যাটফর্ম।', country: 'আন্তর্জাতিক', country_flag: '🚩' },
+        { name: 'অ্যাডমিন প্যানেল', role: 'প্রযুক্তি ও প্রকাশনা টিম', bio: 'মুক্ত প্রকাশনা, ডিজিটাল মহাফেজখানা ও যোগাযোগ নেটওয়ার্ক।', country: 'বাংলাদেশ', country_flag: '🇧🇩' },
+        { name: 'পাঠচক্র সমন্বয় পরিষদ', role: 'অধ্যয়ন ও বিস্তার', bio: 'স্থানীয় ও বৈশ্বিক পাঠচক্র সঞ্চালনা ও তাত্ত্বিক কর্মশালা।', country: 'আন্তর্জাতিক', country_flag: '✊' }
+      ];
+    }
+
+    mount.innerHTML = people.slice(0, 4).map(p => `
+      <div class="profile-card">
+        <div class="profile-card-avatar">
+          <span>${(p.name || 'TW')[0]}</span>
+        </div>
+        <div class="profile-card-name">${p.name}</div>
+        <div class="profile-card-location">
+          <span>${p.country_flag || '🚩'}</span>
+          <span>${p.country || 'আন্তর্জাতিক'}</span>
+        </div>
+        <div style="font-size:0.8rem; color:var(--gold-bright); font-weight:600; margin-bottom:0.4rem;">${p.role || 'Contributor'}</div>
+        <p style="font-size:0.8rem; color:rgba(255,255,255,0.6); line-height:1.4; margin-bottom:0.8rem;">${p.bio || ''}</p>
+        <div class="profile-card-actions">
+          <a href="/directory.html" class="btn-follow" style="text-align:center; text-decoration:none;">প্রোফাইল দেখুন</a>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  async function renderHomepageGroups() {
+    const mount = document.getElementById('homepage-groups-grid');
+    if (!mount) return;
+
+    let groups = [];
+    try {
+      const res = await fetch('/api/network?action=groups');
+      if (res.ok) {
+        const d = await res.json();
+        groups = d.groups || [];
+      }
+    } catch(e) {}
+
+    if (groups.length === 0) {
+      groups = [
+        { id: 'grp_1', name_bn: 'মার্ক্সবাদী রাজনৈতিক অর্থনীতি পাঠচক্র', category: 'Theory', members_count: 142, description: "দাস ক্যাপিটাল ও সাম্রাজ্যবাদ তত্ত্বের সাপ্তাহিক যৌথ পাঠ।" },
+        { id: 'grp_2', name_bn: 'বাংলা সমাজতান্ত্রিক পাঠশালা', category: 'Philosophy', members_count: 320, description: 'ঐতিহাসিক বস্তুবাদ ও উপমহাদেশের সমাজতান্ত্রিক আন্দোলনের ইতিহাস।' },
+        { id: 'grp_3', name_bn: 'শ্রমিক মুক্তি ও ট্রেড ইউনিয়ন সংহতি', category: 'Labor', members_count: 215, description: 'পোশাক শ্রমিক, কৃষক ও মেহনতি মানুষের অধিকার আন্দোলন।' }
+      ];
+    }
+
+    mount.innerHTML = groups.slice(0, 3).map(g => `
+      <div class="group-card">
+        <div class="group-card-icon">📚</div>
+        <div class="group-card-name">${g.name_bn || g.name}</div>
+        <div class="group-card-desc">${g.description || ''}</div>
+        <div class="group-card-stats">
+          <span class="group-card-stat"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg> ${g.members_count || 1} জন সদস্য</span>
+        </div>
+        <div class="group-card-langs">
+          <span class="lang-badge">${(g.lang || 'bn').toUpperCase()}</span>
+          <span class="ideology-tag">${g.category || 'Marxism'}</span>
+        </div>
+        <a href="/groups.html" class="btn-join-group" style="text-align:center; text-decoration:none; display:block;">যোগ দিন</a>
+      </div>
+    `).join('');
+  }
+
+  function renderHomepageEvents() {
+    const mount = document.getElementById('homepage-events-grid');
+    if (!mount) return;
+
+    const events = [
+      { title: 'Capital Vol. I পাঠচক্র — পর্ব ১', date: '২৫ সেপ্টেম্বর ২০২৬', time: 'রাত ৮টা (IST)', type: 'পাঠচক্র', lang: 'বাংলা', mode: 'অনলাইন' },
+      { title: 'State and Revolution Reading Group', date: '২৮ সেপ্টেম্বর ২০২৬', time: 'সন্ধ্যা ৬টা (UTC)', type: 'Study Circle', lang: 'English', mode: 'Online' },
+      { title: 'Labour Rights Webinar: Gig Economy', date: '২ অক্টোবর ২০২৬', time: 'বিকেল ৪টা (UTC)', type: 'Webinar', lang: 'English', mode: 'Online' }
+    ];
+
+    mount.innerHTML = events.map(e => `
+      <div class="event-card">
+        <span class="event-date-badge">📅 ${e.date} · ${e.time}</span>
+        <div class="event-card-title">${e.title}</div>
+        <div class="event-card-meta">
+          <span><span class="lang-badge">${e.lang}</span></span>
+        </div>
+        <div class="event-card-footer">
+          <span class="event-type-badge">${e.type}</span>
+          <span class="event-mode-badge">🌐 ${e.mode}</span>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  async function renderHomepageSolidarity() {
+    const mount = document.getElementById('solidarity-grid');
+    if (!mount) return;
+
+    let campaigns = [];
+    try {
+      const res = await fetch('/api/network?action=solidarity');
+      if (res.ok) {
+        const d = await res.json();
+        campaigns = d.requests || [];
+      }
+    } catch(e) {}
+
+    if (campaigns.length === 0) {
+      campaigns = [
+        {
+          id: 'sol_1',
+          title: 'Hellenic Steel Strike Solidarity',
+          organization: 'Hellenic Federation of Metalworkers',
+          country: 'Greece',
+          country_flag: '🇬🇷',
+          pledges_count: 28,
+          description: 'Workers striking for collective bargaining agreements, workplace safety guarantees, and wage indexation.'
+        },
+        {
+          id: 'sol_2',
+          title: 'আশুলিয়া পোশাক শ্রমিক আইনি প্রতিরক্ষা ও সহায়তা',
+          organization: 'বাংলাদেশ গার্মেন্টস শ্রমিক সংগ্রাম পরিষদ',
+          country: 'Bangladesh',
+          country_flag: '🇧🇩',
+          pledges_count: 45,
+          description: 'ন্যূনতম মজুরি ২৫,০০০ টাকা এবং মিথ্যা মামলা প্রত্যাহারের দাবিতে আন্দোলনরত শ্রমিকদের পাশে সংহতি।'
+        }
+      ];
+    }
+
+    mount.innerHTML = campaigns.slice(0, 2).map(c => `
+      <div class="sol-card" style="background: linear-gradient(145deg, rgba(20,8,8,0.9) 0%, rgba(15,5,5,0.95) 100%); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 1.25rem;">
+        <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:0.5rem; margin-bottom:0.5rem;">
+          <div>
+            <span style="font-size:0.8rem; color:var(--crimson-primary); font-weight:700;">${c.country_flag || '🚩'} ${c.organization} · ${c.country}</span>
+            <h3 style="font-size:1.15rem; font-weight:800; color:#fff; margin-top:0.2rem;">${c.title}</h3>
+          </div>
+          <span style="font-size:0.75rem; background:rgba(34,197,94,0.15); color:#4ade80; padding:0.2rem 0.6rem; border-radius:20px; font-weight:700;">✊ ${c.pledges_count || 0} জন সংহতি</span>
+        </div>
+        <p style="color:rgba(255,255,255,0.7); font-size:0.88rem; line-height:1.5; margin-bottom:1rem;">${c.description}</p>
+        <a href="/feed.html?type=solidarity_request" class="btn-solid-crimson" style="padding:0.4rem 0.9rem; font-size:0.8rem; text-decoration:none; display:inline-block;">সংহতি জানান →</a>
+      </div>
+    `).join('');
+  }
+
   async function initHomepage() {
     const articles = await loadArticles();
     renderHeroSection(articles);
     renderRevolutionaryQuote();
     renderSectionGrids(articles);
     renderBooksShowcase();
+    renderHomepagePeople();
+    renderHomepageGroups();
+    renderHomepageEvents();
+    renderHomepageSolidarity();
   }
 
   // Hook into language change
@@ -292,4 +450,4 @@
     initHomepage();
   }
 
-})();
+})();

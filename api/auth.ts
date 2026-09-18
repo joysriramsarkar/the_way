@@ -1,21 +1,13 @@
 /**
- * api/auth.ts — Authentication & User Management Engine
+ * api/auth.ts — Authentication & User Management Engine using Neon PostgreSQL
  * Handles: Login, Register, Session Verification, Logout, Password Change
- * Full multi-role account support with Supabase + Local persistent JSON fallback.
  */
 
-import { createClient } from '@supabase/supabase-js';
 import jwt from 'jsonwebtoken';
+import sql from './_lib/db';
 import { verifySession, requireAuth, hashPassword, verifyPassword } from './_lib/auth';
 import { logActivity } from './_lib/activity';
-import { findLocalUser, saveLocalUser } from './_lib/db-fallback';
-import type { ApiRequest, ApiResponse, SessionUser } from '../types';
-
-function getSupabase() {
-  const url = process.env.SUPABASE_URL || '';
-  const key = process.env.SUPABASE_SERVICE_KEY || '';
-  return createClient(url, key);
-}
+import type { ApiRequest, ApiResponse } from '../types';
 
 export default async function handler(req: ApiRequest, res: ApiResponse) {
   res.setHeader('Access-Control-Allow-Origin', (req.headers.origin as string) || '*');
@@ -26,103 +18,73 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
 
   const { action } = req.query as { action?: string };
 
-  // ── 1. ME (Session Check) ──────────────────────────────────────────
-  if (action === 'me') {
-    const s = await requireAuth(req, res);
-    if (!s) return;
-    return res.status(200).json({
-      user: {
-        email: s.email,
-        role: s.role,
-        name: s.name || s.email,
-        picture: s.picture || ''
+  try {
+    // ── 1. ME (Session Check) ──────────────────────────────────────────
+    if (action === 'me') {
+      const s = await requireAuth(req, res);
+      if (!s) return;
+      return res.status(200).json({
+        user: {
+          email: s.email,
+          role: s.role,
+          name: s.name || s.email,
+          picture: s.picture || ''
+        }
+      });
+    }
+
+    // ── 2. LOGOUT ──────────────────────────────────────────────────────
+    if (action === 'logout') {
+      const s = verifySession(req);
+      if (s) {
+        logActivity({
+          actor: s,
+          action: 'auth.logout',
+          category: 'auth',
+          summary: `${s.name || s.email} logged out`,
+          target_id: s.email,
+          target_name: s.email,
+          details: {},
+          req
+        }).catch(() => {});
       }
-    });
-  }
-
-  // ── 2. LOGOUT ──────────────────────────────────────────────────────
-  if (action === 'logout') {
-    const s = verifySession(req);
-    if (s) {
-      logActivity({
-        actor: s,
-        action: 'auth.logout',
-        category: 'auth',
-        summary: `${s.name || s.email} logged out`,
-        target_id: s.email,
-        target_name: s.email,
-        details: {},
-        req
-      }).catch(() => {});
-    }
-    res.setHeader('Set-Cookie', 'theway_session=; HttpOnly; Secure; SameSite=Strict; Max-Age=0; Path=/');
-    return res.status(200).json({ success: true });
-  }
-
-  // ── 3. REGISTER (New User / Contributor Account Creation) ──────────
-  if (action === 'register' && req.method === 'POST') {
-    const { name, email, password, role, bio } = req.body || {};
-
-    if (!name || !email || !password) {
-      return res.status(400).json({ error: 'নাম, ইমেইল এবং পাসওয়ার্ড আবশ্যক (Name, email and password are required).' });
+      res.setHeader('Set-Cookie', 'theway_session=; HttpOnly; Secure; SameSite=Strict; Max-Age=0; Path=/');
+      return res.status(200).json({ success: true });
     }
 
-    if (password.length < 6) {
-      return res.status(400).json({ error: 'পাসওয়ার্ড কমপক্ষে ৬ অক্ষরের হতে হবে (Password must be at least 6 characters).' });
-    }
+    // ── 3. REGISTER (New User / Contributor Account Creation) ──────────
+    if (action === 'register' && req.method === 'POST') {
+      const { name, email, password, role, bio } = req.body || {};
 
-    const emailNorm = String(email).trim().toLowerCase();
-    const nameNorm = String(name).trim();
-    const userRole = ['Admin', 'Moderator', 'Editor', 'Contributor', 'User'].includes(role) ? role : 'Contributor';
-    const pwdHash = hashPassword(password);
-    const secret = process.env.SESSION_SECRET || 'theway_revolutionary_portal_jwt_secret_key_2026';
+      if (!name || !email || !password) {
+        return res.status(400).json({ error: 'নাম, ইমেইল এবং পাসওয়ার্ড আবশ্যক (Name, email and password are required).' });
+      }
 
-    try {
-      const localExisting = findLocalUser(emailNorm);
-      if (localExisting) {
+      if (password.length < 6) {
+        return res.status(400).json({ error: 'পাসওয়ার্ড কমপক্ষে ৬ অক্ষরের হতে হবে (Password must be at least 6 characters).' });
+      }
+
+      const emailNorm = String(email).trim().toLowerCase();
+      const nameNorm = String(name).trim();
+      const userRole = ['Admin', 'Moderator', 'Editor', 'Contributor', 'User'].includes(role) ? role : 'Contributor';
+      const pwdHash = hashPassword(password);
+      const secret = process.env.SESSION_SECRET || 'theway_revolutionary_portal_jwt_secret_key_2026';
+
+      const existingRows = await sql.query('SELECT id, email, status FROM allowed_admins WHERE LOWER(email) = LOWER($1) LIMIT 1', [emailNorm]);
+      if (existingRows && existingRows.length > 0) {
         return res.status(400).json({
           error: 'এই ইমেইলটি ইতিমধ্যে নিবন্ধিত রয়েছে। অনুগ্রহ করে লগইন করুন।'
         });
       }
 
-      // Check against Supabase
-      try {
-        const sb = getSupabase();
-        const { data: existing } = await sb
-          .from('allowed_admins')
-          .select('id, email, status')
-          .ilike('email', emailNorm)
-          .maybeSingle();
+      const inserted = await sql.query(`
+        INSERT INTO allowed_admins (email, name, password_hash, role, bio, added_by, status)
+        VALUES ($1, $2, $3, $4, $5, 'self_registration', 'active')
+        RETURNING *;
+      `, [emailNorm, nameNorm, pwdHash, userRole, bio ? String(bio).trim() : 'দ্য ওয়ে নিয়মিত লেখক ও পাঠক']);
 
-        if (existing) {
-          return res.status(400).json({
-            error: 'এই ইমেইলটি ইতিমধ্যে নিবন্ধিত রয়েছে। অনুগ্রহ করে লগইন করুন।'
-          });
-        }
+      const created = inserted[0];
 
-        // Try insert into Supabase allowed_admins
-        await sb.from('allowed_admins').insert({
-          email: emailNorm,
-          role: userRole,
-          status: 'active',
-          added_by: 'self_registration'
-        });
-      } catch (sbErr: any) {
-        console.warn('[auth/register] Supabase notice:', sbErr?.message);
-      }
-
-      // Save into persistent local store
-      saveLocalUser({
-        email: emailNorm,
-        name: nameNorm,
-        password_hash: pwdHash,
-        role: userRole,
-        status: 'active',
-        bio: bio ? String(bio).trim() : 'দ্য ওয়ে নিয়মিত লেখক ও পাঠক',
-        added_by: 'self_registration'
-      });
-
-      // Create JWT session token
       const token = jwt.sign(
         {
           email: emailNorm,
@@ -160,69 +122,39 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
           role: userRole
         }
       });
-
-    } catch (err) {
-      console.error('[auth/register]', err);
-      return res.status(500).json({ error: 'নিবন্ধন প্রক্রিয়ায় ত্রুটি হয়েছে। আবার চেষ্টা করুন।' });
-    }
-  }
-
-  // ── 4. LOGIN (Email & Password Authentication) ─────────────────────
-  if (action === 'login' && req.method === 'POST') {
-    const { email, password } = req.body || {};
-    if (!email || !password) {
-      return res.status(400).json({ error: 'ইমেইল এবং পাসওয়ার্ড প্রদান করুন (Email and password are required).' });
     }
 
-    const emailNorm = String(email).trim().toLowerCase();
-    const primaryAdminEmail = (process.env.ADMIN_EMAIL || 'joysriram.sarkar.56@gmail.com').trim().toLowerCase();
-    const primaryAdminPassword = process.env.ADMIN_PASSWORD || 'theway@admin2026';
-    const secret = process.env.SESSION_SECRET || 'theway_revolutionary_portal_jwt_secret_key_2026';
+    // ── 4. LOGIN (Email & Password Authentication) ─────────────────────
+    if (action === 'login' && req.method === 'POST') {
+      const { email, password } = req.body || {};
+      if (!email || !password) {
+        return res.status(400).json({ error: 'ইমেইল এবং পাসওয়ার্ড প্রদান করুন (Email and password are required).' });
+      }
 
-    try {
+      const emailNorm = String(email).trim().toLowerCase();
+      const primaryAdminEmail = (process.env.ADMIN_EMAIL || 'joysriram.sarkar.56@gmail.com').trim().toLowerCase();
+      const primaryAdminPassword = process.env.ADMIN_PASSWORD || 'theway@admin2026';
+      const secret = process.env.SESSION_SECRET || 'theway_revolutionary_portal_jwt_secret_key_2026';
+
       let matchedUser: any = null;
       let isValidPassword = false;
 
-      // Check local user database first
-      const localUser = findLocalUser(emailNorm);
-      if (localUser) {
-        if (localUser.status !== 'active') {
-          return res.status(403).json({ error: 'এই অ্যাকাউন্টের অ্যাক্সেস স্থগিত বা নিষ্ক্রিয় রয়েছে।' });
+      const rows = await sql.query('SELECT * FROM allowed_admins WHERE LOWER(email) = LOWER($1) LIMIT 1', [emailNorm]);
+      const dbAdmin = rows[0];
+
+      if (dbAdmin) {
+        if (dbAdmin.status !== 'active') {
+          return res.status(403).json({ error: 'অ্যাকাউন্ট স্থগিত রয়েছে।' });
         }
-        if (localUser.password_hash && verifyPassword(password, localUser.password_hash)) {
+        matchedUser = dbAdmin;
+        if (dbAdmin.password_hash && verifyPassword(password, dbAdmin.password_hash)) {
           isValidPassword = true;
-          matchedUser = localUser;
+        } else if (password === primaryAdminPassword || password === 'theway@admin2026') {
+          isValidPassword = true;
         }
       }
 
-      // Check Supabase allowed_admins
-      if (!isValidPassword) {
-        try {
-          const sb = getSupabase();
-          const { data: dbAdmin } = await sb
-            .from('allowed_admins')
-            .select('*')
-            .ilike('email', emailNorm)
-            .maybeSingle();
-
-          if (dbAdmin) {
-            if (dbAdmin.status !== 'active') {
-              return res.status(403).json({ error: 'অ্যাকাউন্ট স্থগিত রয়েছে।' });
-            }
-
-            matchedUser = dbAdmin;
-            if (dbAdmin.password_hash && verifyPassword(password, dbAdmin.password_hash)) {
-              isValidPassword = true;
-            } else if (password === primaryAdminPassword || password === 'theway@admin2026') {
-              isValidPassword = true;
-            }
-          }
-        } catch (dbErr: any) {
-          console.warn('[auth/login] Supabase check notice:', dbErr?.message);
-        }
-      }
-
-      // Check master credentials
+      // Master credentials fallback for primary admin
       if (!isValidPassword && emailNorm === primaryAdminEmail && (password === primaryAdminPassword || password === 'theway@admin2026')) {
         isValidPassword = true;
         matchedUser = {
@@ -279,37 +211,20 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
           picture: matchedUser.picture || ''
         }
       });
-
-    } catch (err) {
-      console.error('[auth/login]', err);
-      return res.status(500).json({ error: 'লগইন প্রক্রিয়ায় ত্রুটি হয়েছে। আবার চেষ্টা করুন।' });
-    }
-  }
-
-  // ── 5. CHANGE PASSWORD ─────────────────────────────────────────────
-  if (action === 'change-password' && req.method === 'POST') {
-    const s = await requireAuth(req, res);
-    if (!s) return;
-
-    const { newPassword } = req.body || {};
-    if (!newPassword || newPassword.length < 6) {
-      return res.status(400).json({ error: 'পাসওয়ার্ড কমপক্ষে ৬ অক্ষরের হতে হবে।' });
     }
 
-    try {
-      const newHash = hashPassword(newPassword);
+    // ── 5. CHANGE PASSWORD ─────────────────────────────────────────────
+    if (action === 'change-password' && req.method === 'POST') {
+      const s = await requireAuth(req, res);
+      if (!s) return;
 
-      // Update local store
-      const localUser = findLocalUser(s.email);
-      if (localUser) {
-        saveLocalUser({ ...localUser, password_hash: newHash });
+      const { newPassword } = req.body || {};
+      if (!newPassword || newPassword.length < 6) {
+        return res.status(400).json({ error: 'পাসওয়ার্ড কমপক্ষে ৬ অক্ষরের হতে হবে।' });
       }
 
-      // Update Supabase if available
-      try {
-        const sb = getSupabase();
-        await sb.from('allowed_admins').update({ password_hash: newHash }).ilike('email', s.email);
-      } catch (e) {}
+      const newHash = hashPassword(newPassword);
+      await sql.query('UPDATE allowed_admins SET password_hash = $1 WHERE LOWER(email) = LOWER($2)', [newHash, s.email]);
 
       logActivity({
         actor: s,
@@ -323,12 +238,13 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
       }).catch(() => {});
 
       return res.status(200).json({ success: true, message: 'পাসওয়ার্ড সফলভাবে পরিবর্তন করা হয়েছে।' });
-    } catch (e: any) {
-      return res.status(500).json({ error: e?.message });
     }
-  }
 
-  return res.status(400).json({ error: 'Unknown action or method' });
+    return res.status(400).json({ error: 'Unknown action or method' });
+  } catch (err: any) {
+    console.error('[Auth Handler Error]:', err.message);
+    return res.status(500).json({ error: err.message });
+  }
 }
 
 module.exports = handler;

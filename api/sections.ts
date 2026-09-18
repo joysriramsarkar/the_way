@@ -1,16 +1,8 @@
 /**
- * /api/sections.ts — Full CRUD handler for the Sections feature.
- *
- * GET  ?status=active     Public — returns active, non-deleted, non-locked sections.
- * GET  ?status=all        Auth required — returns all sections (admin panel view).
- * POST                    Auth — create a new section.
- * PUT  ?id=<admin_id>     Auth — rename/re-slug a section.
- * PATCH ?id=<admin_id>    Auth — restore a trashed section.
- * DELETE ?id=<admin_id>             Auth — soft-delete (move to trash).
- * DELETE ?id=<admin_id>&mode=permanent  Auth — permanently delete.
+ * /api/sections.ts — Full CRUD and site layout handler using Neon PostgreSQL
  */
 
-import { createClient, SupabaseClient } from '@supabase/supabase-js';
+import sql from './_lib/db';
 import { verifySession, requireAuth, requireAdmin } from './_lib/auth';
 import { logActivity } from './_lib/activity';
 import type { ApiRequest, ApiResponse } from '../types';
@@ -35,978 +27,536 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
 
   if (req.method === 'OPTIONS') return res.status(200).end();
 
-  const url = process.env.SUPABASE_URL || '';
-  const key = process.env.SUPABASE_SERVICE_KEY || '';
-  const sb: SupabaseClient = createClient(url, key);
   const action = req.query && (req.query.action as string);
 
-  // ── MENU CONFIGURATION (GET / POST) ─────────────────────────────────────
-  if (action === 'menu') {
-    const DEFAULT_MENU_CONFIG = {
-      sectionsTitle: 'Sections',
-      seriesTitle: 'Featured series',
-      series: [
-        {
-          id: 'series-1',
-          title: 'Wondering',
-          href: '/section/findings',
-          description: 'A series of profound questions explored by The Way (দ্য ওয়ে) experts.',
-          enabled: true
-        }
-      ],
-      exploreTitle: 'Explore The Way (দ্য ওয়ে)',
-      explore: [
-        { id: 'exp-1', label: 'Solidarity Events', href: '/events.html', target: '_self', enabled: true },
-        { id: 'exp-2', label: 'Revolutionary Library', href: '/books.html', target: '_self', enabled: true },
-        { id: 'exp-3', label: 'Submit Essay', href: '/submit-article.html', target: '_self', enabled: true },
-        { id: 'exp-4', label: 'Manifestos & Archives', href: '/section.html?sec=manifestos-archives', target: '_self', enabled: true },
-        { id: 'exp-5', label: 'Editorial HQ', href: '/admin-login.html', target: '_self', enabled: true }
-      ],
-      latestTitle: 'Read the latest',
-      latestMode: 'curated',
-      latest: [
-        {
-          id: 'latest-1',
-          title: "For families in transition, 'not all traditions are equal'",
-          href: '/section/community-heritage',
-          imageUrl: 'img1.webp',
-          enabled: true
-        },
-        {
-          id: 'latest-2',
-          title: 'The art of the pen: How writing shapes cultural identity',
-          href: '/section/culture',
-          imageUrl: 'img3.webp',
-          enabled: true
-        }
-      ]
-    };
-
-    if (req.method === 'GET') {
-      try {
-        const { data } = await sb.from('site_settings').select('value').eq('key', 'navigation_menu_config').maybeSingle();
-        if (data && data.value) return res.status(200).json(data.value);
-      } catch (e) {}
-
-      // Fallback read from sections table
-      try {
-        const { data: sData } = await sb.from('sections').select('name').eq('admin_id', '__menu_config__').maybeSingle();
-        if (sData && sData.name) {
-          const parsed = JSON.parse(sData.name);
-          if (parsed && typeof parsed === 'object') return res.status(200).json(parsed);
-        }
-      } catch (e) {}
-
-      return res.status(200).json(DEFAULT_MENU_CONFIG);
-    }
-
-    if (req.method === 'POST') {
-      const session = await requireAuth(req, res);
-      if (!session) return;
-      const menuConfig = req.body || {};
-
-      let saved = false;
-      try {
-        const { error } = await sb.from('site_settings').upsert({
-          key: 'navigation_menu_config',
-          value: menuConfig,
-          updated_at: new Date().toISOString()
-        }, { onConflict: 'key' });
-        if (!error) saved = true;
-      } catch (err) {}
-
-      if (!saved) {
-        // Fallback save in sections table
-        try {
-          const { data: existing } = await sb.from('sections').select('id').eq('admin_id', '__menu_config__').maybeSingle();
-          if (existing) {
-            await sb.from('sections').update({
-              name: JSON.stringify(menuConfig),
-              slug: '__menu_config__',
-              display_order: 9999,
-              is_active: false,
-              locked: true,
-              is_deleted: true
-            }).eq('admin_id', '__menu_config__');
-          } else {
-            await sb.from('sections').insert({
-              admin_id: '__menu_config__',
-              name: JSON.stringify(menuConfig),
-              slug: '__menu_config__',
-              display_order: 9999,
-              is_active: false,
-              locked: true,
-              is_deleted: true
-            });
-          }
-        } catch (err: any) {
-          console.warn('[DB fallback save error]:', err?.message);
-        }
-      }
-      logActivity({
-        actor: session,
-        action: 'layout.menu_save',
-        category: 'layout',
-        summary: `${session.name || session.email} updated Navigation Menu configuration`,
-        target_id: 'navigation_menu_config',
-        target_name: 'Navigation Menu',
-        details: {},
-        req
-      }).catch(() => {});
-
-      return res.status(200).json({ ok: true, data: menuConfig });
-    }
-  }
-
-  // ── HEADER CONFIGURATION (GET / POST) ───────────────────────────────────
-  if (action === 'header') {
-    const DEFAULT_HEADER_CONFIG = {
-      siteTitle: 'The Way (দ্য ওয়ে)',
-      tabTagline: 'Insights, Stories & Heritage',
-      browserTabTitle: 'The Way (দ্য ওয়ে) — Insights, Stories & Heritage',
-      metaDescription: 'The Official Publication of The Way Society — Cambridge, Massachusetts.',
-      faviconUrl: '',
-      logoSvg: null,
-      logoHeight: 80,
-      enabledNavSections: null,
-      subsections: [
-        { id: 'sub-1', label: 'FAMILY LEGACY', href: '/section/community-heritage', icon: null, enabled: true },
-        { id: 'sub-2', label: 'EXPERIENCE', href: '/section/culture', icon: null, enabled: true },
-        { id: 'sub-3', label: 'RESEARCH & VALUES', href: '/section/privacy-values', icon: null, enabled: true },
-        { id: 'sub-4', label: 'PERSPECTIVES', href: '/section/opinion', icon: null, enabled: true }
-      ],
-      social: [
-        { id: 'soc-1', platform: 'instagram', label: 'Instagram', href: 'https://instagram.com', enabled: true },
-        { id: 'soc-2', platform: 'linkedin', label: 'LinkedIn', href: 'https://linkedin.com', enabled: true },
-        { id: 'soc-3', platform: 'tiktok', label: 'TikTok', href: 'https://tiktok.com', enabled: true },
-        { id: 'soc-4', platform: 'facebook', label: 'Facebook', href: 'https://facebook.com', enabled: true },
-        { id: 'soc-5', platform: 'youtube', label: 'YouTube', href: 'https://youtube.com', enabled: true }
-      ]
-    };
-
-    if (req.method === 'GET') {
-      try {
-        const { data } = await sb.from('site_settings').select('value').eq('key', 'site_header_config').maybeSingle();
-        if (data && data.value) return res.status(200).json(data.value);
-      } catch (e) {}
-
-      // Fallback read from sections table
-      try {
-        const { data: sData } = await sb.from('sections').select('name').eq('admin_id', '__header_config__').maybeSingle();
-        if (sData && sData.name) {
-          const parsed = JSON.parse(sData.name);
-          if (parsed && typeof parsed === 'object') return res.status(200).json(parsed);
-        }
-      } catch (e) {}
-
-      return res.status(200).json(DEFAULT_HEADER_CONFIG);
-    }
-
-    if (req.method === 'POST') {
-      const session = await requireAuth(req, res);
-      if (!session) return;
-      const headerConfig = req.body || {};
-
-      let saved = false;
-      try {
-        const { error } = await sb.from('site_settings').upsert({
-          key: 'site_header_config',
-          value: headerConfig,
-          updated_at: new Date().toISOString()
-        }, { onConflict: 'key' });
-        if (!error) saved = true;
-      } catch (err) {}
-
-      if (!saved) {
-        // Fallback save in sections table
-        try {
-          const { data: existing } = await sb.from('sections').select('id').eq('admin_id', '__header_config__').maybeSingle();
-          if (existing) {
-            await sb.from('sections').update({
-              name: JSON.stringify(headerConfig),
-              slug: '__header_config__',
-              display_order: 9998,
-              is_active: false,
-              locked: true,
-              is_deleted: true
-            }).eq('admin_id', '__header_config__');
-          } else {
-            await sb.from('sections').insert({
-              admin_id: '__header_config__',
-              name: JSON.stringify(headerConfig),
-              slug: '__header_config__',
-              display_order: 9998,
-              is_active: false,
-              locked: true,
-              is_deleted: true
-            });
-          }
-        } catch (err: any) {
-          console.warn('[DB fallback header save error]:', err?.message);
-        }
-      }
-
-      logActivity({
-        actor: session,
-        action: 'layout.header_save',
-        category: 'layout',
-        summary: `${session.name || session.email} updated Header configuration & site title`,
-        target_id: 'site_header_config',
-        target_name: 'Header Settings',
-        details: {},
-        req
-      }).catch(() => {});
-
-      return res.status(200).json({ ok: true, data: headerConfig });
-    }
-  }
-
-  // ── HOMEPAGE CONFIGURATION (GET / POST) ──────────────────────────────────
-  if (action === 'homepage') {
-    const DEFAULT_HOMEPAGE_CONFIG = {
-      hero: {
-        main: {
-          articleId: null,
-          title: 'Karl Marx and Historical Materialism: Understanding Class Struggle in Modern Capitalism.',
-          subtitle: 'An exclusive exploration of family heritage, intellectual tradition, and the enduring power of private knowledge.',
-          imageUrl: 'img1.webp',
-          href: '/section/findings',
-          enabled: true
-        },
-        sidebar: [
+  try {
+    // ── MENU CONFIGURATION ──────────────────────────────────────────────────
+    if (action === 'menu') {
+      const DEFAULT_MENU_CONFIG = {
+        sectionsTitle: 'Sections',
+        seriesTitle: 'Featured series',
+        series: [
           {
-            id: 'h-side-1',
+            id: 'series-1',
+            title: 'Wondering',
+            href: '/section/findings',
+            description: 'A series of profound questions explored by The Way (দ্য ওয়ে) experts.',
+            enabled: true
+          }
+        ],
+        exploreTitle: 'Explore The Way (দ্য ওয়ে)',
+        explore: [
+          { id: 'exp-1', label: 'Solidarity Events', href: '/events.html', target: '_self', enabled: true },
+          { id: 'exp-2', label: 'Revolutionary Library', href: '/books.html', target: '_self', enabled: true },
+          { id: 'exp-3', label: 'Submit Essay', href: '/submit-article.html', target: '_self', enabled: true },
+          { id: 'exp-4', label: 'Manifestos & Archives', href: '/section.html?sec=manifestos-archives', target: '_self', enabled: true },
+          { id: 'exp-5', label: 'Editorial HQ', href: '/admin-login.html', target: '_self', enabled: true }
+        ],
+        latestTitle: 'Read the latest',
+        latestMode: 'curated',
+        latest: [
+          {
+            id: 'latest-1',
+            title: "For families in transition, 'not all traditions are equal'",
+            href: '/section/community-heritage',
+            imageUrl: 'img1.webp',
+            enabled: true
+          },
+          {
+            id: 'latest-2',
+            title: 'The art of the pen: How writing shapes cultural identity',
+            href: '/section/culture',
+            imageUrl: 'img3.webp',
+            enabled: true
+          }
+        ]
+      };
+
+      if (req.method === 'GET') {
+        const rows = await sql.query('SELECT value FROM site_settings WHERE key = $1 LIMIT 1', ['navigation_menu_config']);
+        if (rows && rows[0] && rows[0].value) return res.status(200).json(rows[0].value);
+        return res.status(200).json(DEFAULT_MENU_CONFIG);
+      }
+
+      if (req.method === 'POST') {
+        const session = await requireAuth(req, res);
+        if (!session) return;
+        const menuConfig = req.body || {};
+
+        await sql.query(`
+          INSERT INTO site_settings (key, value, updated_at)
+          VALUES ($1, $2::jsonb, NOW())
+          ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value, updated_at = NOW();
+        `, ['navigation_menu_config', JSON.stringify(menuConfig)]);
+
+        logActivity({
+          actor: session,
+          action: 'layout.menu_save',
+          category: 'layout',
+          summary: `${session.name || session.email} updated Navigation Menu configuration`,
+          target_id: 'navigation_menu_config',
+          target_name: 'Navigation Menu',
+          details: {},
+          req
+        }).catch(() => {});
+
+        return res.status(200).json({ ok: true, data: menuConfig });
+      }
+    }
+
+    // ── HEADER CONFIGURATION ────────────────────────────────────────────────
+    if (action === 'header') {
+      const DEFAULT_HEADER_CONFIG = {
+        siteTitle: 'The Way (দ্য ওয়ে)',
+        tabTagline: 'Insights, Stories & Heritage',
+        browserTabTitle: 'The Way (দ্য ওয়ে) — Insights, Stories & Heritage',
+        metaDescription: 'The Official Publication of The Way Society — Cambridge, Massachusetts.',
+        faviconUrl: '',
+        logoSvg: null,
+        logoHeight: 80,
+        enabledNavSections: null,
+        subsections: [
+          { id: 'sub-1', label: 'FAMILY LEGACY', href: '/section/community-heritage', icon: null, enabled: true },
+          { id: 'sub-2', label: 'EXPERIENCE', href: '/section/culture', icon: null, enabled: true },
+          { id: 'sub-3', label: 'RESEARCH & VALUES', href: '/section/privacy-values', icon: null, enabled: true },
+          { id: 'sub-4', label: 'PERSPECTIVES', href: '/section/opinion', icon: null, enabled: true }
+        ],
+        social: [
+          { id: 'soc-1', platform: 'instagram', label: 'Instagram', href: 'https://instagram.com', enabled: true },
+          { id: 'soc-2', platform: 'linkedin', label: 'LinkedIn', href: 'https://linkedin.com', enabled: true },
+          { id: 'soc-3', platform: 'tiktok', label: 'TikTok', href: 'https://tiktok.com', enabled: true },
+          { id: 'soc-4', platform: 'facebook', label: 'Facebook', href: 'https://facebook.com', enabled: true },
+          { id: 'soc-5', platform: 'youtube', label: 'YouTube', href: 'https://youtube.com', enabled: true }
+        ]
+      };
+
+      if (req.method === 'GET') {
+        const rows = await sql.query('SELECT value FROM site_settings WHERE key = $1 LIMIT 1', ['site_header_config']);
+        if (rows && rows[0] && rows[0].value) return res.status(200).json(rows[0].value);
+        return res.status(200).json(DEFAULT_HEADER_CONFIG);
+      }
+
+      if (req.method === 'POST') {
+        const session = await requireAuth(req, res);
+        if (!session) return;
+        const headerConfig = req.body || {};
+
+        await sql.query(`
+          INSERT INTO site_settings (key, value, updated_at)
+          VALUES ($1, $2::jsonb, NOW())
+          ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value, updated_at = NOW();
+        `, ['site_header_config', JSON.stringify(headerConfig)]);
+
+        logActivity({
+          actor: session,
+          action: 'layout.header_save',
+          category: 'layout',
+          summary: `${session.name || session.email} updated Header configuration & site title`,
+          target_id: 'site_header_config',
+          target_name: 'Header Settings',
+          details: {},
+          req
+        }).catch(() => {});
+
+        return res.status(200).json({ ok: true, data: headerConfig });
+      }
+    }
+
+    // ── HOMEPAGE CONFIGURATION ──────────────────────────────────────────────
+    if (action === 'homepage') {
+      const DEFAULT_HOMEPAGE_CONFIG = {
+        hero: {
+          main: {
             articleId: null,
-            title: 'Lenin and the Theory of Imperialism: How Finance Capital Dominates Global Trade',
-            description: 'From the Paris Commune to October 1917: Lessons of working-class governance and power',
-            imageUrl: 'img5.webp',
-            tag: 'Heritage Archive',
+            title: 'Karl Marx and Historical Materialism: Understanding Class Struggle in Modern Capitalism.',
+            subtitle: 'An exclusive exploration of family heritage, intellectual tradition, and the enduring power of private knowledge.',
+            imageUrl: 'img1.webp',
+            href: '/section/findings',
+            enabled: true
+          },
+          sidebar: [
+            {
+              id: 'h-side-1',
+              articleId: null,
+              title: 'Lenin and the Theory of Imperialism: How Finance Capital Dominates Global Trade',
+              description: 'From the Paris Commune to October 1917: Lessons of working-class governance and power',
+              imageUrl: 'img5.webp',
+              tag: 'Heritage Archive',
+              href: '/section/community-heritage',
+              enabled: true
+            },
+            {
+              id: 'h-side-2',
+              articleId: null,
+              title: 'Stalin’s Problems of Leninism: Preserving the Dictatorship of the Proletariat',
+              description: "The family's influence on culture, art, and intellectual discourse runs deeper than most realize",
+              imageUrl: 'img6.webp',
+              tag: '',
+              href: '/section/culture',
+              enabled: true
+            }
+          ]
+        },
+        smallArticles: [
+          {
+            id: 'sm-1',
+            articleId: null,
+            title: 'Mao Zedong and the Cultural Revolution: Ideological Struggle Under Socialism',
+            imageUrl: 'img2.webp',
             href: '/section/community-heritage',
             enabled: true
           },
           {
-            id: 'h-side-2',
+            id: 'sm-2',
             articleId: null,
-            title: 'Stalin’s Problems of Leninism: Preserving the Dictatorship of the Proletariat',
-            description: "The family's influence on culture, art, and intellectual discourse runs deeper than most realize",
-            imageUrl: 'img6.webp',
-            tag: '',
+            title: 'Why handwritten correspondence is making a private comeback',
+            imageUrl: 'img3.webp',
             href: '/section/culture',
             enabled: true
-          }
-        ]
-      },
-      smallArticles: [
-        {
-          id: 'sm-1',
-          articleId: null,
-          title: 'Mao Zedong and the Cultural Revolution: Ideological Struggle Under Socialism',
-          imageUrl: 'img2.webp',
-          href: '/section/community-heritage',
-          enabled: true
-        },
-        {
-          id: 'sm-2',
-          articleId: null,
-          title: 'Why handwritten correspondence is making a private comeback',
-          imageUrl: 'img3.webp',
-          href: '/section/culture',
-          enabled: true
-        },
-        {
-          id: 'sm-3',
-          articleId: null,
-          title: 'Engels on the Origin of the Family, Private Property, and the State',
-          imageUrl: 'img4.webp',
-          href: '/section/privacy-values',
-          enabled: true
-        }
-      ],
-      eventsSection: {
-        eventsHeading: 'Upcoming Events',
-        seeAllText: 'See all events',
-        seeAllHref: '/events',
-        events: [
-          {
-            id: 'ev-1',
-            date: 'Sep. 22, 2026',
-            title: 'Debate, Debrief, and Dissect: The Role of Privacy in the Modern Family and American Life',
-            meta: '4 p.m. Thursday ■ International Anti-Imperialist Forum, Geneva & Livestream',
-            href: '/events',
-            enabled: true
           },
           {
-            id: 'ev-2',
-            date: 'Oct. 16, 2026',
-            title: 'Global Labor Strike and Multipolar Economic Solidarity',
-            meta: '4 p.m. Friday ■ Socialist Research Institute, Global Hub',
-            href: '/events',
-            enabled: true
-          },
-          {
-            id: 'ev-3',
-            date: 'Nov. 12, 2026',
-            title: 'Winter Symposium on Archival Preservation and Family Documentation',
-            meta: '2 p.m. Thursday ■ Cambridge Heritage Library & Virtual Room A',
-            href: '/events',
-            enabled: true
-          },
-          {
-            id: 'ev-4',
-            date: 'Dec. 04, 2026',
-            title: 'International Socialist Revolutionary Literature & Dialectics Awards',
-            meta: '6 p.m. Friday ■ Grand Ballroom, The Way Society',
-            href: '/events',
+            id: 'sm-3',
+            articleId: null,
+            title: 'Engels on the Origin of the Family, Private Property, and the State',
+            imageUrl: 'img4.webp',
+            href: '/section/privacy-values',
             enabled: true
           }
         ],
-        featured: {
-          articleId: null,
-          title: "Rubies decoded: 'Heritage is just one piece of the puzzle'",
-          description: 'Rare archival manifestos shine in new Socialist retrospective',
-          imageUrl: 'img5.webp',
-          href: '/section/community-heritage',
-          enabled: true
-        }
-      },
-      allNews: {
-        heading: 'All News',
-        columns: [
-          {
-            id: 'col-1',
-            label: 'COMMUNITY & HERITAGE',
-            sectionSlug: 'community-heritage',
-            lead: {
-              articleId: null,
-              title: "Karl Marx and Friedrich Engels on Scientific Socialism vs Utopianism",
-              imageUrl: 'img2.webp',
-              href: '/section/community-heritage',
+        eventsSection: {
+          eventsHeading: 'Upcoming Events',
+          seeAllText: 'See all events',
+          seeAllHref: '/events.html',
+          events: [
+            {
+              id: 'ev-1',
+              date: 'Sep. 22, 2026',
+              title: 'Debate, Debrief, and Dissect: The Role of Privacy in the Modern Family and American Life',
+              meta: '4 p.m. Thursday ■ International Anti-Imperialist Forum, Geneva & Livestream',
+              href: '/events.html',
               enabled: true
             },
-            subArticles: [
-              { id: 'sub-1-1', title: 'Elena Voss named curator of The Way Foundation for Letters', href: '/section/community-heritage', enabled: true },
-              { id: 'sub-1-2', title: 'Family council opposes changes to federal heritage-protection programs', href: '/section/community-heritage', enabled: true },
-              { id: 'sub-1-3', title: "Henry's remarkable legacy of giving: what it means to the family today", href: '/section/community-heritage', enabled: true },
-              { id: 'sub-1-4', title: 'Lenin and Stalin: Documents from the Bolshevik Central Committee Archive', href: '/section/community-heritage', enabled: true }
-            ]
-          },
-          {
-            id: 'col-2',
-            label: 'CULTURE',
-            sectionSlug: 'culture',
-            lead: {
-              articleId: null,
-              title: "Mao Zedong on Culture, Art, and the Proletarian Revolutionary Struggle",
-              imageUrl: 'img1.webp',
-              href: '/section/culture',
+            {
+              id: 'ev-2',
+              date: 'Oct. 16, 2026',
+              title: 'Global Labor Strike and Multipolar Economic Solidarity',
+              meta: '4 p.m. Friday ■ Socialist Research Institute, Global Hub',
+              href: '/events.html',
               enabled: true
-            },
-            subArticles: [
-              { id: 'sub-2-1', title: 'Digital labor and socialist alternatives in the age of artificial intelligence', href: '/section/culture', enabled: true },
-              { id: 'sub-2-2', title: 'Revolutionary working-class poetry and international anti-war art', href: '/section/culture', enabled: true },
-              { id: 'sub-2-3', title: 'Songs of liberation and solidarity: The global heritage of socialist music', href: '/section/culture', enabled: true }
-            ]
-          },
-          {
-            id: 'col-3',
-            label: 'PRIVACY & VALUES',
-            sectionSlug: 'privacy-values',
-            lead: {
-              articleId: null,
-              title: 'Do you have a private AI secret?',
-              imageUrl: 'img4.webp',
-              href: '/section/privacy-values',
-              enabled: true
-            },
-            subArticles: [
-              { id: 'sub-3-1', title: 'Families alone, yes. But watching the community is another thing.', href: '/section/privacy-values', enabled: true },
-              { id: 'sub-3-2', title: 'The class nature of the bourgeois state apparatus: Lenin’s State and Revolution', href: '/section/privacy-values', enabled: true },
-              { id: 'sub-3-3', title: 'Organizing the unorganized: The rise of new militant trade unions globally', href: '/section/privacy-values', enabled: true }
-            ]
-          },
-          {
-            id: 'col-4',
-            label: 'NATION & WORLD',
-            sectionSlug: 'nation-world',
-            lead: {
-              articleId: null,
-              title: 'The Palestinian struggle and the international anti-imperialist solidarity movement',
-              imageUrl: 'img6.webp',
-              href: '/section/nation-world',
-              enabled: true
-            },
-            subArticles: [
-              { id: 'sub-4-1', title: 'Exposing neo-colonial finance capital: IMF, World Bank, and Global South resistance', href: '/section/nation-world', enabled: true },
-              { id: 'sub-4-2', title: 'De-dollarization and multipolar socialist cooperation in the Global South', href: '/section/nation-world', enabled: true }
-            ]
-          },
-          {
-            id: 'col-5',
-            label: 'ARTS & LEGACY',
-            sectionSlug: 'arts-legacy',
-            lead: {
-              articleId: null,
-              title: 'New research shows writing by hand preserves memory and sharpens intellect',
-              imageUrl: 'img3.webp',
-              href: '/section/arts-legacy',
-              enabled: true
-            },
-            subArticles: [
-              { id: 'sub-5-1', title: 'Gramsci’s Prison Notebooks: Cultural hegemony and the battle of ideas', href: '/section/arts-legacy', enabled: true },
-              { id: 'sub-5-2', title: 'Novelist argues the world needs more well-written letters, not fewer', href: '/section/arts-legacy', enabled: true },
-              { id: 'sub-5-3', title: 'Turnover at The Way Society demands that cultural legacy must be paid.', href: '/section/arts-legacy', enabled: true }
-            ]
-          },
-          {
-            id: 'col-6',
-            label: 'WORK & ECONOMY',
-            sectionSlug: 'work-economy',
-            lead: {
-              articleId: null,
-              title: 'The labor theory of value: Why workers create all societal wealth',
-              imageUrl: 'img5.webp',
-              href: '/section/work-economy',
-              enabled: true
-            },
-            subArticles: [
-              { id: 'sub-6-1', title: "Agrarian reform and peasant movements: Lessons from the Chinese Revolution", href: '/section/work-economy', enabled: true },
-              { id: 'sub-6-2', title: 'The Way economy advisor talks to the state of family wealth', href: '/section/work-economy', enabled: true },
-              { id: 'sub-6-3', title: 'Critique of the Gotha Programme: From each according to ability, to each according to need', href: '/section/work-economy', enabled: true }
-            ]
+            }
+          ],
+          featured: {
+            articleId: null,
+            title: "Rubies decoded: 'Heritage is just one piece of the puzzle'",
+            description: 'Rare archival manifestos shine in new Socialist retrospective',
+            imageUrl: 'img5.webp',
+            href: '/section/community-heritage',
+            enabled: true
           }
-        ]
-      }
-    };
-
-    if (req.method === 'GET') {
-      try {
-        const { data } = await sb.from('site_settings').select('value').eq('key', 'site_homepage_config').maybeSingle();
-        if (data && data.value) return res.status(200).json(data.value);
-      } catch (e) {}
-
-      // Fallback read from sections table
-      try {
-        const { data: sData } = await sb.from('sections').select('name').eq('admin_id', '__homepage_config__').maybeSingle();
-        if (sData && sData.name) {
-          const parsed = JSON.parse(sData.name);
-          if (parsed && typeof parsed === 'object') return res.status(200).json(parsed);
         }
-      } catch (e) {}
-
-      return res.status(200).json(DEFAULT_HOMEPAGE_CONFIG);
-    }
-
-    if (req.method === 'POST') {
-      const session = await requireAuth(req, res);
-      if (!session) return;
-      const homepageConfig = req.body || {};
-
-      let saved = false;
-      try {
-        const { error } = await sb.from('site_settings').upsert({
-          key: 'site_homepage_config',
-          value: homepageConfig,
-          updated_at: new Date().toISOString()
-        }, { onConflict: 'key' });
-        if (!error) saved = true;
-      } catch (err) {}
-
-      if (!saved) {
-        // Fallback save in sections table
-        try {
-          const { data: existing } = await sb.from('sections').select('id').eq('admin_id', '__homepage_config__').maybeSingle();
-          if (existing) {
-            await sb.from('sections').update({
-              name: JSON.stringify(homepageConfig),
-              slug: '__homepage_config__',
-              display_order: 9997,
-              is_active: false,
-              locked: true,
-              is_deleted: true
-            }).eq('admin_id', '__homepage_config__');
-          } else {
-            await sb.from('sections').insert({
-              admin_id: '__homepage_config__',
-              name: JSON.stringify(homepageConfig),
-              slug: '__homepage_config__',
-              display_order: 9997,
-              is_active: false,
-              locked: true,
-              is_deleted: true
-            });
-          }
-        } catch (err: any) {
-          console.warn('[DB fallback homepage save error]:', err?.message);
-        }
-      }
-
-      logActivity({
-        actor: session,
-        action: 'layout.homepage_save',
-        category: 'layout',
-        summary: `${session.name || session.email} updated Homepage builder configuration (Hero, Events, Series)`,
-        target_id: 'site_homepage_config',
-        target_name: 'Homepage Builder',
-        details: {},
-        req
-      }).catch(() => {});
-
-      return res.status(200).json({ ok: true, data: homepageConfig });
-    }
-  }
-
-  // ── FOOTER CONFIGURATION (GET / POST) ───────────────────────────────────
-  if (action === 'footer') {
-    const DEFAULT_FOOTER_CONFIG = {
-      sectionsTitle: 'Sections',
-      enabledSections: null,
-      exploreTitle: 'Explore The Way (দ্য ওয়ে)',
-      explore: [
-        { id: 'f-exp-1', label: 'Events', href: '/events', target: '_self', enabled: true },
-        { id: 'f-exp-2', label: 'Article archive', href: '/', target: '_self', enabled: true },
-        { id: 'f-exp-3', label: 'About us', href: '/', target: '_self', enabled: true },
-        { id: 'f-exp-4', label: 'News+', href: '/', target: '_self', enabled: true },
-        { id: 'f-exp-5', label: 'Podcast', href: '/', target: '_self', enabled: true }
-      ],
-      seriesTitle: 'Our recent series',
-      series: [
-        {
-          id: 'f-ser-1',
-          title: 'Wondering',
-          href: '/section/findings',
-          description: 'A series of profound questions explored by The Way (দ্য ওয়ে) experts.',
-          enabled: true
-        },
-        {
-          id: 'f-ser-2',
-          title: 'Life | Heritage',
-          href: '/section/community-heritage',
-          description: 'A theoretical series exploring the core principles of Marxist-Leninist thought.',
-          enabled: true
-        }
-      ],
-      socialTitle: 'Follow us on',
-      social: [
-        { id: 'f-soc-1', platform: 'instagram', label: 'Instagram', href: 'https://instagram.com', enabled: true },
-        { id: 'f-soc-2', platform: 'linkedin', label: 'LinkedIn', href: 'https://linkedin.com', enabled: true },
-        { id: 'f-soc-3', platform: 'tiktok', label: 'TikTok', href: 'https://tiktok.com', enabled: true },
-        { id: 'f-soc-4', platform: 'facebook', label: 'Facebook', href: 'https://facebook.com', enabled: true },
-        { id: 'f-soc-5', platform: 'youtube', label: 'YouTube', href: 'https://youtube.com', enabled: true },
-        { id: 'f-soc-6', platform: 'email', label: 'Email', href: 'mailto:contact@theway-socialism.org', enabled: true }
-      ],
-      logoSvg: '',
-      logoHeight: 80,
-      tagline: 'The Official Publication of The Way Society — Cambridge, Massachusetts',
-      copyright: '© 2026 The Way (দ্য ওয়ে). All rights reserved.',
-      bottomLinks: [
-        { id: 'f-bot-1', label: 'For Media & Journalists', href: '#', target: '_self', enabled: true },
-        { id: 'f-bot-2', label: 'Family News & Archives', href: '#', target: '_self', enabled: true },
-        { id: 'f-bot-3', label: 'Digital Accessibility', href: '#', target: '_self', enabled: true },
-        { id: 'f-bot-4', label: 'Privacy Policy', href: '#', target: '_self', enabled: true },
-        { id: 'f-bot-5', label: 'Trademark', href: '#', target: '_self', enabled: true }
-      ]
-    };
-
-    if (req.method === 'GET') {
-      try {
-        const { data } = await sb.from('site_settings').select('value').eq('key', 'site_footer_config').maybeSingle();
-        if (data && data.value) return res.status(200).json(data.value);
-      } catch (e) {}
-
-      // Fallback read from sections table
-      try {
-        const { data: sData } = await sb.from('sections').select('name').eq('admin_id', '__footer_config__').maybeSingle();
-        if (sData && sData.name) {
-          const parsed = JSON.parse(sData.name);
-          if (parsed && typeof parsed === 'object') return res.status(200).json(parsed);
-        }
-      } catch (e) {}
-
-      return res.status(200).json(DEFAULT_FOOTER_CONFIG);
-    }
-
-    if (req.method === 'POST') {
-      const session = await requireAuth(req, res);
-      if (!session) return;
-      const footerConfig = req.body || {};
-
-      let saved = false;
-      try {
-        const { error } = await sb.from('site_settings').upsert({
-          key: 'site_footer_config',
-          value: footerConfig,
-          updated_at: new Date().toISOString()
-        }, { onConflict: 'key' });
-        if (!error) saved = true;
-      } catch (err) {}
-
-      if (!saved) {
-        // Fallback save in sections table
-        try {
-          const { data: existing } = await sb.from('sections').select('id').eq('admin_id', '__footer_config__').maybeSingle();
-          if (existing) {
-            await sb.from('sections').update({
-              name: JSON.stringify(footerConfig),
-              slug: '__footer_config__',
-              display_order: 9996,
-              is_active: false,
-              locked: true,
-              is_deleted: true
-            }).eq('admin_id', '__footer_config__');
-          } else {
-            await sb.from('sections').insert({
-              admin_id: '__footer_config__',
-              name: JSON.stringify(footerConfig),
-              slug: '__footer_config__',
-              display_order: 9996,
-              is_active: false,
-              locked: true,
-              is_deleted: true
-            });
-          }
-        } catch (err: any) {
-          console.warn('[DB fallback footer save error]:', err?.message);
-        }
-      }
-
-      logActivity({
-        actor: session,
-        action: 'layout.footer_save',
-        category: 'layout',
-        summary: `${session.name || session.email} updated Footer layout configuration`,
-        target_id: 'site_footer_config',
-        target_name: 'Footer Layout',
-        details: {},
-        req
-      }).catch(() => {});
-
-      return res.status(200).json({ ok: true, data: footerConfig });
-    }
-  }
-
-  // ── INDIVIDUAL SECTION CUSTOM CONFIGURATION (GET / POST) ────────────────
-  if (action === 'section-config') {
-    const slug = (req.query && (req.query.slug as string)) || (req.body && req.body.slug) || 'all';
-
-    if (req.method === 'GET') {
-      let allConfigs: Record<string, any> = {};
-      try {
-        const { data } = await sb.from('site_settings').select('value').eq('key', 'sections_custom_configs').maybeSingle();
-        if (data && data.value && typeof data.value === 'object') {
-          allConfigs = data.value;
-        }
-      } catch (e) {}
-
-      if (Object.keys(allConfigs).length === 0) {
-        try {
-          const { data: sData } = await sb.from('sections').select('name').eq('admin_id', '__section_configs__').maybeSingle();
-          if (sData && sData.name) {
-            const parsed = JSON.parse(sData.name);
-            if (parsed && typeof parsed === 'object') allConfigs = parsed;
-          }
-        } catch (e) {}
-      }
-
-      if (req.query.all === '1' || !req.query.slug) {
-        return res.status(200).json(allConfigs);
-      }
-      return res.status(200).json(allConfigs[slug] || {
-        featuredArticleId: null,
-        selectedArticleIds: [],
-        customTitle: '',
-        description: ''
-      });
-    }
-
-    if (req.method === 'POST') {
-      const session = await requireAuth(req, res);
-      if (!session) return;
-
-      const payload = req.body || {};
-      let allConfigs: Record<string, any> = {};
-      try {
-        const { data } = await sb.from('site_settings').select('value').eq('key', 'sections_custom_configs').maybeSingle();
-        if (data && data.value && typeof data.value === 'object') {
-          allConfigs = data.value;
-        }
-      } catch (e) {}
-
-      if (Object.keys(allConfigs).length === 0) {
-        try {
-          const { data: sData } = await sb.from('sections').select('name').eq('admin_id', '__section_configs__').maybeSingle();
-          if (sData && sData.name) {
-            const parsed = JSON.parse(sData.name);
-            if (parsed && typeof parsed === 'object') allConfigs = parsed;
-          }
-        } catch (e) {}
-      }
-
-      allConfigs[slug] = {
-        featuredArticleId: payload.featuredArticleId || null,
-        selectedArticleIds: Array.isArray(payload.selectedArticleIds) ? payload.selectedArticleIds.slice(0, 4) : [],
-        customTitle: payload.customTitle || '',
-        description: payload.description || '',
-        updatedAt: new Date().toISOString()
       };
 
-      let saved = false;
-      try {
-        const { error } = await sb.from('site_settings').upsert({
-          key: 'sections_custom_configs',
-          value: allConfigs,
-          updated_at: new Date().toISOString()
-        }, { onConflict: 'key' });
-        if (!error) saved = true;
-      } catch (err: any) {
-        console.warn('[Sections config save error]:', err?.message);
+      if (req.method === 'GET') {
+        const rows = await sql.query('SELECT value FROM site_settings WHERE key = $1 LIMIT 1', ['site_homepage_config']);
+        if (rows && rows[0] && rows[0].value) return res.status(200).json(rows[0].value);
+        return res.status(200).json(DEFAULT_HOMEPAGE_CONFIG);
       }
 
-      // Fallback save in sections table
-      try {
-        const { data: existing } = await sb.from('sections').select('id').eq('admin_id', '__section_configs__').maybeSingle();
-        if (existing) {
-          await sb.from('sections').update({
-            name: JSON.stringify(allConfigs),
-            slug: '__section_configs__',
-            display_order: 9995,
-            is_active: false,
-            locked: true,
-            is_deleted: true
-          }).eq('admin_id', '__section_configs__');
-        } else {
-          await sb.from('sections').insert({
-            admin_id: '__section_configs__',
-            name: JSON.stringify(allConfigs),
-            slug: '__section_configs__',
-            display_order: 9995,
-            is_active: false,
-            locked: true,
-            is_deleted: true
-          });
+      if (req.method === 'POST') {
+        const session = await requireAuth(req, res);
+        if (!session) return;
+        const homepageConfig = req.body || {};
+
+        await sql.query(`
+          INSERT INTO site_settings (key, value, updated_at)
+          VALUES ($1, $2::jsonb, NOW())
+          ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value, updated_at = NOW();
+        `, ['site_homepage_config', JSON.stringify(homepageConfig)]);
+
+        logActivity({
+          actor: session,
+          action: 'layout.homepage_save',
+          category: 'layout',
+          summary: `${session.name || session.email} updated Homepage builder configuration`,
+          target_id: 'site_homepage_config',
+          target_name: 'Homepage Builder',
+          details: {},
+          req
+        }).catch(() => {});
+
+        return res.status(200).json({ ok: true, data: homepageConfig });
+      }
+    }
+
+    // ── FOOTER CONFIGURATION ────────────────────────────────────────────────
+    if (action === 'footer') {
+      const DEFAULT_FOOTER_CONFIG = {
+        sectionsTitle: 'Sections',
+        enabledSections: null,
+        exploreTitle: 'Explore The Way (দ্য ওয়ে)',
+        explore: [
+          { id: 'f-exp-1', label: 'Events', href: '/events.html', target: '_self', enabled: true },
+          { id: 'f-exp-2', label: 'Article archive', href: '/', target: '_self', enabled: true },
+          { id: 'f-exp-3', label: 'About us', href: '/', target: '_self', enabled: true }
+        ],
+        seriesTitle: 'Our recent series',
+        series: [
+          {
+            id: 'f-ser-1',
+            title: 'Wondering',
+            href: '/section/findings',
+            description: 'A series of profound questions explored by The Way (দ্য ওয়ে) experts.',
+            enabled: true
+          }
+        ],
+        socialTitle: 'Follow us on',
+        social: [
+          { id: 'f-soc-1', platform: 'instagram', label: 'Instagram', href: 'https://instagram.com', enabled: true },
+          { id: 'f-soc-2', platform: 'linkedin', label: 'LinkedIn', href: 'https://linkedin.com', enabled: true }
+        ],
+        logoSvg: '',
+        logoHeight: 80,
+        tagline: 'The Official Publication of The Way Society',
+        copyright: '© 2026 The Way (দ্য ওয়ে). All rights reserved.',
+        bottomLinks: [
+          { id: 'f-bot-4', label: 'Privacy Policy', href: '#', target: '_self', enabled: true }
+        ]
+      };
+
+      if (req.method === 'GET') {
+        const rows = await sql.query('SELECT value FROM site_settings WHERE key = $1 LIMIT 1', ['site_footer_config']);
+        if (rows && rows[0] && rows[0].value) return res.status(200).json(rows[0].value);
+        return res.status(200).json(DEFAULT_FOOTER_CONFIG);
+      }
+
+      if (req.method === 'POST') {
+        const session = await requireAuth(req, res);
+        if (!session) return;
+        const footerConfig = req.body || {};
+
+        await sql.query(`
+          INSERT INTO site_settings (key, value, updated_at)
+          VALUES ($1, $2::jsonb, NOW())
+          ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value, updated_at = NOW();
+        `, ['site_footer_config', JSON.stringify(footerConfig)]);
+
+        logActivity({
+          actor: session,
+          action: 'layout.footer_save',
+          category: 'layout',
+          summary: `${session.name || session.email} updated Footer layout configuration`,
+          target_id: 'site_footer_config',
+          target_name: 'Footer Layout',
+          details: {},
+          req
+        }).catch(() => {});
+
+        return res.status(200).json({ ok: true, data: footerConfig });
+      }
+    }
+
+    // ── SECTION CUSTOM CONFIG ───────────────────────────────────────────────
+    if (action === 'section-config') {
+      const slug = (req.query && (req.query.slug as string)) || (req.body && req.body.slug) || 'all';
+
+      if (req.method === 'GET') {
+        const rows = await sql.query('SELECT value FROM site_settings WHERE key = $1 LIMIT 1', ['sections_custom_configs']);
+        const allConfigs = (rows && rows[0] && rows[0].value) || {};
+        if (req.query.all === '1' || !req.query.slug) {
+          return res.status(200).json(allConfigs);
         }
-      } catch (err) {}
+        return res.status(200).json(allConfigs[slug] || {
+          featuredArticleId: null,
+          selectedArticleIds: [],
+          customTitle: '',
+          description: ''
+        });
+      }
 
-      logActivity({
-        actor: session,
-        action: 'section.customize',
-        category: 'sections',
-        summary: `${session.name || session.email} updated Section Studio configuration for section "${slug}"`,
-        target_id: slug,
-        target_name: payload.customTitle || slug,
-        details: { slug, featuredArticleId: payload.featuredArticleId, selectedArticleIds: payload.selectedArticleIds },
-        req
-      }).catch(() => {});
+      if (req.method === 'POST') {
+        const session = await requireAuth(req, res);
+        if (!session) return;
 
-      return res.status(200).json({ ok: true, data: allConfigs[slug] });
-    }
-  }
+        const payload = req.body || {};
+        const rows = await sql.query('SELECT value FROM site_settings WHERE key = $1 LIMIT 1', ['sections_custom_configs']);
+        const allConfigs = (rows && rows[0] && rows[0].value) || {};
 
-  // ── GET ─────────────────────────────────────────────────────────────────
-  if (req.method === 'GET') {
-    const statusParam = (req.query && (req.query.status as string)) || 'active';
-    const session = verifySession(req);
+        allConfigs[slug] = {
+          featuredArticleId: payload.featuredArticleId || null,
+          selectedArticleIds: Array.isArray(payload.selectedArticleIds) ? payload.selectedArticleIds.slice(0, 4) : [],
+          customTitle: payload.customTitle || '',
+          description: payload.description || '',
+          updatedAt: new Date().toISOString()
+        };
 
-    let query = sb.from('sections').select('*').order('display_order', { ascending: true });
+        await sql.query(`
+          INSERT INTO site_settings (key, value, updated_at)
+          VALUES ($1, $2::jsonb, NOW())
+          ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value, updated_at = NOW();
+        `, ['sections_custom_configs', JSON.stringify(allConfigs)]);
 
-    if (statusParam === 'all' && session) {
-      // Authenticated admin: return everything including deleted
-    } else {
-      // Public: only active, non-deleted rows
-      query = query.eq('is_active', true).eq('is_deleted', false);
-    }
-
-    const { data, error } = await query;
-    if (error) return res.status(500).json({ error: error.message });
-
-    const rows = (data || []).filter((r: any) =>
-      r.admin_id !== '__menu_config__' &&
-      r.admin_id !== '__header_config__' &&
-      r.admin_id !== '__homepage_config__' &&
-      r.admin_id !== '__footer_config__' &&
-      r.admin_id !== '__section_configs__'
-    );
-
-    if (statusParam === 'all' && session) {
-      // Admin format: full section objects
-      return res.status(200).json(rows.map(rowToAdminSection));
-    } else {
-      // Public format: minimal shape, no locked rows
-      return res.status(200).json(
-        rows
-          .filter((r: any) => !r.locked)
-          .map((r: any) => ({ name: r.name, slug: r.slug, display_order: r.display_order }))
-      );
-    }
-  }
-
-  // ── POST: create section ─────────────────────────────────────────────────
-  if (req.method === 'POST') {
-    const session = await requireAuth(req, res);
-    if (!session) return;
-
-    const body = req.body || {};
-    const name    = (body.name   || '').trim();
-    const slug    = (body.slug   || '').trim();
-    const adminId = (body.admin_id || slug || '').trim();
-
-    if (!name) return res.status(400).json({ error: 'name is required' });
-    if (!slug) return res.status(400).json({ error: 'slug is required' });
-
-    // Check uniqueness
-    const { data: existing } = await sb.from('sections')
-      .select('id').or(`name.eq.${name},slug.eq.${slug},admin_id.eq.${adminId}`).eq('is_deleted', false).limit(1);
-    if (existing && existing.length > 0) {
-      return res.status(409).json({ error: 'A section with that name or slug already exists.' });
+        return res.status(200).json({ ok: true, data: allConfigs[slug] });
+      }
     }
 
-    // Next display order
-    const { data: maxRow } = await sb.from('sections')
-      .select('display_order').order('display_order', { ascending: false }).limit(1);
-    const nextOrder = (maxRow && maxRow[0] ? maxRow[0].display_order : 0) + 1;
+    // ── SECTIONS CRUD (GET / POST / PUT / PATCH / DELETE) ───────────────────
+    if (req.method === 'GET') {
+      const statusParam = (req.query && (req.query.status as string)) || 'active';
+      const session = verifySession(req);
 
-    const { data, error } = await sb.from('sections').insert({
-      name, slug, admin_id: adminId,
-      display_order: nextOrder,
-      is_active: true, locked: false, is_deleted: false, deleted_at: null,
-    }).select().single();
-
-    if (error) return res.status(500).json({ error: error.message });
-
-    logActivity({
-      actor: session,
-      action: 'section.create',
-      category: 'sections',
-      summary: `${session.name || session.email} created new section "${name}" (/section/${slug})`,
-      target_id: adminId,
-      target_name: name,
-      details: { slug, name, admin_id: adminId },
-      req
-    }).catch(() => {});
-
-    return res.status(201).json(rowToAdminSection(data));
-  }
-
-  // ── PUT: rename / re-slug ────────────────────────────────────────────────
-  if (req.method === 'PUT') {
-    const session = await requireAuth(req, res);
-    if (!session) return;
-
-    const id   = req.query && (req.query.id as string);
-    const body = req.body || {};
-    const name = (body.name || '').trim();
-    const slug = (body.slug || '').trim();
-
-    if (!id)   return res.status(400).json({ error: 'id (admin_id) is required' });
-    if (!name) return res.status(400).json({ error: 'name is required' });
-
-    const { data, error } = await sb.from('sections')
-      .update({ name, slug })
-      .eq('admin_id', id)
-      .select().single();
-
-    if (error) return res.status(500).json({ error: error.message });
-
-    logActivity({
-      actor: session,
-      action: 'section.edit',
-      category: 'sections',
-      summary: `${session.name || session.email} renamed section ID "${id}" to "${name}" (/section/${slug})`,
-      target_id: id,
-      target_name: name,
-      details: { slug, name },
-      req
-    }).catch(() => {});
-
-    return res.status(200).json(rowToAdminSection(data));
-  }
-
-  // ── PATCH: restore from trash ─────────────────────────────────────────────
-  if (req.method === 'PATCH') {
-    const session = await requireAuth(req, res);
-    if (!session) return;
-
-    const id = req.query && (req.query.id as string);
-    if (!id) return res.status(400).json({ error: 'id (admin_id) is required' });
-
-    const { data, error } = await sb.from('sections')
-      .update({ is_active: true, is_deleted: false, deleted_at: null })
-      .eq('admin_id', id)
-      .select().single();
-
-    if (error) return res.status(500).json({ error: error.message });
-
-    logActivity({
-      actor: session,
-      action: 'section.restore',
-      category: 'sections',
-      summary: `${session.name || session.email} restored section "${data.name || id}" from trash`,
-      target_id: id,
-      target_name: data.name || id,
-      details: {},
-      req
-    }).catch(() => {});
-
-    return res.status(200).json(rowToAdminSection(data));
-  }
-
-  // ── DELETE: soft-delete or permanent ─────────────────────────────────────
-  if (req.method === 'DELETE') {
-    const id   = req.query && (req.query.id as string);
-    const mode = req.query && (req.query.mode as string);
-    if (!id) return res.status(400).json({ error: 'id (admin_id) is required' });
-
-    if (id === 'all' || id.toLowerCase() === 'all') {
-      return res.status(400).json({ error: 'The "All" section is a permanent core section and cannot be deleted.' });
+      let rows: any[] = [];
+      if (statusParam === 'all' && session) {
+        rows = await sql.query(`
+          SELECT * FROM sections
+          WHERE is_deleted = FALSE OR is_deleted IS NULL
+          ORDER BY display_order ASC;
+        `);
+        return res.status(200).json(rows.map(rowToAdminSection));
+      } else {
+        rows = await sql.query(`
+          SELECT name, slug, display_order FROM sections
+          WHERE is_active = TRUE AND is_deleted = FALSE AND (locked = FALSE OR locked IS NULL)
+          ORDER BY display_order ASC;
+        `);
+        return res.status(200).json(rows);
+      }
     }
 
-    if (mode === 'permanent') {
-      // Hard delete — STRICTLY Admin only with live DB check
-      const session = await requireAdmin(req, res);
+    if (req.method === 'POST') {
+      const session = await requireAuth(req, res);
       if (!session) return;
 
-      const { error } = await sb.from('sections').delete().eq('admin_id', id);
-      if (error) return res.status(500).json({ error: error.message });
+      const body = req.body || {};
+      const name = (body.name || '').trim();
+      const slug = (body.slug || '').trim();
+      const adminId = (body.admin_id || slug || '').trim();
+
+      if (!name) return res.status(400).json({ error: 'name is required' });
+      if (!slug) return res.status(400).json({ error: 'slug is required' });
+
+      const existing = await sql.query(
+        'SELECT id FROM sections WHERE (name = $1 OR slug = $2 OR admin_id = $3) AND is_deleted = FALSE LIMIT 1',
+        [name, slug, adminId]
+      );
+      if (existing && existing.length > 0) {
+        return res.status(409).json({ error: 'A section with that name or slug already exists.' });
+      }
+
+      const maxRow = await sql.query('SELECT display_order FROM sections ORDER BY display_order DESC LIMIT 1');
+      const nextOrder = (maxRow && maxRow[0] ? maxRow[0].display_order : 0) + 1;
+
+      const created = await sql.query(`
+        INSERT INTO sections (name, slug, admin_id, display_order, is_active, locked, is_deleted)
+        VALUES ($1, $2, $3, $4, TRUE, FALSE, FALSE)
+        RETURNING *;
+      `, [name, slug, adminId, nextOrder]);
+
+      const data = created[0];
 
       logActivity({
         actor: session,
-        action: 'section.delete_permanent',
+        action: 'section.create',
         category: 'sections',
-        summary: `${session.name || session.email} permanently deleted section ID "${id}"`,
-        target_id: id,
-        target_name: id,
-        details: { permanent: true },
+        summary: `${session.name || session.email} created new section "${name}" (/section/${slug})`,
+        target_id: adminId,
+        target_name: name,
+        details: { slug, name, admin_id: adminId },
         req
       }).catch(() => {});
 
-      return res.status(200).json({ ok: true });
+      return res.status(201).json(rowToAdminSection(data));
     }
 
-    // Soft delete (move to trash)
-    const session = await requireAuth(req, res);
-    if (!session) return;
+    if (req.method === 'PUT') {
+      const session = await requireAuth(req, res);
+      if (!session) return;
 
-    const { data, error } = await sb.from('sections')
-      .update({ is_active: false, is_deleted: true, deleted_at: new Date().toISOString() })
-      .eq('admin_id', id)
-      .select().single();
+      const id = req.query && (req.query.id as string);
+      const body = req.body || {};
+      const name = (body.name || '').trim();
+      const slug = (body.slug || '').trim();
 
-    if (error) return res.status(500).json({ error: error.message });
+      if (!id) return res.status(400).json({ error: 'id (admin_id) is required' });
+      if (!name) return res.status(400).json({ error: 'name is required' });
 
-    logActivity({
-      actor: session,
-      action: 'section.delete',
-      category: 'sections',
-      summary: `${session.name || session.email} moved section "${data.name || id}" to trash`,
-      target_id: id,
-      target_name: data.name || id,
-      details: { is_deleted: true },
-      req
-    }).catch(() => {});
+      const updated = await sql.query(`
+        UPDATE sections
+        SET name = $1, slug = $2
+        WHERE admin_id = $3 OR slug = $3
+        RETURNING *;
+      `, [name, slug, id]);
 
-    return res.status(200).json(rowToAdminSection(data));
+      if (!updated || updated.length === 0) return res.status(404).json({ error: 'Section not found' });
+      const data = updated[0];
+
+      logActivity({
+        actor: session,
+        action: 'section.edit',
+        category: 'sections',
+        summary: `${session.name || session.email} renamed section ID "${id}" to "${name}" (/section/${slug})`,
+        target_id: id,
+        target_name: name,
+        details: { slug, name },
+        req
+      }).catch(() => {});
+
+      return res.status(200).json(rowToAdminSection(data));
+    }
+
+    if (req.method === 'PATCH') {
+      const session = await requireAuth(req, res);
+      if (!session) return;
+
+      const id = req.query && (req.query.id as string);
+      if (!id) return res.status(400).json({ error: 'id (admin_id) is required' });
+
+      const restored = await sql.query(`
+        UPDATE sections
+        SET is_active = TRUE, is_deleted = FALSE, deleted_at = NULL
+        WHERE admin_id = $1 OR slug = $1
+        RETURNING *;
+      `, [id]);
+
+      if (!restored || restored.length === 0) return res.status(404).json({ error: 'Section not found' });
+      return res.status(200).json(rowToAdminSection(restored[0]));
+    }
+
+    if (req.method === 'DELETE') {
+      const id = req.query && (req.query.id as string);
+      const mode = req.query && (req.query.mode as string);
+      if (!id) return res.status(400).json({ error: 'id (admin_id) is required' });
+
+      if (id === 'all' || id.toLowerCase() === 'all') {
+        return res.status(400).json({ error: 'The "All" section is a permanent core section and cannot be deleted.' });
+      }
+
+      if (mode === 'permanent') {
+        const session = await requireAdmin(req, res);
+        if (!session) return;
+
+        await sql.query('DELETE FROM sections WHERE admin_id = $1 OR slug = $1', [id]);
+        return res.status(200).json({ ok: true });
+      }
+
+      const session = await requireAuth(req, res);
+      if (!session) return;
+
+      const trashed = await sql.query(`
+        UPDATE sections
+        SET is_active = FALSE, is_deleted = TRUE, deleted_at = NOW()
+        WHERE admin_id = $1 OR slug = $1
+        RETURNING *;
+      `, [id]);
+
+      if (!trashed || trashed.length === 0) return res.status(404).json({ error: 'Section not found' });
+      return res.status(200).json(rowToAdminSection(trashed[0]));
+    }
+
+    return res.status(405).json({ error: 'Method not allowed' });
+  } catch (err: any) {
+    console.error('[Sections Handler Error]:', err.message);
+    return res.status(500).json({ error: err.message });
   }
-
-  return res.status(405).json({ error: 'Method not allowed' });
 }
 
 module.exports = handler;

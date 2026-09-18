@@ -1,5 +1,59 @@
 [
   {
+    "federation_id": "TW-O-000017",
+    "id": "org_1789728267524",
+    "name": "Sudanese Workers Trade Union Federation",
+    "name_bn": "সুদান ওয়ার্কার্স ট্রেড ইউনিয়ন ফেডারেশন",
+    "country": "Sudan",
+    "country_flag": "🇸🇩",
+    "type": "trade_union",
+    "icon": "🏛️",
+    "desc": "Federated socialist network participant.",
+    "members": 10,
+    "verified": false,
+    "focus": [
+      "Labor Rights",
+      "Anti-Imperialism"
+    ],
+    "created_at": "2026-09-18T10:44:27.524Z"
+  },
+  {
+    "federation_id": "TW-O-000016",
+    "id": "org_1789728227455",
+    "name": "Sudanese Workers Trade Union Federation",
+    "name_bn": "সুদান ওয়ার্কার্স ট্রেড ইউনিয়ন ফেডারেশন",
+    "country": "Sudan",
+    "country_flag": "🇸🇩",
+    "type": "trade_union",
+    "icon": "🏛️",
+    "desc": "Federated socialist network participant.",
+    "members": 10,
+    "verified": false,
+    "focus": [
+      "Labor Rights",
+      "Anti-Imperialism"
+    ],
+    "created_at": "2026-09-18T10:43:47.455Z"
+  },
+  {
+    "federation_id": "TW-O-000015",
+    "id": "org_1789728153807",
+    "name": "Sudanese Workers Trade Union Federation",
+    "name_bn": "সুদান ওয়ার্কার্স ট্রেড ইউনিয়ন ফেডারেশন",
+    "country": "Sudan",
+    "country_flag": "🇸🇩",
+    "type": "trade_union",
+    "icon": "🏛️",
+    "desc": "Federated socialist network participant.",
+    "members": 10,
+    "verified": false,
+    "focus": [
+      "Labor Rights",
+      "Anti-Imperialism"
+    ],
+    "created_at": "2026-09-18T10:42:33.807Z"
+  },
+  {
     "federation_id": "TW-O-000014",
     "id": "org_1789646673542",
     "name": "Sudanese Workers Trade Union Federation",

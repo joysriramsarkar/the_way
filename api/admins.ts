@@ -1,36 +1,22 @@
 /**
- * api/admins.ts — Single endpoint for all admin management operations
- * Routes via ?action= query param
- *
- * GET    /api/admins?action=list                 — list all admins
- * GET    /api/admins?action=check                — check own access + DB role
- * POST   /api/admins?action=add                  — add new admin
- * PATCH  /api/admins?action=update&id=X          — update role/status
- * DELETE /api/admins?action=remove&id=X          — soft-delete (to recycle)
- * DELETE /api/admins?action=purge&id=X           — permanently delete recycled account
+ * api/admins.ts — Single endpoint for all admin management operations using Neon PostgreSQL
  */
 
 import { requireAuth, requireAdmin, verifySession, hashPassword } from './_lib/auth';
 import { logActivity } from './_lib/activity';
 import activityLogHandler from './_handlers/activity-log';
-import { createClient, SupabaseClient } from '@supabase/supabase-js';
+import sql from './_lib/db';
 import type { ApiRequest, ApiResponse } from '../types';
 
-function sb(): SupabaseClient {
-  const url = process.env.SUPABASE_URL || '';
-  const key = process.env.SUPABASE_SERVICE_KEY || '';
-  return createClient(url, key);
-}
-
-async function countGmailAdmins(client: SupabaseClient, excludeId?: string): Promise<number> {
-  const { data } = await client
-    .from('allowed_admins')
-    .select('id, email, role')
-    .eq('status', 'active')
-    .eq('role', 'Admin');
-  return (data || [])
-    .filter((a: any) => a.email.toLowerCase().endsWith('@gmail.com') && a.id !== excludeId)
-    .length;
+async function countGmailAdmins(excludeId?: string): Promise<number> {
+  let q = "SELECT COUNT(*) as count FROM allowed_admins WHERE status = 'active' AND role = 'Admin' AND LOWER(email) LIKE '%@gmail.com'";
+  const params: any[] = [];
+  if (excludeId) {
+    params.push(excludeId);
+    q += " AND id != $1";
+  }
+  const rows = await sql.query(q, params);
+  return parseInt(rows[0]?.count || '0', 10);
 }
 
 export default async function handler(req: ApiRequest, res: ApiResponse) {
@@ -46,230 +32,231 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
   if (req.method === 'OPTIONS') return res.status(200).end();
 
   const { action, id } = req.query as { action?: string; id?: string };
-  const client = sb();
 
-  // ── LIST ────────────────────────────────────────────────────────
-  if (action === 'list' && req.method === 'GET') {
-    const session = await requireAdmin(req, res);
-    if (!session) return;
-    const { data, error } = await client
-      .from('allowed_admins')
-      .select('id, email, role, status, added_by, added_at, modified_by, modified_at, modified_action')
-      .order('added_at', { ascending: true });
-    if (error) return res.status(500).json({ error: error.message });
-    return res.status(200).json(data || []);
-  }
-
-  // ── CHECK (own access) ───────────────────────────────────────────
-  if (action === 'check' && req.method === 'GET') {
-    res.setHeader('Cache-Control', 'no-store');
-    const session = verifySession(req);
-    if (!session) return res.status(401).json({ ok: false, reason: 'invalid_token' });
-    const { data } = await client
-      .from('allowed_admins')
-      .select('status, role')
-      .ilike('email', session.email)
-      .single();
-    if (!data) return res.status(200).json({ ok: false, reason: 'not_found' });
-    if (data.status !== 'active') return res.status(200).json({ ok: false, reason: data.status });
-    return res.status(200).json({ ok: true, role: data.role });
-  }
-
-  // ── ADD ─────────────────────────────────────────────────────────
-  if (action === 'add' && req.method === 'POST') {
-    const session = await requireAdmin(req, res);
-    if (!session) return;
-
-    const { email, role, name, password, bio } = req.body || {};
-    if (!email || !role) return res.status(400).json({ error: 'email and role are required' });
-    const allowedRoles = ['Admin', 'Moderator', 'Editor', 'Contributor', 'User'];
-    if (!allowedRoles.includes(role)) return res.status(400).json({ error: `role must be one of: ${allowedRoles.join(', ')}` });
-
-    const emailNorm = String(email).toLowerCase().trim();
-    const { data: existing } = await client.from('allowed_admins').select('status').ilike('email', emailNorm).maybeSingle();
-    if (existing) {
-      if (existing.status === 'active')    return res.status(400).json({ error: 'already_active', message: 'This email already has active access.' });
-      if (existing.status === 'suspended') return res.status(400).json({ error: 'already_suspended', message: 'This email is currently suspended. Go to the Suspended tab and restore them instead.' });
-      if (existing.status === 'deleted')   return res.status(400).json({ error: 'already_in_recycle', message: 'This email is in the Recycle bin. Go to the Recycle tab and restore them instead.' });
+  try {
+    // ── LIST ────────────────────────────────────────────────────────
+    if (action === 'list' && req.method === 'GET') {
+      const session = await requireAdmin(req, res);
+      if (!session) return;
+      const rows = await sql.query(`
+        SELECT id, email, role, status, added_by, added_at, modified_by, modified_at, modified_action
+        FROM allowed_admins
+        ORDER BY added_at ASC;
+      `);
+      return res.status(200).json(rows || []);
     }
 
-    const pwdHash = password ? hashPassword(password) : hashPassword('theway@admin2026');
-
-    const { data, error } = await client
-      .from('allowed_admins')
-      .insert({
-        email: emailNorm,
-        name: name ? String(name).trim() : emailNorm.split('@')[0],
-        password_hash: pwdHash,
-        role,
-        bio: bio || '',
-        added_by: session.email,
-        status: 'active'
-      })
-      .select().single();
-    if (error) return res.status(500).json({ error: error.message });
-
-    logActivity({
-      actor: session,
-      action: 'admin.add',
-      category: 'admins',
-      summary: `${session.name || session.email} added account "${emailNorm}" (${role})`,
-      target_id: data.id,
-      target_name: emailNorm,
-      details: { role, target_email: emailNorm },
-      req
-    }).catch(() => {});
-
-    return res.status(201).json(data);
-  }
-
-  // ── UPDATE (role / status) ───────────────────────────────────────
-  if (action === 'update' && req.method === 'PATCH') {
-    const session = await requireAdmin(req, res);
-    if (!session) return;
-    if (!id) return res.status(400).json({ error: 'id required' });
-
-    const { status, role } = req.body || {};
-    const updates: Record<string, any> = {};
-    if (status && ['active', 'suspended', 'deleted'].includes(status)) updates.status = status;
-    if (role   && ['Admin', 'Moderator', 'Editor', 'Contributor', 'User'].includes(role)) updates.role = role;
-    if (!Object.keys(updates).length) return res.status(400).json({ error: 'No valid updates' });
-
-    const { data: target } = await client.from('allowed_admins').select('*').eq('id', id).single();
-    if (!target) return res.status(404).json({ error: 'Admin not found' });
-
-    if (target.email.toLowerCase() === session.email.toLowerCase()) {
-      if (updates.status === 'suspended' || updates.status === 'deleted')
-        return res.status(400).json({ error: 'You cannot suspend or remove your own account.' });
+    // ── CHECK (own access) ───────────────────────────────────────────
+    if (action === 'check' && req.method === 'GET') {
+      res.setHeader('Cache-Control', 'no-store');
+      const session = verifySession(req);
+      if (!session) return res.status(401).json({ ok: false, reason: 'invalid_token' });
+      const rows = await sql.query('SELECT status, role FROM allowed_admins WHERE LOWER(email) = LOWER($1) LIMIT 1', [session.email]);
+      const data = rows[0];
+      if (!data) return res.status(200).json({ ok: false, reason: 'not_found' });
+      if (data.status !== 'active') return res.status(200).json({ ok: false, reason: data.status });
+      return res.status(200).json({ ok: true, role: data.role });
     }
 
-    const isGmailAdmin = target.email.toLowerCase().endsWith('@gmail.com') && target.role === 'Admin';
-    const willDeactivate = (updates.status === 'suspended' || updates.status === 'deleted') && target.status === 'active';
-    if (willDeactivate && isGmailAdmin) {
-      const remaining = await countGmailAdmins(client, id);
-      if (remaining < 2) return res.status(400).json({ error: 'min_admins', message: 'At least 2 Gmail Admin accounts must remain active. Add another Gmail Admin first.' });
-    }
+    // ── ADD ─────────────────────────────────────────────────────────
+    if (action === 'add' && req.method === 'POST') {
+      const session = await requireAdmin(req, res);
+      if (!session) return;
 
-    const willDowngrade = updates.role === 'Moderator' && target.role === 'Admin';
-    if (willDowngrade && isGmailAdmin && target.status === 'active') {
-      const remaining = await countGmailAdmins(client, id);
-      if (remaining < 2) return res.status(400).json({ error: 'min_admins', message: 'At least 2 Gmail Admin accounts must remain active. Add another Gmail Admin before downgrading this one.' });
-    }
+      const { email, role, name, password, bio } = req.body || {};
+      if (!email || !role) return res.status(400).json({ error: 'email and role are required' });
+      const allowedRoles = ['Admin', 'Moderator', 'Editor', 'Contributor', 'User'];
+      if (!allowedRoles.includes(role)) return res.status(400).json({ error: `role must be one of: ${allowedRoles.join(', ')}` });
 
-    let auditAction: string | null = null;
-    let actionSummary = '';
-    if (updates.status === 'suspended') {
-      auditAction = 'suspended';
-      actionSummary = `${session.name || session.email} suspended account "${target.email}"`;
-    }
-    if (updates.status === 'active' && target.status === 'suspended') {
-      auditAction = 'unsuspended';
-      actionSummary = `${session.name || session.email} unsuspended/restored account "${target.email}"`;
-    }
-    if (updates.status === 'active' && target.status === 'deleted') {
-      auditAction = 'restored';
-      actionSummary = `${session.name || session.email} restored account "${target.email}" from recycle bin`;
-    }
-    if (updates.status === 'deleted') {
-      auditAction = 'deleted';
-      actionSummary = `${session.name || session.email} moved account "${target.email}" to recycle bin`;
-    }
-    if (updates.role && updates.role !== target.role) {
-      auditAction = 'role_changed_to_' + updates.role;
-      actionSummary = `${session.name || session.email} changed role of "${target.email}" from ${target.role} to ${updates.role}`;
-    }
+      const emailNorm = String(email).toLowerCase().trim();
+      const existingRows = await sql.query('SELECT status FROM allowed_admins WHERE LOWER(email) = LOWER($1) LIMIT 1', [emailNorm]);
+      const existing = existingRows[0];
+      if (existing) {
+        if (existing.status === 'active') return res.status(400).json({ error: 'already_active', message: 'This email already has active access.' });
+        if (existing.status === 'suspended') return res.status(400).json({ error: 'already_suspended', message: 'This email is currently suspended. Go to the Suspended tab and restore them instead.' });
+        if (existing.status === 'deleted') return res.status(400).json({ error: 'already_in_recycle', message: 'This email is in the Recycle bin. Go to the Recycle tab and restore them instead.' });
+      }
 
-    if (auditAction) {
-      updates.modified_by     = session.email;
-      updates.modified_at     = new Date().toISOString();
-      updates.modified_action = auditAction;
-    }
+      const pwdHash = password ? hashPassword(password) : hashPassword('theway@admin2026');
 
-    const { data, error } = await client.from('allowed_admins').update(updates).eq('id', id).select().single();
-    if (error) return res.status(500).json({ error: error.message });
+      const createdRows = await sql.query(`
+        INSERT INTO allowed_admins (email, name, password_hash, role, bio, added_by, status)
+        VALUES ($1, $2, $3, $4, $5, $6, 'active')
+        RETURNING *;
+      `, [emailNorm, name ? String(name).trim() : emailNorm.split('@')[0], pwdHash, role, bio || '', session.email]);
 
-    if (auditAction) {
+      const data = createdRows[0];
+
       logActivity({
         actor: session,
-        action: 'admin.' + auditAction,
+        action: 'admin.add',
         category: 'admins',
-        summary: actionSummary,
-        target_id: target.id,
-        target_name: target.email,
-        details: { old: target, updates },
+        summary: `${session.name || session.email} added account "${emailNorm}" (${role})`,
+        target_id: data.id,
+        target_name: emailNorm,
+        details: { role, target_email: emailNorm },
         req
       }).catch(() => {});
+
+      return res.status(201).json(data);
     }
 
-    return res.status(200).json(data);
-  }
+    // ── UPDATE (role / status) ───────────────────────────────────────
+    if (action === 'update' && req.method === 'PATCH') {
+      const session = await requireAdmin(req, res);
+      if (!session) return;
+      if (!id) return res.status(400).json({ error: 'id required' });
 
-  // ── REMOVE (soft-delete → recycle) ──────────────────────────────
-  if (action === 'remove' && req.method === 'DELETE') {
-    const session = await requireAdmin(req, res);
-    if (!session) return;
-    if (!id) return res.status(400).json({ error: 'id required' });
+      const { status, role } = req.body || {};
+      if (!status && !role) return res.status(400).json({ error: 'No valid updates' });
 
-    const { data: target } = await client.from('allowed_admins').select('*').eq('id', id).single();
-    if (!target) return res.status(404).json({ error: 'Admin not found' });
+      const targetRows = await sql.query('SELECT * FROM allowed_admins WHERE id = $1 LIMIT 1', [id]);
+      const target = targetRows[0];
+      if (!target) return res.status(404).json({ error: 'Admin not found' });
 
-    if (target.email.toLowerCase() === session.email.toLowerCase())
-      return res.status(400).json({ error: 'You cannot remove your own account.' });
+      if (target.email.toLowerCase() === session.email.toLowerCase()) {
+        if (status === 'suspended' || status === 'deleted') {
+          return res.status(400).json({ error: 'You cannot suspend or remove your own account.' });
+        }
+      }
 
-    const isGmailAdmin = target.status === 'active' && target.role === 'Admin' && target.email.toLowerCase().endsWith('@gmail.com');
-    if (isGmailAdmin) {
-      const count = await countGmailAdmins(client, id);
-      if (count < 2) return res.status(400).json({ error: 'min_admins', message: 'At least 2 Gmail Admin accounts must remain active. Add another Gmail Admin first.' });
+      const isGmailAdmin = target.email.toLowerCase().endsWith('@gmail.com') && target.role === 'Admin';
+      const willDeactivate = (status === 'suspended' || status === 'deleted') && target.status === 'active';
+      if (willDeactivate && isGmailAdmin) {
+        const remaining = await countGmailAdmins(id);
+        if (remaining < 2) return res.status(400).json({ error: 'min_admins', message: 'At least 2 Gmail Admin accounts must remain active. Add another Gmail Admin first.' });
+      }
+
+      const willDowngrade = role === 'Moderator' && target.role === 'Admin';
+      if (willDowngrade && isGmailAdmin && target.status === 'active') {
+        const remaining = await countGmailAdmins(id);
+        if (remaining < 2) return res.status(400).json({ error: 'min_admins', message: 'At least 2 Gmail Admin accounts must remain active. Add another Gmail Admin before downgrading this one.' });
+      }
+
+      let auditAction: string | null = null;
+      let actionSummary = '';
+      if (status === 'suspended') {
+        auditAction = 'suspended';
+        actionSummary = `${session.name || session.email} suspended account "${target.email}"`;
+      }
+      if (status === 'active' && target.status === 'suspended') {
+        auditAction = 'unsuspended';
+        actionSummary = `${session.name || session.email} unsuspended/restored account "${target.email}"`;
+      }
+      if (status === 'active' && target.status === 'deleted') {
+        auditAction = 'restored';
+        actionSummary = `${session.name || session.email} restored account "${target.email}" from recycle bin`;
+      }
+      if (status === 'deleted') {
+        auditAction = 'deleted';
+        actionSummary = `${session.name || session.email} moved account "${target.email}" to recycle bin`;
+      }
+      if (role && role !== target.role) {
+        auditAction = 'role_changed_to_' + role;
+        actionSummary = `${session.name || session.email} changed role of "${target.email}" from ${target.role} to ${role}`;
+      }
+
+      const updatedRows = await sql.query(`
+        UPDATE allowed_admins
+        SET status = COALESCE($1, status),
+            role = COALESCE($2, role),
+            modified_by = $3,
+            modified_at = NOW(),
+            modified_action = $4
+        WHERE id = $5
+        RETURNING *;
+      `, [status || null, role || null, session.email, auditAction, id]);
+
+      const data = updatedRows[0];
+
+      if (auditAction) {
+        logActivity({
+          actor: session,
+          action: 'admin.' + auditAction,
+          category: 'admins',
+          summary: actionSummary,
+          target_id: target.id,
+          target_name: target.email,
+          details: { old: target, updates: { status, role } },
+          req
+        }).catch(() => {});
+      }
+
+      return res.status(200).json(data);
     }
 
-    const { error } = await client.from('allowed_admins').update({
-      status: 'deleted', modified_by: session.email,
-      modified_at: new Date().toISOString(), modified_action: 'deleted'
-    }).eq('id', id);
-    if (error) return res.status(500).json({ error: error.message });
+    // ── REMOVE (soft-delete → recycle) ──────────────────────────────
+    if (action === 'remove' && req.method === 'DELETE') {
+      const session = await requireAdmin(req, res);
+      if (!session) return;
+      if (!id) return res.status(400).json({ error: 'id required' });
 
-    logActivity({
-      actor: session,
-      action: 'admin.remove_to_recycle',
-      category: 'admins',
-      summary: `${session.name || session.email} moved account "${target.email}" to Recycle bin`,
-      target_id: target.id,
-      target_name: target.email,
-      details: { previousStatus: target.status },
-      req
-    }).catch(() => {});
+      const targetRows = await sql.query('SELECT * FROM allowed_admins WHERE id = $1 LIMIT 1', [id]);
+      const target = targetRows[0];
+      if (!target) return res.status(404).json({ error: 'Admin not found' });
 
-    return res.status(200).json({ success: true });
+      if (target.email.toLowerCase() === session.email.toLowerCase()) {
+        return res.status(400).json({ error: 'You cannot remove your own account.' });
+      }
+
+      const isGmailAdmin = target.status === 'active' && target.role === 'Admin' && target.email.toLowerCase().endsWith('@gmail.com');
+      if (isGmailAdmin) {
+        const count = await countGmailAdmins(id);
+        if (count < 2) return res.status(400).json({ error: 'min_admins', message: 'At least 2 Gmail Admin accounts must remain active. Add another Gmail Admin first.' });
+      }
+
+      await sql.query(`
+        UPDATE allowed_admins
+        SET status = 'deleted', modified_by = $1, modified_at = NOW(), modified_action = 'deleted'
+        WHERE id = $2;
+      `, [session.email, id]);
+
+      logActivity({
+        actor: session,
+        action: 'admin.remove_to_recycle',
+        category: 'admins',
+        summary: `${session.name || session.email} moved account "${target.email}" to Recycle bin`,
+        target_id: target.id,
+        target_name: target.email,
+        details: { previousStatus: target.status },
+        req
+      }).catch(() => {});
+
+      return res.status(200).json({ success: true });
+    }
+
+    // ── PURGE (permanent delete from recycle) ───────────────────────
+    if (action === 'purge' && req.method === 'DELETE') {
+      const session = await requireAdmin(req, res);
+      if (!session) return;
+      if (!id) return res.status(400).json({ error: 'id required' });
+
+      const targetRows = await sql.query('SELECT status, email FROM allowed_admins WHERE id = $1 LIMIT 1', [id]);
+      const target = targetRows[0];
+      if (!target) return res.status(404).json({ error: 'Not found' });
+      if (target.status !== 'deleted') return res.status(400).json({ error: 'Account must be in Recycle before permanent deletion.' });
+
+      await sql.query('DELETE FROM allowed_admins WHERE id = $1', [id]);
+
+      logActivity({
+        actor: session,
+        action: 'admin.purge_permanent',
+        category: 'admins',
+        summary: `${session.name || session.email} permanently deleted account "${target.email}" from whitelist`,
+        target_id: id,
+        target_name: target.email,
+        details: {},
+        req
+      }).catch(() => {});
+
+      return res.status(200).json({ success: true, email: target.email });
+    }
+
+    return res.status(400).json({ error: 'Unknown action or method' });
+  } catch (err: any) {
+    console.error('[Admins Handler Error]:', err.message);
+    return res.status(500).json({ error: err.message });
   }
-
-  // ── PURGE (permanent delete from recycle) ───────────────────────
-  if (action === 'purge' && req.method === 'DELETE') {
-    const session = await requireAdmin(req, res);
-    if (!session) return;
-    if (!id) return res.status(400).json({ error: 'id required' });
-
-    const { data: target } = await client.from('allowed_admins').select('status, email').eq('id', id).single();
-    if (!target) return res.status(404).json({ error: 'Not found' });
-    if (target.status !== 'deleted') return res.status(400).json({ error: 'Account must be in Recycle before permanent deletion.' });
-
-    const { error } = await client.from('allowed_admins').delete().eq('id', id);
-    if (error) return res.status(500).json({ error: error.message });
-
-    logActivity({
-      actor: session,
-      action: 'admin.purge_permanent',
-      category: 'admins',
-      summary: `${session.name || session.email} permanently deleted account "${target.email}" from whitelist`,
-      target_id: id,
-      target_name: target.email,
-      details: {},
-      req
-    }).catch(() => {});
-
-    return res.status(200).json({ success: true, email: target.email });
-  }
-
-  return res.status(400).json({ error: 'Unknown action or method' });
 }
 
 module.exports = handler;

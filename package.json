@@ -11,7 +11,9 @@
     "test": "tsx tests/test-phase2-phase3.js && tsx tests/test-final-phases.js"
   },
   "dependencies": {
-    "@supabase/supabase-js": "^2.45.0",
+    "@neon/config": "^1.7.2",
+    "@neon/env": "^1.4.3",
+    "@neondatabase/serverless": "^1.1.0",
     "google-auth-library": "^11.0.2",
     "jsonwebtoken": "^9.0.2",
     "webp-converter": "^3.0.1"

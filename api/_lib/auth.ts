@@ -3,7 +3,7 @@
  */
 
 import jwt from 'jsonwebtoken';
-import { createClient } from '@supabase/supabase-js';
+import sql from './db';
 import crypto from 'crypto';
 import type { ApiRequest, ApiResponse, AuthUserSession } from '../../types';
 
@@ -35,35 +35,30 @@ export async function requireAuth(req: ApiRequest, res: ApiResponse): Promise<Au
     return null;
   }
 
-  // Live DB check if supabase credentials exist
-  if (process.env.SUPABASE_URL && process.env.SUPABASE_SERVICE_KEY) {
-    try {
-      const sb = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
-      const { data } = await sb
-        .from('allowed_admins')
-        .select('role, status')
-        .ilike('email', s.email)
-        .maybeSingle();
+  // Live DB check on Neon allowed_admins
+  try {
+    const rows = await sql.query('SELECT role, status FROM allowed_admins WHERE LOWER(email) = LOWER($1) LIMIT 1', [s.email]);
+    const data = rows[0];
 
-      if (!data || data.status !== 'active') {
-        const primaryAdminEmail = (process.env.ADMIN_EMAIL || 'joysriram.sarkar.56@gmail.com').toLowerCase();
-        if (s.email.toLowerCase() === primaryAdminEmail) {
-          s.role = 'Admin';
-          return s;
-        }
-        res.status(401).json({
-          error: 'Account access revoked or suspended',
-          reason: !data ? 'not_found' : data.status,
-          redirect: '/admin-login.html'
-        });
-        return null;
-      }
-      s.role = data.role;
-    } catch (e) {
+    if (!data || data.status !== 'active') {
       const primaryAdminEmail = (process.env.ADMIN_EMAIL || 'joysriram.sarkar.56@gmail.com').toLowerCase();
       if (s.email.toLowerCase() === primaryAdminEmail) {
         s.role = 'Admin';
+        return s;
       }
+      res.status(401).json({
+        error: 'Account access revoked or suspended',
+        reason: !data ? 'not_found' : data.status,
+        redirect: '/admin-login.html'
+      });
+      return null;
+    }
+
+    s.role = data.role as any;
+  } catch (e) {
+    const primaryAdminEmail = (process.env.ADMIN_EMAIL || 'joysriram.sarkar.56@gmail.com').toLowerCase();
+    if (s.email.toLowerCase() === primaryAdminEmail) {
+      s.role = 'Admin';
     }
   }
 

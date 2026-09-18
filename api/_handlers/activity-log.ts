@@ -1,5 +1,5 @@
 /**
- * api/activity-log.ts — Endpoint for Immutable Activity & Audit Logs
+ * api/_handlers/activity-log.ts — Endpoint for Immutable Activity & Audit Logs using Neon PostgreSQL
  * 
  * Supports:
  *   GET  /api/activity-log?action=list   — List filtered, paginated audit logs (requireAuth)
@@ -11,14 +11,8 @@
 
 import { requireAuth } from '../_lib/auth';
 import { logActivity } from '../_lib/activity';
-import { createClient, SupabaseClient } from '@supabase/supabase-js';
+import sql from '../_lib/db';
 import type { ApiRequest, ApiResponse } from '../../types';
-
-function sb(): SupabaseClient {
-  const url = process.env.SUPABASE_URL || '';
-  const key = process.env.SUPABASE_SERVICE_KEY || '';
-  return createClient(url, key);
-}
 
 export default async function handler(req: ApiRequest, res: ApiResponse) {
   res.setHeader('Access-Control-Allow-Origin', (req.headers.origin as string) || '*');
@@ -29,231 +23,114 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
 
   const { action } = req.query as { action?: string };
 
-  // ── 1. LIST AUDIT LOGS ──────────────────────────────────────────
-  if (action === 'list' && req.method === 'GET') {
-    const session = await requireAuth(req, res);
-    if (!session) return;
+  try {
+    // ── 1. LIST AUDIT LOGS ──────────────────────────────────────────
+    if (action === 'list' && req.method === 'GET') {
+      const session = await requireAuth(req, res);
+      if (!session) return;
 
-    const category = (req.query.category as string) || 'all';
-    const actor    = (req.query.actor as string) || '';
-    const search   = ((req.query.search as string) || '').trim().toLowerCase();
-    const limit    = Math.min(Math.max(parseInt((req.query.limit as string) || '100', 10), 1), 500);
-    const offset   = Math.max(parseInt((req.query.offset as string) || '0', 10), 0);
+      const category = (req.query.category as string) || 'all';
+      const actor    = (req.query.actor as string) || '';
+      const search   = ((req.query.search as string) || '').trim().toLowerCase();
+      const limit    = Math.min(Math.max(parseInt((req.query.limit as string) || '100', 10), 1), 500);
+      const offset   = Math.max(parseInt((req.query.offset as string) || '0', 10), 0);
 
-    const client = sb();
-    let logs: any = null;
-
-    // Try fetching from `activity_logs` table
-    try {
-      let query = client
-        .from('activity_logs')
-        .select('*', { count: 'exact' })
-        .order('timestamp', { ascending: false });
+      let queryStr = 'SELECT * FROM activity_logs';
+      let countQueryStr = 'SELECT COUNT(*) as count FROM activity_logs';
+      const conditions: string[] = [];
+      const params: any[] = [];
 
       if (category && category !== 'all') {
-        query = query.eq('category', category);
+        params.push(category);
+        conditions.push(`category = $${params.length}`);
       }
       if (actor) {
-        query = query.ilike('actor_email', `%${actor}%`);
+        params.push(`%${actor}%`);
+        conditions.push(`actor_email ILIKE $${params.length}`);
       }
       if (search) {
-        query = query.or(`summary.ilike.%${search}%,actor_email.ilike.%${search}%,actor_name.ilike.%${search}%,target_name.ilike.%${search}%,action.ilike.%${search}%`);
+        params.push(`%${search}%`);
+        conditions.push(`(summary ILIKE $${params.length} OR actor_email ILIKE $${params.length} OR actor_name ILIKE $${params.length} OR target_name ILIKE $${params.length} OR action ILIKE $${params.length})`);
       }
 
-      query = query.range(offset, offset + limit - 1);
-
-      const { data, count, error } = await query;
-      if (!error && Array.isArray(data)) {
-        logs = {
-          items: data,
-          total: count !== null ? count : data.length,
-          limit,
-          offset
-        };
+      if (conditions.length > 0) {
+        const whereClause = ' WHERE ' + conditions.join(' AND ');
+        queryStr += whereClause;
+        countQueryStr += whereClause;
       }
-    } catch (e: any) {
-      console.warn('[activity-log/list] Supabase table query failed:', e?.message);
+
+      const countRows = await sql.query(countQueryStr, params);
+      const total = parseInt(countRows[0]?.count || '0', 10);
+
+      params.push(limit);
+      queryStr += ` ORDER BY created_at DESC LIMIT $${params.length}`;
+      params.push(offset);
+      queryStr += ` OFFSET $${params.length}`;
+
+      const items = await sql.query(queryStr, params);
+
+      return res.status(200).json({
+        items,
+        total,
+        limit,
+        offset
+      });
     }
 
-    // Fallback: fetch from site_settings store or sections system table
-    if (!logs) {
-      try {
-        let rawList: any[] = [];
-        try {
-          const { data: storeRow } = await client
-            .from('site_settings')
-            .select('value')
-            .eq('key', 'activity_logs_store')
-            .maybeSingle();
+    // ── 2. GET ACTIVITY METRICS STATS ───────────────────────────────
+    if (action === 'stats' && req.method === 'GET') {
+      const session = await requireAuth(req, res);
+      if (!session) return;
 
-          if (storeRow && Array.isArray(storeRow.value) && storeRow.value.length > 0) {
-            rawList = storeRow.value;
-          }
-        } catch (e) {}
+      const totalRows = await sql.query('SELECT COUNT(*) as count FROM activity_logs');
+      const totalLogs = parseInt(totalRows[0]?.count || '0', 10);
 
-        if (rawList.length === 0) {
-          try {
-            const { data: secRow } = await client
-              .from('sections')
-              .select('name')
-              .eq('admin_id', '__activity_logs_store__')
-              .maybeSingle();
+      const todayRows = await sql.query("SELECT COUNT(*) as count FROM activity_logs WHERE created_at >= CURRENT_DATE");
+      const todayCount = parseInt(todayRows[0]?.count || '0', 10);
 
-            if (secRow && secRow.name) {
-              const parsed = JSON.parse(secRow.name);
-              if (Array.isArray(parsed)) rawList = parsed;
-            }
-          } catch (e) {}
-        }
+      const actorsRows = await sql.query("SELECT COUNT(DISTINCT actor_email) as count FROM activity_logs WHERE actor_email IS NOT NULL");
+      const uniqueActorsCount = parseInt(actorsRows[0]?.count || '0', 10);
 
-        // Apply filters in memory
-        if (category && category !== 'all') {
-          rawList = rawList.filter(l => l.category === category);
-        }
-        if (actor) {
-          rawList = rawList.filter(l => (l.actor_email || '').toLowerCase().includes(actor.toLowerCase()));
-        }
-        if (search) {
-          rawList = rawList.filter(l =>
-            (l.summary || '').toLowerCase().includes(search) ||
-            (l.actor_email || '').toLowerCase().includes(search) ||
-            (l.actor_name || '').toLowerCase().includes(search) ||
-            (l.target_name || '').toLowerCase().includes(search) ||
-            (l.action || '').toLowerCase().includes(search)
-          );
-        }
+      const latestRow = await sql.query('SELECT created_at FROM activity_logs ORDER BY created_at DESC LIMIT 1');
+      const lastActivityAt = latestRow[0]?.created_at || null;
 
-        const total = rawList.length;
-        const paged = rawList.slice(offset, offset + limit);
-
-        logs = {
-          items: paged,
-          total,
-          limit,
-          offset
-        };
-      } catch (fbErr: any) {
-        console.error('[activity-log/list] Fallback list failed:', fbErr?.message);
-        logs = { items: [], total: 0, limit, offset };
-      }
+      return res.status(200).json({
+        totalLogs,
+        todayCount,
+        uniqueActorsCount,
+        lastActivityAt
+      });
     }
 
-    return res.status(200).json(logs);
+    // ── 3. RECORD CLIENT-SIDE LOG ───────────────────────────────────
+    if (action === 'log' && req.method === 'POST') {
+      const session = await requireAuth(req, res);
+      if (!session) return;
+
+      const { action: actName, category, summary, target_id, target_name, details } = req.body || {};
+      if (!actName || !summary) {
+        return res.status(400).json({ error: 'action and summary are required' });
+      }
+
+      const recorded = await logActivity({
+        actor: session,
+        action: actName,
+        category: category || 'general',
+        summary,
+        target_id,
+        target_name,
+        details: details || {},
+        req
+      });
+
+      return res.status(201).json({ success: true, log: recorded });
+    }
+
+    return res.status(400).json({ error: 'Unknown action' });
+  } catch (err: any) {
+    console.error('[ActivityLog Handler Error]:', err.message);
+    return res.status(500).json({ error: err.message });
   }
-
-  // ── 2. GET ACTIVITY METRICS STATS ───────────────────────────────
-  if (action === 'stats' && req.method === 'GET') {
-    const session = await requireAuth(req, res);
-    if (!session) return;
-
-    const client = sb();
-    let totalLogs = 0;
-    let todayCount = 0;
-    const uniqueActors = new Set<string>();
-    let lastActivityAt: string | null = null;
-
-    try {
-      const { data: recent, count, error } = await client
-        .from('activity_logs')
-        .select('actor_email, timestamp', { count: 'exact' })
-        .order('timestamp', { ascending: false })
-        .limit(1000);
-
-      if (!error && Array.isArray(recent)) {
-        totalLogs = count !== null ? count : recent.length;
-        if (recent.length > 0) lastActivityAt = recent[0].timestamp;
-
-        const todayStart = new Date();
-        todayStart.setUTCHours(0, 0, 0, 0);
-
-        recent.forEach((r: any) => {
-          if (r.actor_email) uniqueActors.add(r.actor_email);
-          if (r.timestamp && new Date(r.timestamp) >= todayStart) {
-            todayCount++;
-          }
-        });
-      }
-    } catch (e) {}
-
-    // Fallback if table returned 0
-    if (totalLogs === 0) {
-      try {
-        let list: any[] = [];
-        try {
-          const { data: storeRow } = await client
-            .from('site_settings')
-            .select('value')
-            .eq('key', 'activity_logs_store')
-            .maybeSingle();
-
-          if (storeRow && Array.isArray(storeRow.value) && storeRow.value.length > 0) {
-            list = storeRow.value;
-          }
-        } catch (e) {}
-
-        if (list.length === 0) {
-          try {
-            const { data: secRow } = await client
-              .from('sections')
-              .select('name')
-              .eq('admin_id', '__activity_logs_store__')
-              .maybeSingle();
-
-            if (secRow && secRow.name) {
-              const parsed = JSON.parse(secRow.name);
-              if (Array.isArray(parsed)) list = parsed;
-            }
-          } catch (e) {}
-        }
-
-        totalLogs = list.length;
-        if (list.length > 0) lastActivityAt = list[0].timestamp;
-
-        const todayStart = new Date();
-        todayStart.setUTCHours(0, 0, 0, 0);
-
-        list.forEach((r: any) => {
-          if (r.actor_email) uniqueActors.add(r.actor_email);
-          if (r.timestamp && new Date(r.timestamp) >= todayStart) {
-            todayCount++;
-          }
-        });
-      } catch (e) {}
-    }
-
-    return res.status(200).json({
-      totalLogs,
-      todayCount,
-      uniqueActorsCount: uniqueActors.size,
-      lastActivityAt
-    });
-  }
-
-  // ── 3. RECORD CLIENT-SIDE LOG ───────────────────────────────────
-  if (action === 'log' && req.method === 'POST') {
-    const session = await requireAuth(req, res);
-    if (!session) return;
-
-    const { action: actName, category, summary, target_id, target_name, details } = req.body || {};
-    if (!actName || !summary) {
-      return res.status(400).json({ error: 'action and summary are required' });
-    }
-
-    const recorded = await logActivity({
-      actor: session,
-      action: actName,
-      category: category || 'general',
-      summary,
-      target_id,
-      target_name,
-      details: details || {},
-      req
-    });
-
-    return res.status(201).json({ success: true, log: recorded });
-  }
-
-  return res.status(400).json({ error: 'Unknown action' });
 }
 
 module.exports = handler;

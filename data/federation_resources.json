@@ -1,5 +1,86 @@
 [
   {
+    "federation_id": "TW-W-000085",
+    "type": "work",
+    "title": "Socialist Dialectics of Nature",
+    "title_bn": "প্রকৃতির দ্বান্দ্বিকতা",
+    "title_en": "Socialist Dialectics of Nature",
+    "author": "Friedrich Engels",
+    "year": 1883,
+    "category": "theory",
+    "description": "",
+    "identifiers": {
+      "openlibrary": null,
+      "wikidata": null,
+      "doi": null,
+      "openalex": null
+    },
+    "languages": [
+      "de",
+      "en",
+      "bn"
+    ],
+    "license": "Public Domain",
+    "pdf_url": null,
+    "read_url": null,
+    "source_collection": "Federated Peer Node",
+    "created_at": "2026-09-18T10:44:27.515Z"
+  },
+  {
+    "federation_id": "TW-W-000084",
+    "type": "work",
+    "title": "Socialist Dialectics of Nature",
+    "title_bn": "প্রকৃতির দ্বান্দ্বিকতা",
+    "title_en": "Socialist Dialectics of Nature",
+    "author": "Friedrich Engels",
+    "year": 1883,
+    "category": "theory",
+    "description": "",
+    "identifiers": {
+      "openlibrary": null,
+      "wikidata": null,
+      "doi": null,
+      "openalex": null
+    },
+    "languages": [
+      "de",
+      "en",
+      "bn"
+    ],
+    "license": "Public Domain",
+    "pdf_url": null,
+    "read_url": null,
+    "source_collection": "Federated Peer Node",
+    "created_at": "2026-09-18T10:43:47.443Z"
+  },
+  {
+    "federation_id": "TW-W-000083",
+    "type": "work",
+    "title": "Socialist Dialectics of Nature",
+    "title_bn": "প্রকৃতির দ্বান্দ্বিকতা",
+    "title_en": "Socialist Dialectics of Nature",
+    "author": "Friedrich Engels",
+    "year": 1883,
+    "category": "theory",
+    "description": "",
+    "identifiers": {
+      "openlibrary": null,
+      "wikidata": null,
+      "doi": null,
+      "openalex": null
+    },
+    "languages": [
+      "de",
+      "en",
+      "bn"
+    ],
+    "license": "Public Domain",
+    "pdf_url": null,
+    "read_url": null,
+    "source_collection": "Federated Peer Node",
+    "created_at": "2026-09-18T10:42:33.799Z"
+  },
+  {
     "federation_id": "TW-W-000082",
     "type": "work",
     "title": "Socialist Dialectics of Nature",

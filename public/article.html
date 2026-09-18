@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="bn">
 <head>
   <meta charset="UTF-8">
@@ -143,7 +143,6 @@
   <footer id="theway-footer-mount" class="theway-footer"></footer>
 
   <!-- Scripts -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="assets/js/supabase-config.js"></script>
   <script src="assets/js/components.js"></script>
   <script>
@@ -210,8 +209,16 @@
         document.getElementById('art-title').textContent = art.title;
         document.getElementById('art-deck').textContent = art.deck || '';
 
-        document.getElementById('art-author-name').textContent = art.author || 'দ্য ওয়ে সম্পাদকীয় পর্ষদ';
-        document.getElementById('art-author-role').textContent = art.author_role || '';
+        const fictionalNames = ['অমিত দাশগুপ্ত', 'তানভীর হাসান', 'সৌমিক রায়হান', 'আহমেদ হাসান'];
+        let authorName = (art.author || '').trim();
+        let authorRole = (art.author_role || '').trim();
+        if (!authorName || fictionalNames.some(f => authorName.includes(f))) {
+          authorName = 'সম্পাদকীয়';
+          authorRole = 'দ্য ওয়ে সম্পাদকীয় পর্ষদ';
+        }
+
+        document.getElementById('art-author-name').textContent = authorName;
+        document.getElementById('art-author-role').textContent = authorRole;
         if (art.author_photo_url) document.getElementById('art-author-photo').src = art.author_photo_url;
 
         const dateStr = new Date(art.published_at || art.created_at || Date.now()).toLocaleDateString('bn-BD');
@@ -240,9 +247,9 @@
         }
 
         // Author bio
-        document.getElementById('author-bio-name').textContent = art.author || 'দ্য ওয়ে লেখক';
-        document.getElementById('author-bio-role').textContent = art.author_role || '';
-        document.getElementById('author-bio-desc').textContent = art.author_bio || 'মেহনতি মানুষের মুক্তিকামী চিন্তা ও সমাজতান্ত্রিক বিশ্লেষণের পক্ষে লেখক।';
+        document.getElementById('author-bio-name').textContent = authorName;
+        document.getElementById('author-bio-role').textContent = authorRole;
+        document.getElementById('author-bio-desc').textContent = art.author_bio || 'মেহনতি মানুষের মুক্তিকামী চিন্তা ও সমাজতান্ত্রিক বিশ্লেষণের পক্ষে সম্পাদকীয় পরিষদ।';
         if (art.author_photo_url) document.getElementById('author-bio-avatar').src = art.author_photo_url;
 
         // Revision Link

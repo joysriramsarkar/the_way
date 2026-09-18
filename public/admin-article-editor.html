@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -1468,7 +1468,6 @@ kbd {
 <!-- Hidden inputs -->
 <input type="file" id="feat-img-inp" accept="image/*" style="display:none" onchange="handleFeatImgFile(this)" />
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="assets/js/supabase-config.js"></script>
 <script src="assets/js/admin-auth.js"></script>
 <script>
@@ -1528,6 +1527,11 @@ function initEmpty() {
     history.replaceState({}, '', u.toString());
   }
   refreshArticleIdDisplay();
+  if (!gt('ed-author')) {
+    tx('ed-author', 'সম্পাদকীয়');
+    tx('bio-name', 'সম্পাদকীয়');
+    tx('bio-role', 'দ্য ওয়ে সম্পাদকীয় পর্ষদ');
+  }
   checkLocalDraft();
 }
 
@@ -1608,12 +1612,19 @@ function fill(a) {
   refreshArticleIdDisplay();
   tx('ed-headline', a.title || '');
   tx('ed-deck',     a.deck  || '');
-  tx('ed-author',   a.author      || '');
+  const fictional = ['অমিত দাশগুপ্ত', 'তানভীর হাসান', 'সৌমিক রায়হান', 'আহমেদ হাসান', 'Amit Dasgupta', 'Tanvir Hasan', 'Soumik Rayhan'];
+  let auth = (a.author || '').trim();
+  let role = (a.author_role || '').trim();
+  if (!auth || fictional.some(f => auth.includes(f))) {
+    auth = 'সম্পাদকীয়';
+    role = 'দ্য ওয়ে সম্পাদকীয় পর্ষদ';
+  }
+  tx('ed-author',   auth);
   tx('ed-date',     a.published_at
     ? fmtDate(new Date(a.published_at))
     : fmtDate(new Date(a.created_at || Date.now())));
-  tx('bio-name', a.author      || '');
-  tx('bio-role', a.author_role || '');
+  tx('bio-name', auth);
+  tx('bio-role', role);
   tx('bio-desc', a.author_bio  || '');
   syncSlug(a.slug || '', 'load');
   if (a.section) setSec(a.section);
@@ -2140,6 +2151,14 @@ function buildPayload() {
   cleanTags.push('feat_pos:' + (_featPos || 'top'));
   const tagsStr = cleanTags.join(',');
 
+  const fictional = ['অমিত দাশগুপ্ত', 'তানভীর হাসান', 'সৌমিক রায়হান', 'আহমেদ হাসান', 'Amit Dasgupta', 'Tanvir Hasan', 'Soumik Rayhan'];
+  let authName = gt('ed-author').trim();
+  let authRole = gt('bio-role').trim();
+  if (!authName || fictional.some(f => authName.includes(f))) {
+    authName = 'সম্পাদকীয়';
+    authRole = 'দ্য ওয়ে সম্পাদকীয় পর্ষদ';
+  }
+
   return {
     id:              ART_ID,
     slug:            currentSlug || undefined,
@@ -2147,8 +2166,8 @@ function buildPayload() {
     title:           gt('ed-headline'),
     deck:            gt('ed-deck'),
     section:         g('sec-lbl').textContent === 'Select Section' ? '' : g('sec-lbl').textContent,
-    author:          gt('ed-author'),
-    author_role:     gt('bio-role'),
+    author:          authName,
+    author_role:     authRole,
     author_bio:      gt('bio-desc'),
     author_photo_url: g('author-photo-img').src && g('author-photo-img').style.display !== 'none' ? g('author-photo-img').src : '',
     hero_img_url:    _featImgUrl || '',
