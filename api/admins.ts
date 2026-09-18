@@ -12,6 +12,7 @@
 
 import { requireAuth, requireAdmin, verifySession, hashPassword } from './_lib/auth';
 import { logActivity } from './_lib/activity';
+import activityLogHandler from './_handlers/activity-log';
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import type { ApiRequest, ApiResponse } from '../types';
 
@@ -33,6 +34,11 @@ async function countGmailAdmins(client: SupabaseClient, excludeId?: string): Pro
 }
 
 export default async function handler(req: ApiRequest, res: ApiResponse) {
+  // Delegate to activity-log handler if requested
+  if (req.query?._route === 'activity-log' || (req.url && req.url.includes('/activity-log'))) {
+    return await activityLogHandler(req, res);
+  }
+
   res.setHeader('Access-Control-Allow-Origin', (req.headers.origin as string) || '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PATCH, DELETE, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Authorization, Content-Type');

@@ -4,15 +4,15 @@
  */
 
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
-import { verifySession, requireAuth, requireAdmin } from './_lib/auth';
-import { logActivity } from './_lib/activity';
+import { verifySession, requireAuth, requireAdmin } from '../_lib/auth';
+import { logActivity } from '../_lib/activity';
 import {
   getLocalMovementSignups,
   saveLocalMovementSignup,
   updateLocalMovementSignup,
   deleteLocalMovementSignup
-} from './_lib/db-fallback';
-import type { ApiRequest, ApiResponse } from '../types';
+} from '../_lib/db-fallback';
+import type { ApiRequest, ApiResponse } from '../../types';
 
 function getSupabase(): SupabaseClient {
   const url = process.env.SUPABASE_URL || '';

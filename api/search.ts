@@ -4,9 +4,10 @@
  */
 
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
-import openlibrary from './connectors/openlibrary';
-import openalex from './connectors/openalex';
-import wikidata from './connectors/wikidata';
+import openlibrary from './_connectors/openlibrary';
+import openalex from './_connectors/openalex';
+import wikidata from './_connectors/wikidata';
+import resourcesHandler from './_handlers/resources';
 import fs from 'fs';
 import path from 'path';
 import type { ApiRequest, ApiResponse } from '../types';
@@ -131,6 +132,11 @@ const DEFAULT_GROUPS = [
 ];
 
 export default async function handler(req: ApiRequest, res: ApiResponse) {
+  // Delegate to resources handler if rewritten from /api/resources
+  if (req.query?._route === 'resources' || (req.url && req.url.includes('/resources'))) {
+    return await resourcesHandler(req, res);
+  }
+
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');

@@ -19,43 +19,24 @@ jobs:
     - name: Checkout Code
       uses: actions/checkout@v4
 
-    - name: Install pnpm
-      uses: pnpm/action-setup@v4
-      with:
-        version: 11.24.0
-
     - name: Set up Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v4
       with:
         node-version: ${{ matrix.node-version }}
-        cache: 'pnpm'
+        cache: 'npm'
 
     - name: Install Dependencies
-      run: pnpm install --frozen-lockfile
+      run: npm ci
 
-    - name: Syntax Check Node.js Backend & API Handlers
-      run: |
-        node --check dev-server.js
-        node --check api/articles.js
-        node --check api/article-seo.js
-        node --check api/auth.js
-        node --check api/books.js
-        node --check api/sections.js
-        node --check api/sitemap.js
-        node --check api/submissions.js
-        node --check api/movement.js
-        node --check api/admins.js
-        node --check api/activity-log.js
-        node --check api/_lib/auth.js
-        node --check api/_lib/activity.js
-        node --check api/_lib/db-fallback.js
+    - name: Type Check Backend & API Handlers (TypeScript)
+      run: npm run type-check
 
     - name: Validate All Web Books JSON Data
       run: |
         node -e "
           const fs = require('fs');
           const path = require('path');
-          const booksDir = path.join(__dirname, 'assets', 'js', 'books');
+          const booksDir = path.join(__dirname, 'public', 'assets', 'js', 'books');
           const files = fs.readdirSync(booksDir).filter(f => f.endsWith('.json'));
           console.log('Validating ' + files.length + ' book JSON files...');
           let hasError = false;
@@ -81,23 +62,30 @@ jobs:
 
     - name: Verify Frontend JavaScript Syntax
       run: |
-        node --check assets/js/supabase-config.js
-        node --check assets/js/books-data.js
-        node --check assets/js/components.js
-        node --check assets/js/script.js
+        node --check public/assets/js/supabase-config.js
+        node --check public/assets/js/books-data.js
+        node --check public/assets/js/components.js
+        node --check public/assets/js/script.js
+        node --check public/assets/js/i18n.js
+        node --check public/assets/js/admin.js
+        node --check public/assets/js/admin-auth.js
+
+    - name: Run Test Suite
+      run: npm test
 
     - name: Test Local Server Boot
       run: |
         node -e "
           const http = require('http');
-          const fs = require('fs');
+          const { exec } = require('child_process');
           console.log('Testing server bootstrap...');
-          process.env.PORT = '3999';
-          process.env.SESSION_SECRET = 'test_secret_for_ci_12345678901234';
-          require('./dev-server.js');
+          const serverProc = exec('npx tsx dev-server.ts', {
+            env: { ...process.env, PORT: '3999', SESSION_SECRET: 'test_secret_for_ci_12345678901234' }
+          });
           setTimeout(() => {
             http.get('http://localhost:3999', (res) => {
               console.log('Server responded with HTTP code:', res.statusCode);
+              serverProc.kill();
               if (res.statusCode === 200) {
                 console.log('✅ Local server bootstrap verified!');
                 process.exit(0);
@@ -107,7 +95,8 @@ jobs:
               }
             }).on('error', (e) => {
               console.error('❌ Server connection error:', e.message);
+              serverProc.kill();
               process.exit(1);
             });
-          }, 1000);
+          }, 3500);
         "

@@ -93,7 +93,20 @@ const server = http.createServer(async (rawReq, rawRes) => {
 
   // ── Handle /api/* serverless routes ────────────────────────────────
   if (pathname.startsWith('/api/')) {
-    const apiName = pathname.replace(/^\/api\//, '').split('/')[0].replace(/\.(js|ts)$/, '');
+    let apiName = pathname.replace(/^\/api\//, '').split('/')[0].replace(/\.(js|ts)$/, '');
+    if (apiName === 'activity-log') {
+      apiName = 'admins';
+      reqUrl.searchParams.set('_route', 'activity-log');
+    } else if (apiName === 'submissions') {
+      apiName = 'articles';
+      reqUrl.searchParams.set('_route', 'submissions');
+    } else if (apiName === 'movement') {
+      apiName = 'network';
+      reqUrl.searchParams.set('_route', 'movement');
+    } else if (apiName === 'resources') {
+      apiName = 'search';
+      reqUrl.searchParams.set('_route', 'resources');
+    }
     const apiFile = resolveApiFile(apiName);
 
     res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0');

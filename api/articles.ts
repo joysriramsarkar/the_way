@@ -11,6 +11,7 @@
 
 import { requireAuth, requireAdmin, verifySession } from './_lib/auth';
 import { logActivity } from './_lib/activity';
+import submissionsHandler from './_handlers/submissions';
 import { createClient } from '@supabase/supabase-js';
 import type { ApiRequest, ApiResponse } from '../types';
 
@@ -30,6 +31,11 @@ function slugify(text: string): string {
 }
 
 export default async function handler(req: ApiRequest, res: ApiResponse) {
+  // Delegate to submissions handler if requested
+  if (req.query?._route === 'submissions' || (req.url && req.url.includes('/submissions'))) {
+    return await submissionsHandler(req, res);
+  }
+
   res.setHeader('Access-Control-Allow-Origin', (req.headers.origin as string) || '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, DELETE, OPTIONS, PATCH');
   res.setHeader('Access-Control-Allow-Headers', 'Authorization, Content-Type');

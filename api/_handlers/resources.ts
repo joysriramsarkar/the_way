@@ -6,20 +6,20 @@
 
 import fs from 'fs';
 import path from 'path';
-import openlibrary from './connectors/openlibrary';
-import openalex from './connectors/openalex';
-import crossref from './connectors/crossref';
-import wikidata from './connectors/wikidata';
-import type { ApiRequest, ApiResponse } from '../types';
+import openlibrary from '../_connectors/openlibrary';
+import openalex from '../_connectors/openalex';
+import crossref from '../_connectors/crossref';
+import wikidata from '../_connectors/wikidata';
+import type { ApiRequest, ApiResponse } from '../../types';
 
 // Load local books data
 let localBooksCache: any[] | null = null;
 function getLocalBooks(): any[] {
   if (localBooksCache) return localBooksCache;
   try {
-    let booksDataPath = path.join(__dirname, '..', 'public', 'assets', 'js', 'books-data.js');
+    let booksDataPath = path.join(process.cwd(), 'public', 'assets', 'js', 'books-data.js');
     if (!fs.existsSync(booksDataPath)) {
-      booksDataPath = path.join(__dirname, '..', 'assets', 'js', 'books-data.js');
+      booksDataPath = path.join(__dirname, '..', '..', 'public', 'assets', 'js', 'books-data.js');
     }
     if (fs.existsSync(booksDataPath)) {
       const content = fs.readFileSync(booksDataPath, 'utf8');

@@ -8,6 +8,7 @@ import fs from 'fs';
 import path from 'path';
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import { verifySession } from './_lib/auth';
+import movementHandler from './_handlers/movement';
 import type { ApiRequest, ApiResponse, SocialistPost, SolidarityRequest } from '../types';
 
 function getSbClient(): SupabaseClient | null {
@@ -137,6 +138,11 @@ const SEED_SOLIDARITY: SolidarityRequest[] = [
 ];
 
 export default async function handler(req: ApiRequest, res: ApiResponse) {
+  // Delegate to movement handler if requested
+  if (req.query?._route === 'movement' || (req.url && req.url.includes('/movement'))) {
+    return await movementHandler(req, res);
+  }
+
   res.setHeader('Access-Control-Allow-Origin', (req.headers && req.headers.origin) || '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Authorization, Content-Type');

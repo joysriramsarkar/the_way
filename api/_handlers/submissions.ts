@@ -6,14 +6,14 @@
  */
 
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
-import { verifySession, requireAuth } from './_lib/auth';
-import { logActivity } from './_lib/activity';
+import { verifySession, requireAuth } from '../_lib/auth';
+import { logActivity } from '../_lib/activity';
 import {
   getLocalSubmissions,
   saveLocalSubmission,
   updateLocalSubmission
-} from './_lib/db-fallback';
-import type { ApiRequest, ApiResponse } from '../types';
+} from '../_lib/db-fallback';
+import type { ApiRequest, ApiResponse } from '../../types';
 
 function getSupabase(): SupabaseClient {
   const url = process.env.SUPABASE_URL || '';

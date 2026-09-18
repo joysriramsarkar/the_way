@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "tsx dev-server.ts",
     "start": "tsx dev-server.ts",
-    "build": "tsc",
+    "build": "tsc --noEmit",
     "type-check": "tsc --noEmit",
     "test": "tsx tests/test-phase2-phase3.js && tsx tests/test-final-phases.js"
   },

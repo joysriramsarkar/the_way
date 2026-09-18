@@ -9,10 +9,10 @@
  * IMMUTABILITY GUARANTEE: No DELETE or CLEAR endpoints exist.
  */
 
-import { requireAuth } from './_lib/auth';
-import { logActivity } from './_lib/activity';
+import { requireAuth } from '../_lib/auth';
+import { logActivity } from '../_lib/activity';
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
-import type { ApiRequest, ApiResponse } from '../types';
+import type { ApiRequest, ApiResponse } from '../../types';
 
 function sb(): SupabaseClient {
   const url = process.env.SUPABASE_URL || '';

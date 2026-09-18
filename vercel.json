@@ -1,4 +1,5 @@
 {
+  "outputDirectory": "public",
   "cleanUrls": true,
   "trailingSlash": false,
   "rewrites": [
@@ -18,8 +19,17 @@
     { "source": "/translations", "destination": "/translations.html" },
     { "source": "/organizations", "destination": "/organizations.html" },
     { "source": "/languages", "destination": "/languages.html" },
+    { "source": "/api/activity-log", "destination": "/api/admins?_route=activity-log" },
+    { "source": "/api/submissions", "destination": "/api/articles?_route=submissions" },
+    { "source": "/api/movement", "destination": "/api/network?_route=movement" },
+    { "source": "/api/resources", "destination": "/api/search?_route=resources" },
     { "source": "/api/v1/:path*", "destination": "/api/v1?endpoint=:path*" }
   ],
+  "functions": {
+    "api/**/*.ts": {
+      "includeFiles": "data/**"
+    }
+  },
   "headers": [
     {
       "source": "/assets/(.*)",
