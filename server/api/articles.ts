@@ -7,7 +7,7 @@ import { requireAuth, requireAdmin, verifySession } from './_lib/auth';
 import { logActivity } from './_lib/activity';
 import submissionsHandler from './_handlers/submissions';
 import sql from './_lib/db';
-import type { ApiRequest, ApiResponse } from '../types';
+import type { ApiRequest, ApiResponse } from '@/types';
 
 function slugify(text: string): string {
   return (text || '')

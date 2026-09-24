@@ -1,4 +1,4 @@
-import sql from '../api/_lib/db';
+import sql from '../server/api/_lib/db';
 
 async function execSql(raw: string) {
   const statements = raw

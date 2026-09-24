@@ -8,8 +8,8 @@ import openlibrary from './_connectors/openlibrary';
 import openalex from './_connectors/openalex';
 import wikidata from './_connectors/wikidata';
 import resourcesHandler from './_handlers/resources';
-import { getAllBooks } from '../data/books-data';
-import type { ApiRequest, ApiResponse } from '../types';
+import { getAllBooks } from '@/data/books-data';
+import type { ApiRequest, ApiResponse } from '@/types';
 
 export default async function handler(req: ApiRequest, res: ApiResponse) {
   if (req.query?._route === 'resources' || (req.url && req.url.includes('/resources'))) {
@@ -90,12 +90,12 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
       try {
         // Search local books-data first (supports Bengali titles and socialist works)
         const qLower = q.toLowerCase();
-        const localMatches = getAllBooks().filter(b =>
+        const localMatches = getAllBooks().filter((b: any) =>
           b.title.toLowerCase().includes(qLower) ||
           (b.orig || '').toLowerCase().includes(qLower) ||
           b.author.toLowerCase().includes(qLower) ||
           (b.desc || '').toLowerCase().includes(qLower)
-        ).slice(0, 6).map(b => ({
+        ).slice(0, 6).map((b: any) => ({
           id: b.id,
           type: 'book',
           title: b.title,
@@ -121,11 +121,11 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
         // Fallback: just search local books
         try {
           const qLower = q.toLowerCase();
-          results.books = getAllBooks().filter(b =>
+          results.books = getAllBooks().filter((b: any) =>
             b.title.toLowerCase().includes(qLower) ||
             (b.orig || '').toLowerCase().includes(qLower) ||
             b.author.toLowerCase().includes(qLower)
-          ).slice(0, 8).map(b => ({
+          ).slice(0, 8).map((b: any) => ({
             id: b.id,
             type: 'book',
             title: b.title,

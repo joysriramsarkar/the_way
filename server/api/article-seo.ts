@@ -6,7 +6,7 @@
 import sql from './_lib/db';
 import fs from 'fs';
 import path from 'path';
-import type { ApiRequest, ApiResponse } from '../types';
+import type { ApiRequest, ApiResponse } from '@/types';
 
 function escapeHtml(str: string): string {
   return (str || '').toString()

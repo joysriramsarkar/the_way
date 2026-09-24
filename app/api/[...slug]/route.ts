@@ -2,17 +2,17 @@ import { NextRequest, NextResponse } from 'next/server';
 import path from 'path';
 import fs from 'fs';
 
-import adminsHandler from '@/api/admins';
-import articleSeoHandler from '@/api/article-seo';
-import articlesHandler from '@/api/articles';
-import authHandler from '@/api/auth';
-import booksHandler from '@/api/books';
-import networkHandler from '@/api/network';
-import searchHandler from '@/api/search';
-import sectionsHandler from '@/api/sections';
-import sitemapHandler from '@/api/sitemap';
-import translationsHandler from '@/api/translations';
-import v1Handler from '@/api/v1';
+import adminsHandler from '@/server/api/admins';
+import articleSeoHandler from '@/server/api/article-seo';
+import articlesHandler from '@/server/api/articles';
+import authHandler from '@/server/api/auth';
+import booksHandler from '@/server/api/books';
+import networkHandler from '@/server/api/network';
+import searchHandler from '@/server/api/search';
+import sectionsHandler from '@/server/api/sections';
+import sitemapHandler from '@/server/api/sitemap';
+import translationsHandler from '@/server/api/translations';
+import v1Handler from '@/server/api/v1';
 
 const apiHandlers: Record<string, (req: any, res: any) => Promise<any> | any> = {
   admins: adminsHandler,

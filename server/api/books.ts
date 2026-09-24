@@ -3,7 +3,7 @@
  */
 
 import sql from './_lib/db';
-import type { ApiRequest, ApiResponse } from '../types';
+import type { ApiRequest, ApiResponse } from '@/types';
 
 export default async function handler(req: ApiRequest, res: ApiResponse) {
   res.setHeader('Access-Control-Allow-Origin', (req.headers.origin as string) || '*');

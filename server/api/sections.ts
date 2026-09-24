@@ -5,7 +5,7 @@
 import sql from './_lib/db';
 import { verifySession, requireAuth, requireAdmin } from './_lib/auth';
 import { logActivity } from './_lib/activity';
-import type { ApiRequest, ApiResponse } from '../types';
+import type { ApiRequest, ApiResponse } from '@/types';
 
 function rowToAdminSection(row: any) {
   return {

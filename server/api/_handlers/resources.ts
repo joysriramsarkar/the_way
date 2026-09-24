@@ -10,8 +10,8 @@ import openlibrary from '../_connectors/openlibrary';
 import openalex from '../_connectors/openalex';
 import crossref from '../_connectors/crossref';
 import wikidata from '../_connectors/wikidata';
-import { WORKS } from '../../data/books-data';
-import type { ApiRequest, ApiResponse } from '../../types';
+import { WORKS } from '@/data/books-data';
+import type { ApiRequest, ApiResponse } from '@/types';
 
 // Load local books data
 let localBooksCache: any[] | null = null;

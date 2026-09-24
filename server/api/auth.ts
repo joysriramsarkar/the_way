@@ -7,7 +7,7 @@ import jwt from 'jsonwebtoken';
 import sql from './_lib/db';
 import { verifySession, requireAuth, hashPassword, verifyPassword } from './_lib/auth';
 import { logActivity } from './_lib/activity';
-import type { ApiRequest, ApiResponse } from '../types';
+import type { ApiRequest, ApiResponse } from '@/types';
 
 export default async function handler(req: ApiRequest, res: ApiResponse) {
   const origin = req.headers?.origin as string;

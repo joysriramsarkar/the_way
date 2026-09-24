@@ -7,7 +7,7 @@ import { requireAuth, requireAdmin, verifySession, hashPassword } from './_lib/a
 import { logActivity } from './_lib/activity';
 import activityLogHandler from './_handlers/activity-log';
 import sql from './_lib/db';
-import type { ApiRequest, ApiResponse } from '../types';
+import type { ApiRequest, ApiResponse } from '@/types';
 
 async function countGmailAdmins(excludeId?: string): Promise<number> {
   let q = "SELECT COUNT(*) as count FROM allowed_admins WHERE status = 'active' AND role = 'Admin' AND LOWER(email) LIKE '%@gmail.com'";

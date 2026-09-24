@@ -3,7 +3,7 @@
  */
 
 import sql from './_lib/db';
-import type { ApiRequest, ApiResponse } from '../types';
+import type { ApiRequest, ApiResponse } from '@/types';
 
 function escapeXml(unsafe: string | null | undefined): string {
   return (unsafe || '').toString().replace(/[<>&'"]/g, c => {

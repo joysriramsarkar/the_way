@@ -33,7 +33,7 @@ async function runTests() {
   }
 
   // ── 2. TEST WIKIDATA CONCEPT CONNECTOR ────────────────────────────
-  const wikidata = require('../api/_connectors/wikidata');
+  const wikidata = require('../server/api/_connectors/wikidata');
   const conceptBn = wikidata.findConcept('সাম্রাজ্যবাদ');
   assert(conceptBn && conceptBn.canonical === 'imperialism', 'Wikidata findConcept (Bengali -> Imperialism)');
 
@@ -44,7 +44,7 @@ async function runTests() {
   assert(expanded.includes('Surplus value') && expanded.includes('উদ্বৃত্ত মূল্য'), 'Wikidata expandSearchTerms');
 
   // ── 3. TEST OPENLIBRARY CONNECTOR ─────────────────────────────────
-  const openlibrary = require('../api/_connectors/openlibrary');
+  const openlibrary = require('../server/api/_connectors/openlibrary');
   try {
     const books = await openlibrary.searchBooks('Das Kapital', { limit: 2 });
     assert(Array.isArray(books) && books.length > 0, `OpenLibrary searchBooks (returned ${books.length} books)`);
@@ -53,7 +53,7 @@ async function runTests() {
   }
 
   // ── 4. TEST OPENALEX CONNECTOR ────────────────────────────────────
-  const openalex = require('../api/_connectors/openalex');
+  const openalex = require('../server/api/_connectors/openalex');
   try {
     const papers = await openalex.searchResearch('Marxism imperialism', { limit: 2 });
     assert(Array.isArray(papers) && papers.length > 0, `OpenAlex searchResearch (returned ${papers.length} papers)`);
@@ -62,7 +62,7 @@ async function runTests() {
   }
 
   // ── 5. TEST CROSSREF CONNECTOR ────────────────────────────────────
-  const crossref = require('../api/_connectors/crossref');
+  const crossref = require('../server/api/_connectors/crossref');
   try {
     const papers = await crossref.searchCrossref('Historical Materialism', { limit: 2 });
     assert(Array.isArray(papers) && papers.length > 0, `Crossref searchCrossref (returned ${papers.length} items)`);
@@ -71,7 +71,7 @@ async function runTests() {
   }
 
   // ── 6. TEST RESOURCES API ─────────────────────────────────────────
-  const resourcesHandlerMod = require('../api/_handlers/resources');
+  const resourcesHandlerMod = require('../server/api/_handlers/resources');
   const resourcesHandler = resourcesHandlerMod.default || resourcesHandlerMod;
   {
     const req = { method: 'GET', query: { q: '' }, headers: {} };
@@ -99,7 +99,7 @@ async function runTests() {
   }
 
   // ── 7. TEST SEARCH API ────────────────────────────────────────────
-  const searchHandlerMod = require('../api/search');
+  const searchHandlerMod = require('../server/api/search');
   const searchHandler = searchHandlerMod.default || searchHandlerMod;
   {
     const req = { method: 'GET', query: { q: 'লেনিন' }, headers: {} };
@@ -115,7 +115,7 @@ async function runTests() {
   }
 
   // ── 8. TEST NETWORK API ───────────────────────────────────────────
-  const networkHandlerMod = require('../api/network');
+  const networkHandlerMod = require('../server/api/network');
   const networkHandler = networkHandlerMod.default || networkHandlerMod;
   {
     // GET Posts

@@ -47,9 +47,9 @@ async function run() {
     };
   }
 
-  // ── 1. Collaborative Translation Workspace (api/translations.ts) ──
-  console.log('[1] Testing Collaborative Translation Workspace (api/translations.ts)...');
-  const translationsHandlerMod = require('../api/translations');
+  // ── 1. Collaborative Translation Workspace (server/api/translations.ts) ──
+  console.log('[1] Testing Collaborative Translation Workspace (server/api/translations.ts)...');
+  const translationsHandlerMod = require('../server/api/translations');
   const translationsHandler = translationsHandlerMod.default || translationsHandlerMod;
 
   await asyncTest('GET /api/translations returns active translation projects and languages', async () => {
@@ -141,9 +141,9 @@ async function run() {
     assert.strictEqual(res.body.project.status, 'published');
   });
 
-  // ── 2. Federation & Public Knowledge API (api/v1.ts) ───────────────
-  console.log('\n[2] Testing Federation & Public Knowledge API (api/v1.ts)...');
-  const federationHandlerMod = require('../api/v1');
+  // ── 2. Federation & Public Knowledge API (server/api/v1.ts) ───────────────
+  console.log('\n[2] Testing Federation & Public Knowledge API (server/api/v1.ts)...');
+  const federationHandlerMod = require('../server/api/v1');
   const federationHandler = federationHandlerMod.default || federationHandlerMod;
 
   await asyncTest('GET /api/v1?endpoint=manifest returns node metadata & protocol spec', async () => {
@@ -277,8 +277,8 @@ async function run() {
     assert(i18nCode.includes("ko: '한국어'"), 'I18nProvider must support Korean');
   });
 
-  test('api/sitemap.ts includes all new routes in XML sitemap', async () => {
-    const sitemapHandlerMod = require('../api/sitemap');
+  test('server/api/sitemap.ts includes all new routes in XML sitemap', async () => {
+    const sitemapHandlerMod = require('../server/api/sitemap');
     const sitemapHandler = sitemapHandlerMod.default || sitemapHandlerMod;
     const req = { method: 'GET', query: {}, headers: { host: 'thewaysocialist.vercel.app' } };
     const res = mockRes();

@@ -5,7 +5,7 @@
 import jwt from 'jsonwebtoken';
 import sql from './db';
 import crypto from 'crypto';
-import type { ApiRequest, ApiResponse, AuthUserSession } from '../../types';
+import type { ApiRequest, ApiResponse, AuthUserSession } from '@/types';
 
 export function verifySession(req: ApiRequest): AuthUserSession | null {
   if (!req || !req.headers) return null;

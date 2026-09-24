@@ -3,7 +3,7 @@
  */
 
 import sql from './db';
-import type { ApiRequest } from '../../types';
+import type { ApiRequest } from '@/types';
 
 export function extractClientInfo(req: ApiRequest | null): { ip: string; userAgent: string } {
   if (!req) return { ip: 'unknown', userAgent: 'unknown' };

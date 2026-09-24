@@ -58,9 +58,9 @@ const MIME_TYPES: Record<string, string> = {
 };
 
 function resolveApiFile(apiName: string): string | null {
-  const tsPath = path.join(__dirname, 'api', `${apiName}.ts`);
+  const tsPath = path.join(__dirname, 'server', 'api', `${apiName}.ts`);
   if (fs.existsSync(tsPath)) return tsPath;
-  const jsPath = path.join(__dirname, 'api', `${apiName}.js`);
+  const jsPath = path.join(__dirname, 'server', 'api', `${apiName}.js`);
   if (fs.existsSync(jsPath)) return jsPath;
   return null;
 }

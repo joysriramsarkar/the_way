@@ -9,7 +9,7 @@
  */
 
 import sql from './_lib/db';
-import type { ApiRequest, ApiResponse, FederationManifest } from '../types';
+import type { ApiRequest, ApiResponse, FederationManifest } from '@/types';
 
 function formatOrganization(o: any) {
   if (!o) return o;

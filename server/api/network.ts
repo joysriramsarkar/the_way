@@ -6,7 +6,7 @@
 import sql from './_lib/db';
 import { verifySession } from './_lib/auth';
 import movementHandler from './_handlers/movement';
-import type { ApiRequest, ApiResponse } from '../types';
+import type { ApiRequest, ApiResponse } from '@/types';
 
 export default async function handler(req: ApiRequest, res: ApiResponse) {
   if (req.query?._route === 'movement' || (req.url && req.url.includes('/movement'))) {

@@ -5,7 +5,7 @@
 import sql from '../_lib/db';
 import { verifySession, requireAuth } from '../_lib/auth';
 import { logActivity } from '../_lib/activity';
-import type { ApiRequest, ApiResponse } from '../../types';
+import type { ApiRequest, ApiResponse } from '@/types';
 
 function generateSlug(text: string): string {
   return String(text || '')
