@@ -49,7 +49,8 @@ async function run() {
 
   // ── 1. Collaborative Translation Workspace (api/translations.ts) ──
   console.log('[1] Testing Collaborative Translation Workspace (api/translations.ts)...');
-  const translationsHandler = require('../api/translations');
+  const translationsHandlerMod = require('../api/translations');
+  const translationsHandler = translationsHandlerMod.default || translationsHandlerMod;
 
   await asyncTest('GET /api/translations returns active translation projects and languages', async () => {
     const req = { method: 'GET', query: {}, headers: {} };
@@ -142,7 +143,8 @@ async function run() {
 
   // ── 2. Federation & Public Knowledge API (api/v1.ts) ───────────────
   console.log('\n[2] Testing Federation & Public Knowledge API (api/v1.ts)...');
-  const federationHandler = require('../api/v1');
+  const federationHandlerMod = require('../api/v1');
+  const federationHandler = federationHandlerMod.default || federationHandlerMod;
 
   await asyncTest('GET /api/v1?endpoint=manifest returns node metadata & protocol spec', async () => {
     const req = { method: 'GET', query: { endpoint: 'manifest' }, headers: {} };
@@ -226,42 +228,33 @@ async function run() {
     assert.strictEqual(res.body.organization.country, 'Sudan');
   });
 
-  // ── 3. Frontend Architecture & HTML Pages ─────────────────────────
+  // ── 3. Frontend Architecture & Next.js App Router Pages ───────────
   console.log('\n[3] Testing Frontend Pages & Integrity...');
 
-  const requiredPages = [
-    'translations.html',
-    'organizations.html',
-    'languages.html',
-    'resource.html',
-    'search.html',
-    'solidarity.html',
-    'feed.html',
-    'groups.html',
-    'profile.html'
+  const requiredNextPages = [
+    'app/translations/page.tsx',
+    'app/organizations/page.tsx',
+    'app/languages/page.tsx',
+    'app/resource/[id]/page.tsx',
+    'app/search/page.tsx',
+    'app/solidarity/page.tsx',
+    'app/feed/page.tsx',
+    'app/groups/page.tsx',
+    'app/profile/page.tsx'
   ];
 
-  requiredPages.forEach(page => {
-    test(`Page ${page} exists and has semantic HTML`, () => {
-      const p = path.join(__dirname, '..', 'public', page);
-      assert(fs.existsSync(p), `${page} must exist in public/`);
+  requiredNextPages.forEach(pagePath => {
+    test(`Page ${pagePath} exists and has valid component structure`, () => {
+      const p = path.join(__dirname, '..', pagePath);
+      assert(fs.existsSync(p), `${pagePath} must exist in project`);
       const content = fs.readFileSync(p, 'utf8');
-      assert(content.includes('<!DOCTYPE html>'), `${page} must have DOCTYPE`);
-      assert(content.includes('<title>'), `${page} must have title`);
-      assert(content.length > 500, `${page} must have rich content`);
+      assert(content.includes('export default'), `${pagePath} must have default export`);
+      assert(content.length > 500, `${pagePath} must have rich content`);
     });
   });
 
   // ── 4. Routing & Components Verification ──────────────────────────
   console.log('\n[4] Testing Navigation & Routing Configuration...');
-
-  test('dev-server includes pretty rewrites for new routes', () => {
-    const serverFile = path.join(__dirname, '..', 'dev-server.ts');
-    const serverCode = fs.readFileSync(serverFile, 'utf8');
-    assert(serverCode.includes("pathname === '/translations'"), 'dev-server must rewrite /translations');
-    assert(serverCode.includes("pathname === '/organizations'"), 'dev-server must rewrite /organizations');
-    assert(serverCode.includes("pathname === '/languages'"), 'dev-server must rewrite /languages');
-  });
 
   test('vercel.json includes rewrites for translations, organizations, languages, and api/v1', () => {
     const vercelConfig = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'vercel.json'), 'utf8'));
@@ -272,17 +265,21 @@ async function run() {
     assert(rewrites.some(r => r.source === '/api/v1/:path*'), 'vercel.json missing /api/v1/:path*');
   });
 
-  test('assets/js/components.js contains navigation links and 8-language switcher', () => {
-    const compCode = fs.readFileSync(path.join(__dirname, '..', 'public', 'assets', 'js', 'components.js'), 'utf8');
-    assert(compCode.includes('/translations.html'), 'components.js missing /translations link');
-    assert(compCode.includes('/organizations.html'), 'components.js missing /organizations link');
-    assert(compCode.includes('/languages.html'), 'components.js missing /languages link');
-    assert(compCode.includes("SUPPORTED_LANGS = ['bn', 'en', 'es', 'hi', 'ar', 'pt', 'fr', 'ru']"), 'components.js must support 8 locales');
-    assert(compCode.includes("العربية (Arabic)"), 'components.js language modal must have Arabic');
+  test('components/Header.tsx & I18nProvider.tsx contain navigation and 11-language switcher', () => {
+    const headerCode = fs.readFileSync(path.join(__dirname, '..', 'components', 'Header.tsx'), 'utf8');
+    assert(headerCode.includes("href: '/translations'"), 'Header.tsx missing /translations link');
+    assert(headerCode.includes("href: '/organizations'"), 'Header.tsx missing /organizations link');
+    assert(headerCode.includes("href: '/languages'"), 'Header.tsx missing /languages link');
+
+    const i18nCode = fs.readFileSync(path.join(__dirname, '..', 'components', 'I18nProvider.tsx'), 'utf8');
+    assert(i18nCode.includes("ar: 'العربية'"), 'I18nProvider language modal must have Arabic');
+    assert(i18nCode.includes("ja: '日本語'"), 'I18nProvider must support Japanese');
+    assert(i18nCode.includes("ko: '한국어'"), 'I18nProvider must support Korean');
   });
 
   test('api/sitemap.ts includes all new routes in XML sitemap', async () => {
-    const sitemapHandler = require('../api/sitemap');
+    const sitemapHandlerMod = require('../api/sitemap');
+    const sitemapHandler = sitemapHandlerMod.default || sitemapHandlerMod;
     const req = { method: 'GET', query: {}, headers: { host: 'thewaysocialist.vercel.app' } };
     const res = mockRes();
     await sitemapHandler(req, res);

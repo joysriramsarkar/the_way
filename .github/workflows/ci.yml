@@ -13,7 +13,7 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [18.x, 20.x]
+        node-version: [20.x, 22.x]
 
     steps:
     - name: Checkout Code
@@ -28,7 +28,7 @@ jobs:
     - name: Install Dependencies
       run: npm ci
 
-    - name: Type Check Backend & API Handlers (TypeScript)
+    - name: Type Check Backend & Frontend (TypeScript)
       run: npm run type-check
 
     - name: Validate All Web Books JSON Data
@@ -36,7 +36,7 @@ jobs:
         node -e "
           const fs = require('fs');
           const path = require('path');
-          const booksDir = path.join(__dirname, 'public', 'assets', 'js', 'books');
+          const booksDir = path.join(__dirname, 'public', 'assets', 'books');
           const files = fs.readdirSync(booksDir).filter(f => f.endsWith('.json'));
           console.log('Validating ' + files.length + ' book JSON files...');
           let hasError = false;
@@ -60,34 +60,27 @@ jobs:
           console.log('All book data files validated successfully!');
         "
 
-    - name: Verify Frontend JavaScript Syntax
-      run: |
-        node --check public/assets/js/supabase-config.js
-        node --check public/assets/js/books-data.js
-        node --check public/assets/js/components.js
-        node --check public/assets/js/script.js
-        node --check public/assets/js/i18n.js
-        node --check public/assets/js/admin.js
-        node --check public/assets/js/admin-auth.js
-
     - name: Run Test Suite
       run: npm test
 
-    - name: Test Local Server Boot
+    - name: Build Next.js Production Application
+      run: npm run build
+
+    - name: Test Next.js Production Server Boot
       run: |
         node -e "
           const http = require('http');
           const { exec } = require('child_process');
-          console.log('Testing server bootstrap...');
-          const serverProc = exec('npx tsx dev-server.ts', {
+          console.log('Testing Next.js server bootstrap...');
+          const serverProc = exec('npx next start -p 3999', {
             env: { ...process.env, PORT: '3999', SESSION_SECRET: 'test_secret_for_ci_12345678901234' }
           });
           setTimeout(() => {
             http.get('http://localhost:3999', (res) => {
-              console.log('Server responded with HTTP code:', res.statusCode);
+              console.log('Next.js server responded with HTTP code:', res.statusCode);
               serverProc.kill();
               if (res.statusCode === 200) {
-                console.log('✅ Local server bootstrap verified!');
+                console.log('✅ Next.js server bootstrap verified!');
                 process.exit(0);
               } else {
                 console.error('❌ Unexpected status code:', res.statusCode);
@@ -98,5 +91,5 @@ jobs:
               serverProc.kill();
               process.exit(1);
             });
-          }, 3500);
+          }, 4000);
         "

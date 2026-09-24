@@ -19,8 +19,8 @@ async function runTests() {
     }
   }
 
-  // ── 1. TEST LOCALES JSON VALIDITY (ALL 8 LOCALES) ─────────────────
-  const locales = ['bn', 'en', 'es', 'hi', 'ar', 'pt', 'fr', 'ru'];
+  // ── 1. TEST LOCALES JSON VALIDITY (ALL 11 LOCALES) ────────────────
+  const locales = ['bn', 'en', 'es', 'hi', 'ar', 'pt', 'fr', 'ru', 'zh', 'ja', 'ko'];
   for (const loc of locales) {
     try {
       const p = path.join(__dirname, '..', 'public', 'locales', `${loc}.json`);
@@ -71,7 +71,8 @@ async function runTests() {
   }
 
   // ── 6. TEST RESOURCES API ─────────────────────────────────────────
-  const resourcesHandler = require('../api/_handlers/resources');
+  const resourcesHandlerMod = require('../api/_handlers/resources');
+  const resourcesHandler = resourcesHandlerMod.default || resourcesHandlerMod;
   {
     const req = { method: 'GET', query: { q: '' }, headers: {} };
     let responseData = null;
@@ -98,7 +99,8 @@ async function runTests() {
   }
 
   // ── 7. TEST SEARCH API ────────────────────────────────────────────
-  const searchHandler = require('../api/search');
+  const searchHandlerMod = require('../api/search');
+  const searchHandler = searchHandlerMod.default || searchHandlerMod;
   {
     const req = { method: 'GET', query: { q: 'লেনিন' }, headers: {} };
     let responseData = null;
@@ -113,7 +115,8 @@ async function runTests() {
   }
 
   // ── 8. TEST NETWORK API ───────────────────────────────────────────
-  const networkHandler = require('../api/network');
+  const networkHandlerMod = require('../api/network');
+  const networkHandler = networkHandlerMod.default || networkHandlerMod;
   {
     // GET Posts
     const req = { method: 'GET', query: { action: 'posts' }, headers: {} };

@@ -31,7 +31,8 @@ export default function Header() {
     { href: '/directory', label: `👥 ${t('nav.directory', 'ডিরেক্টরি')}` },
     { href: '/groups', label: `📚 ${t('nav.groups', 'পাঠচক্র')}` },
     { href: '/solidarity', label: `✊ ${t('nav.solidarity', 'সংহতি')}` },
-    { href: '/translations', label: `🌐 ${t('nav.translations', 'অনুবাদ')}` }
+    { href: '/translations', label: `🌐 ${t('nav.translations', 'অনুবাদ')}` },
+    { href: '/languages', label: `🗣️ ${t('nav.languages', 'ভাষাসমূহ')}` }
   ];
 
   const handleSearch = (e: React.FormEvent) => {
