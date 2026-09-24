@@ -1,7 +1,4 @@
-import { neon } from '@neondatabase/serverless';
-
-const connectionString = process.env.DATABASE_URL || 'postgresql://neondb_owner:npg_WCpu4xhLD9tr@ep-twilight-cake-b4sogard-pooler.c-6.us-east-2.aws.neon.tech/neondb?sslmode=require&channel_binding=require';
-const sql = neon(connectionString);
+import sql from '../api/_lib/db';
 
 async function execSql(raw: string) {
   const statements = raw
@@ -189,18 +186,36 @@ export async function migrate() {
     );
   `);
 
-  // 8. NETWORK TABLES (Groups, Solidarity, Posts, Comments, Reactions)
+  // 8. NETWORK TABLES (Groups, Solidarity, Posts, Comments, Reactions, Follows, Memberships)
   await execSql(`
     CREATE TABLE IF NOT EXISTS network_groups (
       id TEXT PRIMARY KEY,
+      slug TEXT,
       name TEXT NOT NULL,
       name_bn TEXT,
       category TEXT,
+      group_type TEXT DEFAULT 'study_group',
       lang TEXT DEFAULT 'bn',
+      visibility TEXT DEFAULT 'public',
+      join_policy TEXT DEFAULT 'open',
+      created_by TEXT DEFAULT 'system',
       members_count INTEGER DEFAULT 0,
       description TEXT,
-      created_at TIMESTAMPTZ DEFAULT NOW()
+      created_at TIMESTAMPTZ DEFAULT NOW(),
+      updated_at TIMESTAMPTZ DEFAULT NOW()
     );
+
+    CREATE TABLE IF NOT EXISTS group_members (
+      id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      group_id TEXT NOT NULL REFERENCES network_groups(id) ON DELETE CASCADE,
+      user_email TEXT NOT NULL,
+      role TEXT DEFAULT 'member',
+      status TEXT DEFAULT 'active',
+      joined_at TIMESTAMPTZ DEFAULT NOW(),
+      UNIQUE(group_id, user_email)
+    );
+    CREATE INDEX IF NOT EXISTS idx_group_members_group ON group_members (group_id);
+    CREATE INDEX IF NOT EXISTS idx_group_members_user ON group_members (user_email);
 
     CREATE TABLE IF NOT EXISTS solidarity_campaigns (
       id TEXT PRIMARY KEY,
@@ -218,6 +233,7 @@ export async function migrate() {
     CREATE TABLE IF NOT EXISTS network_posts (
       id TEXT PRIMARY KEY,
       author TEXT NOT NULL,
+      author_email TEXT,
       country TEXT,
       country_flag TEXT,
       initials TEXT,
@@ -232,9 +248,70 @@ export async function migrate() {
       id TEXT PRIMARY KEY,
       post_id TEXT NOT NULL REFERENCES network_posts(id) ON DELETE CASCADE,
       author TEXT NOT NULL,
+      author_email TEXT,
       content TEXT NOT NULL,
       created_at TIMESTAMPTZ DEFAULT NOW()
     );
+
+    ALTER TABLE network_posts ADD COLUMN IF NOT EXISTS author_email TEXT;
+    ALTER TABLE network_comments ADD COLUMN IF NOT EXISTS author_email TEXT;
+
+    CREATE TABLE IF NOT EXISTS post_reactions (
+      id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      post_id TEXT NOT NULL REFERENCES network_posts(id) ON DELETE CASCADE,
+      user_email TEXT NOT NULL,
+      reaction_type TEXT NOT NULL DEFAULT 'solidarity',
+      created_at TIMESTAMPTZ DEFAULT NOW(),
+      UNIQUE(post_id, user_email, reaction_type)
+    );
+    CREATE INDEX IF NOT EXISTS idx_post_reactions_post ON post_reactions (post_id);
+    CREATE INDEX IF NOT EXISTS idx_post_reactions_user ON post_reactions (user_email);
+
+    CREATE TABLE IF NOT EXISTS follows (
+      id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      follower_email TEXT NOT NULL,
+      following_email TEXT NOT NULL,
+      created_at TIMESTAMPTZ DEFAULT NOW(),
+      UNIQUE(follower_email, following_email)
+    );
+    CREATE INDEX IF NOT EXISTS idx_follows_follower ON follows (follower_email);
+    CREATE INDEX IF NOT EXISTS idx_follows_following ON follows (following_email);
+
+    CREATE TABLE IF NOT EXISTS events (
+      id TEXT PRIMARY KEY,
+      title TEXT NOT NULL,
+      title_bn TEXT,
+      description TEXT,
+      event_type TEXT NOT NULL,
+      language TEXT DEFAULT 'bn',
+      start_at TIMESTAMPTZ NOT NULL,
+      end_at TIMESTAMPTZ,
+      timezone TEXT DEFAULT 'Asia/Dhaka',
+      country TEXT DEFAULT 'Bangladesh',
+      country_flag TEXT DEFAULT '🇧🇩',
+      city TEXT,
+      online_url TEXT,
+      organizer TEXT NOT NULL,
+      organizer_email TEXT,
+      status TEXT DEFAULT 'upcoming',
+      created_at TIMESTAMPTZ DEFAULT NOW()
+    );
+    CREATE INDEX IF NOT EXISTS idx_events_start_at ON events (start_at);
+    CREATE INDEX IF NOT EXISTS idx_events_status ON events (status);
+
+    CREATE TABLE IF NOT EXISTS notifications (
+      id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      user_email TEXT NOT NULL,
+      type TEXT NOT NULL,
+      actor_name TEXT,
+      actor_email TEXT,
+      entity_type TEXT,
+      entity_id TEXT,
+      message TEXT NOT NULL,
+      read_at TIMESTAMPTZ,
+      created_at TIMESTAMPTZ DEFAULT NOW()
+    );
+    CREATE INDEX IF NOT EXISTS idx_notifications_user ON notifications (user_email, read_at);
 
     CREATE TABLE IF NOT EXISTS translations (
       id TEXT PRIMARY KEY,
@@ -255,6 +332,43 @@ export async function migrate() {
       created_at TIMESTAMPTZ DEFAULT NOW(),
       updated_at TIMESTAMPTZ DEFAULT NOW()
     );
+
+    CREATE TABLE IF NOT EXISTS federation_resources (
+      federation_id TEXT PRIMARY KEY,
+      type TEXT NOT NULL,
+      slug TEXT,
+      title TEXT NOT NULL,
+      title_bn TEXT,
+      title_en TEXT,
+      author TEXT NOT NULL,
+      year INTEGER,
+      category TEXT,
+      description TEXT,
+      identifiers JSONB DEFAULT '{}'::jsonb,
+      languages JSONB DEFAULT '["bn","en"]'::jsonb,
+      license TEXT DEFAULT 'CC-BY-SA 4.0',
+      pdf_url TEXT,
+      read_url TEXT,
+      source_collection TEXT,
+      created_at TIMESTAMPTZ DEFAULT NOW()
+    );
+    CREATE INDEX IF NOT EXISTS idx_fed_res_type ON federation_resources (type);
+
+    CREATE TABLE IF NOT EXISTS organizations (
+      federation_id TEXT PRIMARY KEY,
+      name TEXT NOT NULL,
+      name_bn TEXT,
+      country TEXT,
+      country_flag TEXT,
+      type TEXT,
+      icon TEXT,
+      description TEXT,
+      members INTEGER DEFAULT 1,
+      verified BOOLEAN DEFAULT FALSE,
+      focus JSONB DEFAULT '[]'::jsonb,
+      created_at TIMESTAMPTZ DEFAULT NOW()
+    );
+    CREATE INDEX IF NOT EXISTS idx_orgs_country ON organizations (country);
   `);
 
   console.log('✅ All Neon tables and indexes created successfully.');
@@ -482,6 +596,232 @@ export async function migrate() {
       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9::jsonb)
       ON CONFLICT (id) DO UPDATE SET content = EXCLUDED.content;
     `, [id, author, country, flag, initials, lang, ptype, content, reactions]);
+  }
+
+  // Seed Events
+  const events = [
+    [
+      'evt_1',
+      'প্যালেস্টাইন সংহতি ও সাম্রাজ্যবাদবিরোধী বৈশ্বিক পদযাত্রা',
+      'প্যালেস্টাইন সংহতি ও সাম্রাজ্যবাদবিরোধী বৈশ্বিক পদযাত্রা',
+      'পশ্চিমা সাম্রাজ্যবাদী মদদ ও জায়নবাদী আগ্রাসনের বিরুদ্ধে বিশ্বের মুক্তিকামী জনতার সাথে একাত্মতা প্রকাশ।',
+      'rally',
+      'bn',
+      '2026-09-28T10:00:00Z',
+      'Asia/Dhaka',
+      'Bangladesh',
+      '🇧🇩',
+      'কেন্দ্রীয় শহীদ মিনার ও আন্তর্জাতিক ভার্চুয়াল সংযোগ',
+      'https://meet.theway-socialism.org/palestine-solidarity',
+      'আন্তর্জাতিক সংহতি ফ্রন্ট'
+    ],
+    [
+      'evt_2',
+      'সমাজতান্ত্রিক পাঠচক্র: গ্রামশির ‘প্রিজন নোটবুকস’ ও আধুনিক হেজেমনি',
+      'সমাজতান্ত্রিক পাঠচক্র: গ্রামশির ‘প্রিজন নোটবুকস’ ও আধুনিক হেজেমনি',
+      'সাংস্কৃতিক আধিপত্য, সুশীল সমাজ ও সর্বহারা বিপ্লবের রণকৌশল দ্বান্দ্বিক পাঠ।',
+      'study_circle',
+      'bn',
+      '2026-10-02T14:30:00Z',
+      'Asia/Dhaka',
+      'Bangladesh',
+      '🇧🇩',
+      'ভার্চুয়াল (দ্য ওয়ে স্টাডি রুম)',
+      'https://meet.theway-socialism.org/gramsci-circle',
+      'বাংলা সমাজতান্ত্রিক পাঠশালা'
+    ],
+    [
+      'evt_3',
+      'Global Labor Strike & Platform Capitalism Solidarity Forum',
+      'বৈশ্বিক শ্রমিক ধর্মঘট ও প্ল্যাটফর্ম পুঁজিবাদ সংহতি ফোরাম',
+      'International coordination against algorithmic exploitation, gig labor precarity, and anti-union legislation.',
+      'conference',
+      'en',
+      '2026-10-10T16:00:00Z',
+      'Europe/London',
+      'United Kingdom',
+      '🇬🇧',
+      'London & Global Livestream',
+      'https://meet.theway-socialism.org/labor-forum-2026',
+      "Workers' Study Collective"
+    ],
+    [
+      'evt_4',
+      'Capital — Círculo de Lectura en Español',
+      'কার্ল মার্ক্সের ‘পুঁজি’ পাঠচক্র (স্প্যানিশ ও আন্তর্জাতিক)',
+      'Análisis colectivo del Libro I de El Capital y las teorías contemporáneas de la dependencia.',
+      'study_circle',
+      'es',
+      '2026-10-15T22:00:00Z',
+      'America/Argentina/Buenos_Aires',
+      'Argentina',
+      '🇦🇷',
+      'Buenos Aires & Virtual Aula',
+      'https://meet.theway-socialism.org/capital-espanol',
+      'Frente Socialista Latinoamericano'
+    ]
+  ];
+
+  for (const [id, title, title_bn, desc, etype, lang, start_at, tz, country, flag, city, url, org] of events) {
+    await sql.query(`
+      INSERT INTO events (id, title, title_bn, description, event_type, language, start_at, timezone, country, country_flag, city, online_url, organizer, status)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, 'upcoming')
+      ON CONFLICT (id) DO UPDATE SET
+        title = EXCLUDED.title,
+        description = EXCLUDED.description,
+        start_at = EXCLUDED.start_at,
+        online_url = EXCLUDED.online_url;
+    `, [id, title, title_bn, desc, etype, lang, start_at, tz, country, flag, city, url, org]);
+  }
+
+  // Seed Initial Organizations (at least 10 for global representation)
+  const orgs = [
+    ['TW-O-000001', "Workers' Study Collective", "ওয়ার্কার্স স্টাডি কালেক্টিভ", "India", "🇮🇳", "Study Circle", "📚", "Autonomous worker-student reading collective studying political economy, trade unionism, and subcontinental labor history.", 120, true, JSON.stringify(["Labor", "Political Economy", "Education"])],
+    ['TW-O-000002', "Bangladesh Garment Sramik Sangram Parishad", "বাংলাদেশ গার্মেন্টস শ্রমিক সংগ্রাম পরিষদ", "Bangladesh", "🇧🇩", "Trade Union", "⚒️", "Federation of apparel trade unions fighting for living wages and safety democracy on factory floors.", 14500, true, JSON.stringify(["RMG Labor", "Living Wage", "Legal Rights"])],
+    ['TW-O-000003', "Movimento dos Trabalhadores Sem Terra (MST)", "মুভিমেন্তো দোস ত্রাবালিয়াদোরেস সেম তেরা (এমএসটি)", "Brazil", "🇧🇷", "Peasant Movement", "🌾", "Landless rural workers movement struggling for agrarian reform and agroecological popular sovereignty.", 350000, true, JSON.stringify(["Agrarian Reform", "Ecology", "Cooperatives"])],
+    ['TW-O-000004', "Hellenic Federation of Metalworkers", "হেলেনিক মেটালওয়ার্কার্স ফেডারেশন", "Greece", "🇬🇷", "Trade Union", "🏭", "National trade union federation defending metal and industrial workers against austerity.", 8200, true, JSON.stringify(["Industrial Labor", "Strikes", "Solidarity"])],
+    ['TW-O-000005', "Institut Tribune Socialiste", "আঁস্তিতু ত্রিবুন সোসিয়ালিস্ত", "France", "🇫🇷", "Research Center", "🎓", "Independent research center preserving the history of self-management socialism and democratic planning.", 430, false, JSON.stringify(["History", "Self-Management", "Archives"])],
+    ['TW-O-000006', "Sudanese Professionals Association", "تجمع المهنيين السودانيين", "Sudan", "🇸🇩", "Trade Union", "✊", "Alliance of Sudanese trade unions and professionals at the frontline of democratic popular resistance.", 25000, true, JSON.stringify(["Democracy", "Labor Rights", "General Strike"])],
+    ['TW-O-000007', "All-India Agricultural Workers Union (AIAWU)", "সারা ভারত খেতমজুর ইউনিয়ন", "India", "🇮🇳", "Peasant Movement", "🌾", "Mass agricultural labor organization fighting for land rights, rural minimum wages, and MGNREGA expansion.", 4200000, true, JSON.stringify(["Rural Labor", "Land Rights", "Anti-Feudalism"])],
+    ['TW-O-000008', "Kilusang Mayo Uno (KMU)", "মে ১ আন্দোলন ফিলিপাইন", "Philippines", "🇵🇭", "Trade Union", "⚒️", "Militant labor center organizing factory workers, transport drivers, and contractual laborers.", 120000, true, JSON.stringify(["Anti-Imperialism", "Contractualization", "Labor Rights"])],
+    ['TW-O-000009', "Central Unitaria de Trabajadores (CUT)", "একীভূত শ্রমিক কেন্দ্র চিলি", "Chile", "🇨🇱", "Trade Union", "🚩", "Historic Chilean national trade union confederation advocating democratic economic planning.", 310000, true, JSON.stringify(["Labor", "Social Security", "Mining Solidarity"])],
+    ['TW-O-000010', "National Union of Metalworkers of South Africa (NUMSA)", "দক্ষিণ আফ্রিকা মেটালওয়ার্কার্স ইউনিয়ন", "South Africa", "🇿🇦", "Trade Union", "⚙️", "Largest socialist trade union in Africa resisting neoliberal privatization and mining monopolies.", 340000, true, JSON.stringify(["Manufacturing", "Nationalization", "Pan-African Solidarity"])]
+  ];
+
+  for (const [fid, name, name_bn, country, flag, otype, icon, desc, mems, ver, focus] of orgs) {
+    await sql.query(`
+      INSERT INTO organizations (federation_id, name, name_bn, country, country_flag, type, icon, description, members, verified, focus)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11::jsonb)
+      ON CONFLICT (federation_id) DO UPDATE SET
+        name = EXCLUDED.name,
+        name_bn = EXCLUDED.name_bn,
+        country = EXCLUDED.country,
+        country_flag = EXCLUDED.country_flag,
+        type = EXCLUDED.type,
+        icon = EXCLUDED.icon,
+        description = EXCLUDED.description,
+        members = EXCLUDED.members,
+        verified = EXCLUDED.verified,
+        focus = EXCLUDED.focus;
+    `, [fid, name, name_bn, country, flag, otype, icon, desc, mems, ver, focus]);
+  }
+
+  // Seed Initial Federation Resources (Classics & Research Papers)
+  const classicIdentifiers: Record<string, { openlibrary?: string; wikidata?: string; doi?: string }> = {
+    'manifesto': { openlibrary: 'OL45804W', wikidata: 'Q131105' },
+    'capital-1': { openlibrary: 'OL7353617M', wikidata: 'Q5879' },
+    'state-rev': { openlibrary: 'OL2181775W', wikidata: 'Q1196144' },
+    'imperialism': { openlibrary: 'OL262768W', wikidata: 'Q686259' },
+    'what-is-done': { openlibrary: 'OL262760W', wikidata: 'Q1143822' },
+    'reform-rev': { openlibrary: 'OL13953503W', wikidata: 'Q1429986' },
+    'wretched-earth': { openlibrary: 'OL2717013W', wikidata: 'Q1197946' },
+    'pedagogy-oppressed': { openlibrary: 'OL2633083W', wikidata: 'Q1638634' },
+    'wage-labor': { openlibrary: 'OL45814W', wikidata: 'Q1889476' },
+    'socialism-utopian': { openlibrary: 'OL45811W', wikidata: 'Q1196720' }
+  };
+
+  try {
+    const fs = await import('fs');
+    const path = await import('path');
+    let booksDataPath = path.join(__dirname, '..', 'public', 'assets', 'js', 'books-data.js');
+    if (!fs.existsSync(booksDataPath)) {
+      booksDataPath = path.join(__dirname, '..', 'assets', 'js', 'books-data.js');
+    }
+    if (fs.existsSync(booksDataPath)) {
+      const content = fs.readFileSync(booksDataPath, 'utf8');
+      const match = content.match(/const\s+WORKS\s*=\s*(\[[\s\S]*?\]);\s*const/);
+      if (match) {
+        const fn = new Function(`return ${match[1]};`);
+        const works = fn() || [];
+        function parseYear(val: any): number {
+          if (!val) return 1900;
+          if (typeof val === 'number') return Math.floor(val);
+          const bnMap: Record<string, string> = { '০':'0','১':'1','২':'2','৩':'3','৪':'4','৫':'5','৬':'6','৭':'7','৮':'8','৯':'9' };
+          const s = String(val).replace(/[০-৯]/g, d => bnMap[d] || d);
+          const m = s.match(/\b(1[789]\d\d|20\d\d)\b/);
+          if (m) return parseInt(m[1], 10);
+          const digits = s.replace(/[^\d]/g, '').slice(0, 4);
+          const n = parseInt(digits, 10);
+          return isNaN(n) || n === 0 ? 1900 : n;
+        }
+
+        for (let idx = 0; idx < works.length; idx++) {
+          const w = works[idx];
+          const num = String(idx + 1).padStart(6, '0');
+          const fedId = `TW-W-${num}`;
+          const slug = w.slug || `work-${idx + 1}`;
+          const ids = classicIdentifiers[slug] || {};
+          const identifiers = JSON.stringify({
+            openlibrary: ids.openlibrary || null,
+            wikidata: ids.wikidata || null,
+            doi: ids.doi || null
+          });
+          const languages = JSON.stringify(['bn', 'en', 'es', 'de', 'ru', 'fr', 'pt', 'hi']);
+          const readUrl = w.hasJson ? `/book-reader.html?book=${slug}` : (w.pdf || `/books.html`);
+          const yr = parseYear(w.year);
+
+          await sql.query(`
+            INSERT INTO federation_resources (
+              federation_id, type, slug, title, title_bn, title_en, author, year, category, description, identifiers, languages, license, pdf_url, read_url, source_collection
+            ) VALUES ($1, 'work', $2, $3, $4, $5, $6, $7, $8, $9, $10::jsonb, $11::jsonb, $12, $13, $14, $15)
+            ON CONFLICT (federation_id) DO UPDATE SET
+              title = EXCLUDED.title,
+              title_bn = EXCLUDED.title_bn,
+              title_en = EXCLUDED.title_en,
+              author = EXCLUDED.author,
+              description = EXCLUDED.description,
+              read_url = EXCLUDED.read_url;
+          `, [
+            fedId, slug, w.title, w.title, w.titleEn || w.title, w.author, yr,
+            w.cat || 'marx', w.desc || '', identifiers, languages, 'Public Domain / Free Culture',
+            w.pdf || null, readUrl, 'লাল পাঠাগার (The Way Classics)'
+          ]);
+        }
+      }
+    }
+  } catch (e: any) {
+    console.warn('[Seed Warning] Could not seed classic works into federation_resources:', e.message);
+  }
+
+  // Seed default research papers
+  const papers = [
+    [
+      'TW-P-000001',
+      'Unequal Exchange and the Universal Law of Value in the 21st Century',
+      'একবিংশ শতকে অসম বিনিময় ও মূল্যের বৈশ্বিক নিয়ম',
+      'Unequal Exchange and the Universal Law of Value in the 21st Century',
+      'Samir Amin & Collective',
+      2018,
+      'theory',
+      'Empirical analysis of international value transfers from the Global South to monopoly capital.',
+      JSON.stringify({ doi: '10.1080/08854300.2018.1492582', openalex: 'W2741809807', wikidata: 'Q115862341' }),
+      JSON.stringify(['en', 'fr', 'es', 'bn']),
+      'CC-BY-SA 4.0'
+    ],
+    [
+      'TW-P-000002',
+      'Digital Taylorism, Platform Capitalism and the New Working Class',
+      'ডিজিটাল টেইলরিজম, প্ল্যাটফর্ম পুঁজিবাদ ও নতুন শ্রমজীবী শ্রেণি',
+      'Digital Taylorism, Platform Capitalism and the New Working Class',
+      'Ursula Huws',
+      2021,
+      'labor',
+      'Critical examination of algorithmic labor surveillance, gig economy piece rates, and international organizing.',
+      JSON.stringify({ doi: '10.1177/08969205211025732', openalex: 'W3165982012', wikidata: 'Q117498223' }),
+      JSON.stringify(['en', 'bn']),
+      'Open Access'
+    ]
+  ];
+
+  for (const [fid, title, title_bn, title_en, author, year, cat, desc, ids, langs, lic] of papers) {
+    await sql.query(`
+      INSERT INTO federation_resources (
+        federation_id, type, slug, title, title_bn, title_en, author, year, category, description, identifiers, languages, license, source_collection
+      ) VALUES ($1, 'paper', $1, $2, $3, $4, $5, $6, $7, $8, $9::jsonb, $10::jsonb, $11, 'Federated Academic Commons')
+      ON CONFLICT (federation_id) DO UPDATE SET
+        title = EXCLUDED.title,
+        description = EXCLUDED.description;
+    `, [fid, title, title_bn, title_en, author, year, cat, desc, ids, langs, lic]);
   }
 
   console.log('✨ Neon database migration and initial seed completed successfully!');

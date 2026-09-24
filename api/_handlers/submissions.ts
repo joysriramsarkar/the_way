@@ -227,5 +227,3 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
   }
 }
 
-module.exports = handler;
-(module.exports as any).default = handler;

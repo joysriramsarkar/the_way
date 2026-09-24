@@ -8,6 +8,7 @@ import openlibrary from './_connectors/openlibrary';
 import openalex from './_connectors/openalex';
 import wikidata from './_connectors/wikidata';
 import resourcesHandler from './_handlers/resources';
+import { getAllBooks } from '../data/books-data';
 import type { ApiRequest, ApiResponse } from '../types';
 
 export default async function handler(req: ApiRequest, res: ApiResponse) {
@@ -83,13 +84,59 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
     })());
   }
 
-  // 2. Search Books
+  // 2. Search Books — first search local library, then fall back to Open Library
   if (category === 'all' || category === 'books') {
     tasks.push((async () => {
       try {
+        // Search local books-data first (supports Bengali titles and socialist works)
+        const qLower = q.toLowerCase();
+        const localMatches = getAllBooks().filter(b =>
+          b.title.toLowerCase().includes(qLower) ||
+          (b.orig || '').toLowerCase().includes(qLower) ||
+          b.author.toLowerCase().includes(qLower) ||
+          (b.desc || '').toLowerCase().includes(qLower)
+        ).slice(0, 6).map(b => ({
+          id: b.id,
+          type: 'book',
+          title: b.title,
+          subtitle: b.orig || '',
+          author: b.author,
+          year: b.year,
+          url: `/library#${b.cat}`,
+          source: 'local'
+        }));
+
+        // Then fetch from Open Library for broader results
         const olBooks = await openlibrary.searchBooks(primarySearchTerm, { limit: 6 });
-        results.books = olBooks;
-      } catch (e) {}
+
+        // Merge — local results first to avoid duplicates
+        const combined: any[] = [...localMatches];
+        for (const ob of olBooks) {
+          if (!combined.find(l => l.title.toLowerCase() === ((ob as any).title || '').toLowerCase())) {
+            combined.push(ob);
+          }
+        }
+        results.books = combined.slice(0, 10);
+      } catch (e) {
+        // Fallback: just search local books
+        try {
+          const qLower = q.toLowerCase();
+          results.books = getAllBooks().filter(b =>
+            b.title.toLowerCase().includes(qLower) ||
+            (b.orig || '').toLowerCase().includes(qLower) ||
+            b.author.toLowerCase().includes(qLower)
+          ).slice(0, 8).map(b => ({
+            id: b.id,
+            type: 'book',
+            title: b.title,
+            subtitle: b.orig || '',
+            author: b.author,
+            year: b.year,
+            url: `/library#${b.cat}`,
+            source: 'local'
+          }));
+        } catch {}
+      }
     })());
   }
 
@@ -172,5 +219,3 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
   });
 }
 
-module.exports = handler;
-(module.exports as any).default = handler;

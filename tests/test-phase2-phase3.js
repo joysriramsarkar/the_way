@@ -19,8 +19,8 @@ async function runTests() {
     }
   }
 
-  // ── 1. TEST LOCALES JSON VALIDITY ─────────────────────────────────
-  const locales = ['bn', 'en', 'es', 'hi', 'ar', 'pt', 'fr'];
+  // ── 1. TEST LOCALES JSON VALIDITY (ALL 8 LOCALES) ─────────────────
+  const locales = ['bn', 'en', 'es', 'hi', 'ar', 'pt', 'fr', 'ru'];
   for (const loc of locales) {
     try {
       const p = path.join(__dirname, '..', 'public', 'locales', `${loc}.json`);
@@ -127,19 +127,25 @@ async function runTests() {
     assert(responseData && responseData.success && Array.isArray(responseData.posts), `Network API GET posts (${responseData.posts?.length} posts)`);
   }
 
+  const jwt = require('jsonwebtoken');
+  const secret = process.env.SESSION_SECRET || 'theway_dev_session_secret_12345';
+  const tokenUser1 = jwt.sign({ email: 'joy@theway-socialism.org', name: 'Comrade Joy', role: 'Admin' }, secret);
+  const tokenUser2 = jwt.sign({ email: 'lenin@theway-socialism.org', name: 'Comrade Lenin', role: 'Contributor' }, secret);
+
   let createdPostId = null;
   {
-    // CREATE Post
+    // CREATE Post (requires authenticated session)
     const req = {
       method: 'POST',
       query: { action: 'create_post' },
       body: {
         content: 'সংহতি সমাবেশ এবং আন্তর্জাতিক মুক্ত কমরেডশিপ নেটওয়ার্ক টেস্ট পোস্ট।',
-        author: { name: 'Comrade Joy', username: 'joy_sarkar', role: 'Editorial Board' },
         category: 'debate',
         tags: ['solidarity', 'test']
       },
-      headers: {}
+      headers: {
+        authorization: 'Bearer ' + tokenUser1
+      }
     };
     let responseData = null;
     const res = {
@@ -148,17 +154,19 @@ async function runTests() {
       setHeader() {}
     };
     await networkHandler(req, res);
-    assert(responseData && responseData.success && responseData.post?.id, `Network API create post (${responseData.post?.id})`);
+    assert(responseData && responseData.success && responseData.post?.id, `Network API create post (${responseData?.post?.id})`);
     createdPostId = responseData?.post?.id;
   }
 
   if (createdPostId) {
-    // REACT to Post
+    // REACT to Post (User 2 reacts to User 1's post -> count increases to 2)
     const req = {
       method: 'POST',
       query: { action: 'react' },
       body: { post_id: createdPostId, type: 'solidarity' },
-      headers: {}
+      headers: {
+        authorization: 'Bearer ' + tokenUser2
+      }
     };
     let responseData = null;
     const res = {
@@ -169,12 +177,14 @@ async function runTests() {
     await networkHandler(req, res);
     assert(responseData && responseData.success && responseData.reactions?.solidarity === 2, `Network API react to post (count: ${responseData.reactions?.solidarity})`);
 
-    // COMMENT on Post
+    // COMMENT on Post (requires authenticated session)
     const cReq = {
       method: 'POST',
       query: { action: 'comment' },
-      body: { post_id: createdPostId, author: 'Comrade Lenin', content: 'দারুণ উদ্যোগ!' },
-      headers: {}
+      body: { post_id: createdPostId, content: 'দারুণ উদ্যোগ!' },
+      headers: {
+        authorization: 'Bearer ' + tokenUser2
+      }
     };
     let cData = null;
     const cRes = {

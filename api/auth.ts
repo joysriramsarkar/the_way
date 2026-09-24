@@ -10,7 +10,18 @@ import { logActivity } from './_lib/activity';
 import type { ApiRequest, ApiResponse } from '../types';
 
 export default async function handler(req: ApiRequest, res: ApiResponse) {
-  res.setHeader('Access-Control-Allow-Origin', (req.headers.origin as string) || '*');
+  const origin = req.headers?.origin as string;
+  const allowedOrigins = [
+    'https://thewaysocialist.vercel.app',
+    'http://localhost:3000',
+    'http://localhost:5173',
+    'http://127.0.0.1:3000'
+  ];
+  if (origin && (allowedOrigins.includes(origin) || origin.endsWith('.vercel.app'))) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+  } else if (!origin) {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+  }
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Authorization, Content-Type');
   res.setHeader('Access-Control-Allow-Credentials', 'true');
@@ -66,7 +77,8 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
 
       const emailNorm = String(email).trim().toLowerCase();
       const nameNorm = String(name).trim();
-      const userRole = ['Admin', 'Moderator', 'Editor', 'Contributor', 'User'].includes(role) ? role : 'Contributor';
+      // Security: Public registration cannot assign Admin/Editor/Moderator roles
+      const userRole = role === 'User' ? 'User' : 'Contributor';
       const pwdHash = hashPassword(password);
       const secret = process.env.SESSION_SECRET || 'theway_revolutionary_portal_jwt_secret_key_2026';
 
@@ -133,7 +145,6 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
 
       const emailNorm = String(email).trim().toLowerCase();
       const primaryAdminEmail = (process.env.ADMIN_EMAIL || 'joysriram.sarkar.56@gmail.com').trim().toLowerCase();
-      const primaryAdminPassword = process.env.ADMIN_PASSWORD || 'theway@admin2026';
       const secret = process.env.SESSION_SECRET || 'theway_revolutionary_portal_jwt_secret_key_2026';
 
       let matchedUser: any = null;
@@ -149,20 +160,12 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
         matchedUser = dbAdmin;
         if (dbAdmin.password_hash && verifyPassword(password, dbAdmin.password_hash)) {
           isValidPassword = true;
-        } else if (password === primaryAdminPassword || password === 'theway@admin2026') {
+        } else if (!dbAdmin.password_hash && process.env.ADMIN_PASSWORD && password === process.env.ADMIN_PASSWORD) {
+          // One-time setup/migration of primary admin password hash to database
           isValidPassword = true;
+          const newHash = hashPassword(password);
+          await sql.query('UPDATE allowed_admins SET password_hash = $1 WHERE id = $2', [newHash, dbAdmin.id]);
         }
-      }
-
-      // Master credentials fallback for primary admin
-      if (!isValidPassword && emailNorm === primaryAdminEmail && (password === primaryAdminPassword || password === 'theway@admin2026')) {
-        isValidPassword = true;
-        matchedUser = {
-          email: primaryAdminEmail,
-          role: 'Admin',
-          name: 'Joysriram Sarkar',
-          status: 'active'
-        };
       }
 
       if (!isValidPassword || !matchedUser) {
@@ -247,5 +250,3 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
   }
 }
 
-module.exports = handler;
-(module.exports as any).default = handler;

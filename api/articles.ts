@@ -79,7 +79,7 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
     }
 
     // ── GET SINGLE ARTICLE: by slug or by ID ────────────────────────
-    if (action === 'public-get' && req.method === 'GET') {
+    if ((action === 'public-get' || action === 'get') && req.method === 'GET') {
       const slug = (req.query.slug as string) || '';
       if (id) {
         const session = await requireAuth(req, res);
@@ -474,5 +474,3 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
   }
 }
 
-module.exports = handler;
-(module.exports as any).default = handler;

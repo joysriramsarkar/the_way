@@ -50,7 +50,7 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
         total: rows.length,
         projects: rows,
         proposals: rows,
-        languages: ['bn', 'en', 'es', 'hi', 'ar', 'pt', 'fr', 'ru']
+        languages: ['bn', 'en', 'es', 'hi', 'ar', 'pt', 'fr', 'ru', 'zh']
       });
     }
 
@@ -166,5 +166,3 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
   }
 }
 
-module.exports = handler;
-(module.exports as any).default = handler;

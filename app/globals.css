@@ -1,0 +1,26 @@
+@import "../public/assets/css/style.css";
+@import "../public/assets/css/network.css";
+@import "../public/assets/css/article.css";
+@import "../public/assets/css/laal-pathagar.css";
+
+/* App Router enhancements */
+html, body {
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+}
+
+#__next, main {
+  flex: 1;
+}
+
+.main-wrapper {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+#main-content {
+  flex: 1;
+  width: 100%;
+}

@@ -10,6 +10,7 @@ import openlibrary from '../_connectors/openlibrary';
 import openalex from '../_connectors/openalex';
 import crossref from '../_connectors/crossref';
 import wikidata from '../_connectors/wikidata';
+import { WORKS } from '../../data/books-data';
 import type { ApiRequest, ApiResponse } from '../../types';
 
 // Load local books data
@@ -17,38 +18,24 @@ let localBooksCache: any[] | null = null;
 function getLocalBooks(): any[] {
   if (localBooksCache) return localBooksCache;
   try {
-    let booksDataPath = path.join(process.cwd(), 'public', 'assets', 'js', 'books-data.js');
-    if (!fs.existsSync(booksDataPath)) {
-      booksDataPath = path.join(__dirname, '..', '..', 'public', 'assets', 'js', 'books-data.js');
-    }
-    if (fs.existsSync(booksDataPath)) {
-      const content = fs.readFileSync(booksDataPath, 'utf8');
-      const match = content.match(/const\s+WORKS\s*=\s*(\[[\s\S]*?\]);\s*const/);
-      if (match) {
-        try {
-          const fn = new Function(`return ${match[1]};`);
-          const works = fn();
-          localBooksCache = works.map((w: any) => ({
-            id: `local:${w.slug || w.id || Math.random().toString(36).slice(2)}`,
-            external_id: w.slug,
-            provider: 'local',
-            type: 'book',
-            title: w.title,
-            title_bn: w.title,
-            title_en: w.titleEn || w.title,
-            author: w.author,
-            year: w.year,
-            category: w.cat,
-            description: w.desc,
-            has_fulltext: !!w.hasJson,
-            pdf_url: w.pdf,
-            read_url: w.hasJson ? `/book-reader.html?book=${w.slug}` : (w.pdf || '/books.html'),
-            source: 'লাল পাঠাগার (Laal Pathagar)'
-          }));
-          return localBooksCache || [];
-        } catch (e) {}
-      }
-    }
+    localBooksCache = WORKS.map((w: any) => ({
+      id: `local:${w.slug || w.id || Math.random().toString(36).slice(2)}`,
+      external_id: w.slug || w.id,
+      provider: 'local',
+      type: 'book',
+      title: w.title,
+      title_bn: w.title,
+      title_en: w.orig || w.title,
+      author: w.author,
+      year: w.year,
+      category: w.cat,
+      description: w.desc,
+      has_fulltext: !!w.hasJson,
+      pdf_url: w.pdf,
+      read_url: w.hasJson ? `/books/${w.slug || w.id}` : (w.pdf || '/books'),
+      source: 'লাল পাঠাগার (Laal Pathagar)'
+    }));
+    return localBooksCache || [];
   } catch (e: any) {
     console.error('[Resources] Error reading local books:', e.message);
   }
@@ -218,5 +205,3 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
   });
 }
 
-module.exports = handler;
-(module.exports as any).default = handler;

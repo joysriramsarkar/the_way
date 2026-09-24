@@ -10,3 +10,6 @@ desktop.ini
 *.log
 books project/
 
+.next/
+.agents/
+*.tsbuildinfo

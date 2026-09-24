@@ -2420,3 +2420,25 @@ body.modal-open {
     margin-top: 10px;
   }
 }
+
+/* admin theme extra */
+.admin-theme-extra {}
+input[type="text"], input[type="search"], input[type="email"], input[type="password"], input[type="url"], select, textarea {
+  background-color: var(--card-bg) !important;
+  color: var(--text-primary) !important;
+  border-color: var(--border) !important;
+}
+.card, .panel, .modal-box, .modal-content {
+  background: var(--card-bg) !important;
+  color: var(--text-primary) !important;
+  border-color: var(--border) !important;
+}
+.data-table th {
+  background: var(--content-bg) !important;
+  color: var(--text-secondary) !important;
+  border-bottom: 1px solid var(--border) !important;
+}
+.data-table td {
+  border-bottom: 1px solid var(--border) !important;
+  color: var(--text-primary) !important;
+}

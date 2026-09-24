@@ -4,18 +4,24 @@
   "description": "দ্য ওয়ে (The Way) — আন্তর্জাতিক সমাজতান্ত্রিক চিন্তন ও গণআন্দোলনের উন্মুক্ত পোর্টাল",
   "private": true,
   "scripts": {
-    "dev": "tsx dev-server.ts",
-    "start": "tsx dev-server.ts",
-    "build": "tsc --noEmit",
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
     "type-check": "tsc --noEmit",
+    "legacy-dev": "tsx dev-server.ts",
     "test": "tsx tests/test-phase2-phase3.js && tsx tests/test-final-phases.js"
   },
   "dependencies": {
     "@neon/config": "^1.7.2",
     "@neon/env": "^1.4.3",
     "@neondatabase/serverless": "^1.1.0",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
     "google-auth-library": "^11.0.2",
     "jsonwebtoken": "^9.0.2",
+    "next": "^16.3.6",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0",
     "webp-converter": "^3.0.1"
   },
   "devDependencies": {

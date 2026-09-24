@@ -149,5 +149,3 @@ ${schemaJson}
   return res.end(html);
 }
 
-module.exports = handler;
-(module.exports as any).default = handler;

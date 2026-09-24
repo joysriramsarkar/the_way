@@ -2,6 +2,7 @@
  * api/admins.ts — Single endpoint for all admin management operations using Neon PostgreSQL
  */
 
+import crypto from 'crypto';
 import { requireAuth, requireAdmin, verifySession, hashPassword } from './_lib/auth';
 import { logActivity } from './_lib/activity';
 import activityLogHandler from './_handlers/activity-log';
@@ -77,7 +78,8 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
         if (existing.status === 'deleted') return res.status(400).json({ error: 'already_in_recycle', message: 'This email is in the Recycle bin. Go to the Recycle tab and restore them instead.' });
       }
 
-      const pwdHash = password ? hashPassword(password) : hashPassword('theway@admin2026');
+      const initialPassword = password ? String(password) : crypto.randomBytes(8).toString('hex');
+      const pwdHash = hashPassword(initialPassword);
 
       const createdRows = await sql.query(`
         INSERT INTO allowed_admins (email, name, password_hash, role, bio, added_by, status)
@@ -259,5 +261,3 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
   }
 }
 
-module.exports = handler;
-(module.exports as any).default = handler;
